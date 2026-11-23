@@ -193,6 +193,60 @@ Problems seen:
   turns it back into a normal result; the proper fix belongs in
   `client/src/ladder.ts`.
 
+### Custom mode, Paste, launch suggestion, edge cases (2026-11-24, test wallet)
+
+Emulator `rung-play35`, devnet, `com.solana.mwallet` (mock wallet, no-lock
+patch), 0.01 SOL. Signatures (open / filled try):
+
+- Custom 0.5, 1.5, 2.5 on `9ZootZ8ZhnsqgYFfvKMs3vVy5EsgcH7WTuip6NHwqc6U`: open
+  `3WDFWyMpJU6AQ3kBSQqsUSBSB1i2385yubahbnvxPSMqPyKHJzLYRJTwykrDpTHzAYs4vC7PKidBM71gubVVQcHW`,
+  filled on try 0.5% `3wAob3SoEsER6QTwLZcNZH7YyN6wCP8cuRCWVKZCTNVf8iM7o1wToautSyKYiXiLv2jyoAyqGgiunfmwLKwjSsMq`;
+  receipt "This buy needed: 0.5%" ([screen](../docs/shots/app-11-custom.png),
+  [receipt](../docs/shots/app-12-custom-receipt.png)).
+- Custom with one rung (2%) on `6ye39DUC4wbkKy4mTEvkn8pcwfaybWWkNuSqJJmYYgAU`: open
+  `4PpPYUJAExRQhub2CQ73ni7Z6Y5o4qZ1sx5KUkfRX2X369Z47vhbW5fURwEG5zQSYtE5fudjn3cufvr62eLNLXT7`,
+  filled on try 2% `653rjvUKFLMXnwbm7ZgcpkmvkFFfef4eRX3J1xTwCNL2inNxXaKodJacAnA4y5q8xKGSihZ8JCQoHMuvujU4M2rQ`.
+- Tight, app sent to the background on the ladder screen and brought back from
+  the launcher after 25 s: open
+  `56t2q8e3KUT1hrpExgDoeRHpF5ysXgo1ysG5qt3EhLxSSoy3r3MBRzduFyRRxB8Gta65Z2dwrRGdM3YAraA1VmAL`,
+  the receipt (filled on try 1%) was on screen on return.
+
+Found and fixed:
+
+- **Decimal comma in custom rungs**: "1,5" (a Turkish keyboard's 1.5) was
+  read as two rungs, 1% and 5%, with the Buy button on. A comma between two
+  digits is now refused with "Use a dot for decimals (1.5) and a comma and space
+  between rungs (1, 2, 3)." (`src/flow/plan.ts`). "1,2,3" without spaces is
+  refused the same way.
+- **Decimal comma in the amount**: "0,01" gave "Enter an amount in SOL.";
+  it is now read as 0.01 (`src/flow/format.ts`).
+- **Launch suggestion stayed on**: the curve age was read once, so "suggested
+  for a token's first two minutes" stayed after the token was two minutes old
+  (seen at 144 s). The creation time is kept now and the label goes away at
+  120 s (seen live; `src/screens/BuyScreen.tsx`).
+- **Connect / Disconnect not shown**: after Disconnect the wallet line stayed,
+  and after the first Connect "The button connects your wallet first." stayed,
+  until the app was restarted (the saved value was right). The cache is now set
+  directly instead of being invalidated (`src/utils/useAuthorization.tsx`).
+- **Network off**: a buy showed "Something went wrong: Network request failed";
+  now "No network connection. Check it and try again." (`App.tsx`).
+
+Seen, not changed:
+
+- Backgrounding the app right after approving in the wallet (before Rung sent
+  the transaction) for about 30 s: the send failed with `Blockhash not found`
+  and nothing was sent (same cause as "Approval took too long" above).
+- Android Back on the History screen closes the app instead of going back to
+  the previous screen (the screen's own Back button works).
+- Typing a 44-character address quickly with `adb shell input text` dropped
+  characters in the address field; pasting or typing in chunks did not.
+- An invalid pasted text shows "This is not a token address."; a completed
+  curve "Pool tokens are not supported yet."; a token without a curve (wSOL)
+  "This token is not on a pump.fun bonding curve."; a program address and
+  another non-token account "This address is not a token."; amounts 0.0009 and 0.51 "Amount must be
+  between 0.001 and 0.5 SOL."; an amount above the connected wallet's balance
+  "Not enough SOL in the wallet for this buy." (all with the Buy button off).
+
 - `JAVA_TOOL_OPTIONS` breaks the native build: it fails at
   `:expo-modules-core:configureCMakeDebug[x86_64]` with
   `[CXX1210] ... No compatible library found`. AGP runs the prefab CLI and

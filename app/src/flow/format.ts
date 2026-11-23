@@ -47,7 +47,9 @@ export const explorerTx = (signature: string) => `https://explorer.solana.com/tx
 
 /** "0.01" -> 10_000_000n; null if it is not a SOL amount with at most 9 decimals. */
 export function parseSol(text: string): bigint | null {
-  const m = /^(\d+)(?:\.(\d{0,9}))?$/.exec(text.trim());
+  // A decimal comma ("0,01") is what the decimal pad types in a Turkish locale;
+  // an amount has one number, so the comma can only be the decimal mark.
+  const m = /^(\d+)(?:[.,](\d{0,9}))?$/.exec(text.trim());
   if (!m) return null;
   return BigInt(m[1]) * LAMPORTS + BigInt((m[2] ?? "").padEnd(9, "0"));
 }

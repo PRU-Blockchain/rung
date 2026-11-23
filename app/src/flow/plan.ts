@@ -42,6 +42,10 @@ export const rungsForMode = (mode: Exclude<Mode, "custom">) => [...MODES[mode]];
  * rungs break the program's rules (1-5 rungs, increasing, cap at most 30%).
  */
 export function parseCustomRungs(text: string): { rungs: number[] } | { error: string } {
+  // "1,5" (a decimal comma, as a Turkish keyboard types it) was read as two
+  // rungs, 1% and 5%, without a word. A comma between two digits is ambiguous,
+  // so ask for a dot instead of guessing.
+  if (/\d,\d/.test(text)) return { error: "Use a dot for decimals (1.5) and a comma and space between rungs (1, 2, 3)." };
   const parts = text.split(/[,\s]+/).filter(Boolean);
   if (parts.length < 1 || parts.length > MAX_RUNGS) return { error: `Enter 1 to ${MAX_RUNGS} rungs, in percent.` };
   const rungs: number[] = [];

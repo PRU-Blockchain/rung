@@ -95,8 +95,11 @@ export function useAuthorization() {
   });
   const { mutateAsync: setAuthorization } = useMutation({
     mutationFn: persistAuthorization,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["wallet-authorization"] });
+    // Put the new value in the cache directly. With only an invalidate, the
+    // screen kept showing the old state after Connect or Disconnect (seen with
+    // the test wallet on the emulator) until the app was restarted.
+    onSuccess: (_, auth) => {
+      queryClient.setQueryData(["wallet-authorization"], auth);
     },
   });
 

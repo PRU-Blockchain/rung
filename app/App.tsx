@@ -36,7 +36,13 @@ type Screen =
   | { name: "not-bought"; r: Receipt }
   | { name: "history"; back: Screen };
 
-const message = (e: unknown) => (e instanceof BuyError ? e.message : `Something went wrong: ${(e as Error)?.message ?? e}`);
+// With the network off, a buy only showed "Something went wrong: Network request failed".
+const message = (e: unknown) =>
+  e instanceof BuyError
+    ? e.message
+    : /Network request failed/i.test(String((e as Error)?.message ?? e))
+      ? "No network connection. Check it and try again."
+      : `Something went wrong: ${(e as Error)?.message ?? e}`;
 
 function Main() {
   const { selectedAccount } = useAuthorization();

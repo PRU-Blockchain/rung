@@ -35,7 +35,10 @@ export function BuyScreen(props: {
   const [mintText, setMintText] = useState("");
   const [market, setMarket] = useState<Market | null>(null);
   const [marketError, setMarketError] = useState<string | null>(null);
-  const [ageSeconds, setAgeSeconds] = useState<number | null>(null);
+  // When the curve was created (unix seconds). The age used to be read once, so
+  // "suggested for a token's first two minutes" stayed on after two minutes.
+  const [createdAt, setCreatedAt] = useState<number | null>(null);
+  const [, setAgeTick] = useState(0);
   const [mode, setMode] = useState<Mode>("tight");
   const [customText, setCustomText] = useState("1, 2, 3");
   const [amountText, setAmountText] = useState("0.01");
@@ -49,7 +52,7 @@ export function BuyScreen(props: {
   useEffect(() => {
     setMarket(null);
     setMarketError(null);
-    setAgeSeconds(null);
+    setCreatedAt(null);
     const text = mintText.trim();
     if (!text) return;
     const mint = parseMint(text);
@@ -63,7 +66,7 @@ export function BuyScreen(props: {
         .then((m) => live && setMarket(m))
         .catch((e) => live && setMarketError(e instanceof MarketError ? e.message : "Could not read this token. Check the network."));
       curveAgeSeconds(mint)
-        .then((a) => live && setAgeSeconds(a))
+        .then((a) => live && a !== null && setCreatedAt(Date.now() / 1000 - a))
         .catch(() => undefined);
     }, 300);
     return () => {
@@ -71,6 +74,16 @@ export function BuyScreen(props: {
       clearTimeout(t);
     };
   }, [mintText]);
+
+  // Re-render once the curve turns two minutes old, so the suggestion goes away.
+  useEffect(() => {
+    if (createdAt === null) return;
+    const left = createdAt + YOUNG_CURVE_SECONDS - Date.now() / 1000;
+    if (left <= 0) return;
+    const t = setTimeout(() => setAgeTick((n) => n + 1), left * 1000 + 100);
+    return () => clearTimeout(t);
+  }, [createdAt]);
+  const young = createdAt !== null && Date.now() / 1000 - createdAt < YOUNG_CURVE_SECONDS;
 
   // Refresh the curve (quote), the wallet balance and the order account every few seconds.
   const marketRef = useRef(market);
@@ -187,7 +200,7 @@ export function BuyScreen(props: {
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           {MODE_OPTIONS.map((o) => {
             const on = mode === o.mode;
-            const suggested = o.mode === "launch" && ageSeconds !== null && ageSeconds < YOUNG_CURVE_SECONDS;
+            const suggested = o.mode === "launch" && young;
             return (
               <Pressable
                 key={o.mode}
