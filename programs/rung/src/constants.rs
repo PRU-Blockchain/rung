@@ -15,8 +15,19 @@ pub const MAX_RUNGS: usize = 5;
 /// 100% in basis points.
 pub const BPS_DENOMINATOR: u64 = 10_000;
 
-/// The highest cap an order may set (Custom mode): 50%.
-pub const MAX_CAP_BPS: u16 = 5_000;
+/// The highest cap an order may set: 30%, the cap of Launch mode. The cap is
+/// also the most a sandwich around the buy can take, so it is kept low.
+pub const MAX_CAP_BPS: u16 = 3_000;
+
+/// The quote with fees that the client supplies may be at most this far below
+/// its fee-free quote: 10%. (Pump's fee was 1.25% in November 2026.) Without
+/// this band a faulty client could sign away the protection unnoticed.
+pub const MAX_VENUE_FEE_BPS: u64 = 1_000;
+
+/// Most SOL the buy may take from the vault on top of the order amount: the
+/// rent of the buyer's volume account that pump creates on a first buy, with
+/// some room. Checked after the buy, whatever the called program did.
+pub const MAX_BUY_RENT_LAMPORTS: u64 = 2_500_000;
 
 /// Most SOL one order may spend: 0.5 SOL. The program is unaudited; large
 /// amounts must not sit in it. Raising this is a team decision.

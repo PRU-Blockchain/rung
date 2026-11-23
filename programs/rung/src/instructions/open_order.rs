@@ -109,6 +109,30 @@ pub fn handle_open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result
         args.expected_tokens_seen > 0 && args.raw_tokens_seen > 0,
         RungError::InvalidExpectedTokens
     );
+    // The two quotes must agree with each other: fees only reduce a quote,
+    // and by no more than `MAX_VENUE_FEE_BPS`. This keeps the ladder's start
+    // tied to the price the program reads, whatever the client sends.
+    let seen = args.expected_tokens_seen as u128;
+    let raw_seen = args.raw_tokens_seen as u128;
+    require!(
+        seen <= raw_seen
+            && seen * BPS_DENOMINATOR as u128
+                >= raw_seen * (BPS_DENOMINATOR - MAX_VENUE_FEE_BPS) as u128,
+        RungError::InvalidExpectedTokens
+    );
+    // A new account must hold the rent-exempt minimum or nothing at all.
+    if args.fee_budget > 0 {
+        let session_key_after = ctx
+            .accounts
+            .session_key
+            .lamports()
+            .checked_add(args.fee_budget)
+            .ok_or(RungError::MathOverflow)?;
+        require!(
+            session_key_after >= Rent::get()?.minimum_balance(0),
+            RungError::FeeBudgetBelowRent
+        );
+    }
     require!(args.venue == Venue::Curve, RungError::VenueNotSupported);
 
     // One open order per user: the vault never holds the SOL of two orders.

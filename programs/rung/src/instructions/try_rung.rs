@@ -153,6 +153,13 @@ pub fn handle_try_rung(ctx: Context<TryRung>, rung_index: u8) -> Result<()> {
         tokens_bought >= min_tokens_out,
         RungError::BoughtLessThanMinimum
     );
+    // The same for SOL: the buy may take the order amount plus a small rent
+    // allowance from the vault, and nothing more.
+    let lamports_taken = vault_before.saturating_sub(ctx.accounts.vault.lamports());
+    require!(
+        lamports_taken <= amount.saturating_add(MAX_BUY_RENT_LAMPORTS),
+        RungError::BuyTookTooMuchSol
+    );
     // What the trade itself cost: what left the vault, minus the rent pump
     // took for the buyer's volume account (created on the first buy).
     let accumulator_rent = accumulator.lamports().saturating_sub(accumulator_before);

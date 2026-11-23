@@ -18,7 +18,9 @@
 //!
 //! Cheat switch (tests only): if the first data byte of the `global` account is
 //! 1, the slippage check is skipped and only half of the quoted tokens are
-//! delivered. This lets the tests check Rung's own after-the-fact check.
+//! delivered. If that byte is 2, the full tokens are delivered but
+//! `OVERCHARGE_LAMPORTS` extra are taken from the buyer. These let the tests
+//! check Rung's own after-the-fact checks.
 
 use anchor_lang::prelude::*;
 use anchor_lang::system_program;
@@ -29,6 +31,10 @@ declare_id!("6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P");
 /// Fixed total fee of the double. The real fee comes from pump's fee config;
 /// this value is only a test choice.
 pub const FEE_BPS: u64 = 125;
+
+/// Extra lamports the double takes from the buyer when the second cheat
+/// switch is on (first data byte of `global` is 2).
+pub const OVERCHARGE_LAMPORTS: u64 = 2_000_000;
 
 pub const BONDING_CURVE_SEED: &[u8] = b"bonding-curve";
 pub const GLOBAL_SEED: &[u8] = b"global";
@@ -146,6 +152,24 @@ pub mod mock_pump {
             ),
             spendable_quote_in,
         )?;
+
+        // Second cheat (tests only): take extra lamports from the buyer.
+        let overcharge = {
+            let data = accounts.global.try_borrow_data()?;
+            data.first() == Some(&2)
+        };
+        if overcharge {
+            system_program::transfer(
+                CpiContext::new(
+                    accounts.system_program.key(),
+                    system_program::Transfer {
+                        from: accounts.user.to_account_info(),
+                        to: accounts.bonding_curve.to_account_info(),
+                    },
+                ),
+                OVERCHARGE_LAMPORTS,
+            )?;
+        }
 
         // 5. Tokens from the curve to the buyer's token account; the curve PDA signs.
         let mint_key = accounts.base_mint.key();

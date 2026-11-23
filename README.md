@@ -62,7 +62,7 @@ emulator -avd rung-play35
 anchor test        # builds the program and the test double, then runs `cargo test`
 ```
 
-The tests load the built program into LiteSVM and load the test double at pump's address. 117 tests: unit tests of the rung arithmetic, the ladder scenarios (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, and security tests (wrong signer, substituted accounts, a fake buy program, a buy program that delivers too few tokens, pre-funded accounts, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
+The tests load the built program into LiteSVM and load the test double at pump's address. 129 tests: unit tests of the rung arithmetic, the ladder scenarios (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, and security tests (wrong signer, substituted accounts, a fake buy program, a buy program that delivers too few tokens, pre-funded accounts, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
 
 ### Against the real pump program
 

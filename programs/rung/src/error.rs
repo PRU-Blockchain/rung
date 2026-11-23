@@ -61,4 +61,8 @@ pub enum RungError {
     VenueNotSupported,
     #[msg("The bonding curve is complete; the token trades in a pool now")]
     CurveComplete,
+    #[msg("The buy took more SOL from the vault than the order allows")]
+    BuyTookTooMuchSol,
+    #[msg("Fee budget would leave the new session key below rent exemption")]
+    FeeBudgetBelowRent,
 }

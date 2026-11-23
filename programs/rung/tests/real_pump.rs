@@ -468,6 +468,13 @@ struct RungRun {
     open_cu: u64,
 }
 
+/// The quote before fees. Pump gives about 1.23% less, so an order that
+/// expects this many tokens cannot fill on a 1% rung: a tight rung by design.
+fn fee_free_quote(env: &Real) -> u64 {
+    let (vt, vq) = env.reserves();
+    raw_quote(AMOUNT, vt, vq)
+}
+
 fn open_rung_order(env: &mut Real, expected_tokens_seen: u64) -> RungRun {
     let user = env.wallet(USER_AIRDROP);
     let session = Keypair::new();
@@ -602,9 +609,9 @@ fn t2_rung_vault_pda_buys_from_real_pump() {
 #[test]
 fn t3_tight_rung_fails_with_real_pump_slippage() {
     let Some(mut env) = Real::load() else { return };
-    let quote = env.real_quote(AMOUNT);
     // 5% more than pump will give: the 1% rung asks for ~4% more than possible.
-    let run = open_rung_order(&mut env, quote * 105 / 100);
+    let expects_too_many = fee_free_quote(&env);
+    let run = open_rung_order(&mut env, expects_too_many);
     let user = run.user.pubkey();
     let vault_before = env.balance(&vault_pda(&user));
     let res = try_rung_tx(&mut env, &run, 0);
@@ -629,7 +636,8 @@ fn t4_try_rung_compute_units() {
     let Some(mut env) = Real::load() else { return };
     let quote = env.real_quote(AMOUNT);
 
-    let tight = open_rung_order(&mut env, quote * 105 / 100);
+    let expects_too_many = fee_free_quote(&env);
+    let tight = open_rung_order(&mut env, expects_too_many);
     let fail = try_rung_tx(&mut env, &tight, 0);
     assert_code(&fail, PUMP_SLIPPAGE);
 
