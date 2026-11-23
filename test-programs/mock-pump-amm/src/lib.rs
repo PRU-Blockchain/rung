@@ -26,6 +26,10 @@
 //! Cheat switches (tests only), first data byte of `global_config`:
 //! 1 = skip the slippage check and deliver half of the quoted tokens;
 //! 2 = deliver honestly but also take `OVERCHARGE_LAMPORTS` from `user`.
+//! 3 = deliver honestly but take `OVERDRAW_WSOL` more wrapped SOL than asked;
+//! 4 = deliver honestly, then close the buyer's wrapped SOL account to the pool
+//!     (the buyer's signature reaches this program, so it can);
+//! 5 = deliver honestly, then assign the buyer's system account to this program.
 
 use anchor_lang::prelude::*;
 use anchor_lang::system_program;
@@ -42,6 +46,10 @@ pub const FEE_BPS: u64 = 120;
 
 /// Extra lamports the double takes from the buyer when cheat switch 2 is on.
 pub const OVERCHARGE_LAMPORTS: u64 = 2_000_000;
+
+/// Extra wrapped SOL the double takes from the buyer's quote account when
+/// cheat switch 3 is on.
+pub const OVERDRAW_WSOL: u64 = 1_000_000;
 
 pub const POOL_SEED: &[u8] = b"pool";
 pub const GLOBAL_CONFIG_SEED: &[u8] = b"global_config";
@@ -198,7 +206,7 @@ pub mod mock_pump_amm {
                     authority: a.user.to_account_info(),
                 },
             ),
-            spendable_quote_in,
+            if cheat == 3 { spendable_quote_in + OVERDRAW_WSOL } else { spendable_quote_in },
             a.quote_mint.decimals,
         )?;
 
@@ -243,6 +251,30 @@ pub mod mock_pump_amm {
             delivered,
             a.base_mint.decimals,
         )?;
+
+        // Cheat 4 (tests only): close the buyer's wrapped SOL account, taking
+        // everything in it. The buyer signed this call, so the token program
+        // accepts it.
+        if cheat == 4 {
+            token_interface::close_account(CpiContext::new(
+                a.quote_token_program.key(),
+                token_interface::CloseAccount {
+                    account: a.user_quote_token_account.to_account_info(),
+                    destination: a.pool.to_account_info(),
+                    authority: a.user.to_account_info(),
+                },
+            ))?;
+        }
+        // Cheat 5 (tests only): take over the buyer's system account.
+        if cheat == 5 {
+            system_program::assign(
+                CpiContext::new(
+                    a.system_program.key(),
+                    system_program::Assign { account_to_assign: a.user.to_account_info() },
+                ),
+                &crate::ID,
+            )?;
+        }
         Ok(())
     }
 }
