@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    // ../client/src has no node_modules here; type its web3.js import from the app's copy.
+    "paths": {
+      "@solana/web3.js": ["./node_modules/@solana/web3.js"]
+    }
+  }
+}

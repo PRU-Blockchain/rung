@@ -1,0 +1,22 @@
+diff --git a/app/src/main/java/com/solana/mwallet/usecase/EncryptionUseCase.kt b/app/src/main/java/com/solana/mwallet/usecase/EncryptionUseCase.kt
+index e06d251..3beb2d6 100644
+--- a/app/src/main/java/com/solana/mwallet/usecase/EncryptionUseCase.kt
++++ b/app/src/main/java/com/solana/mwallet/usecase/EncryptionUseCase.kt
+@@ -69,14 +69,9 @@ object EncryptionUseCase {
+                 KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+                 .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                 .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+-                .setUserAuthenticationRequired(true).apply {
+-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+-                        setUserAuthenticationParameters(KEY_VALIDITY_SECONDS,
+-                            KeyProperties.AUTH_BIOMETRIC_STRONG or KeyProperties.AUTH_DEVICE_CREDENTIAL)
+-                    } else {
+-                        setUserAuthenticationValidityDurationSeconds(KEY_VALIDITY_SECONDS)
+-                    }
+-                }
++                // TEST-ONLY PATCH (Rung): no user authentication, so the wallet works on an
++                // emulator without a screen lock. Never ship this; the key is then unprotected.
++                .setUserAuthenticationRequired(false)
+                 .build()).run { getSecretKey() }
+ 
+     private fun getCipher(): Cipher =
