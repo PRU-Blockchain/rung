@@ -40,7 +40,7 @@ const message = (e: unknown) => (e instanceof BuyError ? e.message : `Something 
 
 function Main() {
   const { selectedAccount } = useAuthorization();
-  const { connect, disconnect, signAndSendTransaction } = useMobileWallet();
+  const { connect, disconnect, signOpen } = useMobileWallet();
   const [screen, setScreen] = useState<Screen>({ name: "start" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,9 +56,12 @@ function Main() {
     setBusy(true);
     setError(null);
     try {
+      // Network work happens while Rung is in front (its requests failed from
+      // the background); the wallet then opens once, to authorize and sign.
+      // Without any cached account the first buy connects first.
       const user: PublicKey = selectedAccount?.publicKey ?? (await connect()).publicKey;
       const plan = await getPlan();
-      const opened = await openBuy(plan, user, signAndSendTransaction);
+      const opened = await openBuy(plan, user, signOpen);
       setScreen({ name: "ladder", running: opened });
     } catch (e) {
       setError(message(e));

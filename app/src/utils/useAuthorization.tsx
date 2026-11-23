@@ -67,14 +67,19 @@ function cacheReviver(key: string, value: unknown) {
 
 const AUTHORIZATION_STORAGE_KEY = "authorization-cache";
 
+/** The most recent authorization, shared by every hook instance (undefined until read). */
+let latestAuthorization: WalletAuthorization | null | undefined;
+
 async function fetchAuthorization(): Promise<WalletAuthorization | null> {
   const cached = await AsyncStorage.getItem(AUTHORIZATION_STORAGE_KEY);
-  return cached ? JSON.parse(cached, cacheReviver) : null;
+  latestAuthorization = cached ? JSON.parse(cached, cacheReviver) : null;
+  return latestAuthorization ?? null;
 }
 
 async function persistAuthorization(
   auth: WalletAuthorization | null
 ): Promise<void> {
+  latestAuthorization = auth;
   if (auth == null) {
     await AsyncStorage.removeItem(AUTHORIZATION_STORAGE_KEY);
   } else {
@@ -97,14 +102,26 @@ export function useAuthorization() {
 
   const authorizeSession = useCallback(
     async (wallet: AuthorizeAPI): Promise<Account> => {
-      const result = await wallet.authorize({
-        identity: APP_IDENTITY,
-        chain: CHAIN_IDENTIFIER,
-        auth_token: authorization?.authToken,
-      });
+      // The latest authorization, even when this callback was created before
+      // a connect that just happened (a buy connects, then signs at once).
+      const known = latestAuthorization !== undefined ? latestAuthorization : authorization;
+      let result: AuthorizationResult;
+      try {
+        result = await wallet.authorize({
+          identity: APP_IDENTITY,
+          chain: CHAIN_IDENTIFIER,
+          auth_token: known?.authToken,
+        });
+      } catch (e) {
+        if (!known?.authToken) throw e;
+        // The wallet refused the saved token (Phantom answers the legacy
+        // `reauthorize` with -1): ask for a fresh authorization instead.
+        console.log(`RUNG reauthorize refused, authorizing again: ${(e as Error)?.message ?? e}`);
+        result = await wallet.authorize({ identity: APP_IDENTITY, chain: CHAIN_IDENTIFIER });
+      }
       const next = getAuthorizationFromAuthorizationResult(
         result,
-        authorization?.selectedAccount
+        known?.selectedAccount
       );
       await setAuthorization(next);
       return next.selectedAccount;
@@ -114,8 +131,9 @@ export function useAuthorization() {
 
   const deauthorizeSession = useCallback(
     async (wallet: DeauthorizeAPI) => {
-      if (authorization?.authToken != null) {
-        await wallet.deauthorize({ auth_token: authorization.authToken });
+      const known = latestAuthorization !== undefined ? latestAuthorization : authorization;
+      if (known?.authToken != null) {
+        await wallet.deauthorize({ auth_token: known.authToken });
       }
       await setAuthorization(null);
     },

@@ -24,7 +24,11 @@ export function NotBoughtScreen(props: {
       <ScrollView contentContainerStyle={s.content}>
         <Header />
         <Text style={s.body}>Token {shortAddress(r.mint)}</Text>
-        {r.outcome === "not-bought" ? (
+        {r.outcome === "not-bought" && !r.transactions.some((t) => t.label.startsWith("try")) ? (
+          <Text style={[s.body, { fontWeight: "600" }]}>
+            The order ran out of time before any rung was tried. Not bought. Your SOL is back.
+          </Text>
+        ) : r.outcome === "not-bought" ? (
           <Text style={[s.body, { fontWeight: "600" }]}>{NOT_BOUGHT}</Text>
         ) : (
           <Text style={[s.body, { fontWeight: "600" }]}>
