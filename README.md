@@ -320,7 +320,7 @@ Environment variables (names only; no values are in the repository): `RPC_URL` (
 anchor test        # builds the program and the test double, then runs `cargo test`
 ```
 
-The tests load the built program into LiteSVM and load two test doubles, one at pump's address and one at PumpSwap's. 225 Rust tests: unit tests of the rung arithmetic, the ladder scenarios on both venues (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, the two references, events, the fixes after the two reviews, and security tests (wrong signer, substituted accounts, a pool that is not the token's own, a fake buy program, a buy program that delivers too few tokens, takes too much SOL or misuses the vault's signature, pre-funded accounts, a try that runs out of compute units, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
+The tests load the built program into LiteSVM and load two test doubles, one at pump's address and one at PumpSwap's. 226 Rust tests: unit tests of the rung arithmetic, the ladder scenarios on both venues (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, the two references, events, the fixes after the two reviews, and security tests (wrong signer, substituted accounts, a pool that is not the token's own, a fake buy program, a buy program that delivers too few tokens, takes too much SOL or misuses the vault's signature, pre-funded accounts, a try that runs out of compute units, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
 
 ```bash
 cd client && npm install && npm test     # 65 client tests, including byte-for-byte vectors from the Rust program
@@ -349,13 +349,14 @@ node scripts/fetch-pumpswap-fixtures.mjs # read-only: dumps PumpSwap's program a
 cargo test -p rung --test real_pumpswap -- --nocapture
 ```
 
-Same arrangement: the fixtures go to `programs/rung/tests/fixtures/pumpswap/` (git-ignored, source written to `SOURCE.md` there), and without them these nine tests pass without running. With them, the real program is loaded at PumpSwap's address in LiteSVM and:
+Same arrangement: the fixtures go to `programs/rung/tests/fixtures/pumpswap/` (git-ignored, source written to `SOURCE.md` there), and without them these ten tests pass without running. With them, the real program is loaded at PumpSwap's address in LiteSVM and:
 
 - the program's vault buys from the token's own pool through `try_rung` (`buy_exact_quote_in_v2`), wrapping the order's SOL for the buy and unwrapping what is left;
 - a rung that is too tight fails with PumpSwap's own error 6040, and the order stays open;
 - a `try_rung` that buys used 194,000 to 219,000 compute units there (154,000 to 171,000 in the devnet runs above);
 - the fees charged matched the tier read from PumpSwap's fee config in the snapshot of Nov 23, 2026 (20 + 5 + 95 basis points);
 - a pool marked cashback fails PumpSwap's v2 buy with its error 6079, which is why `open_order` refuses such pools.
+- the snapshot's mint is a Token-2022 mint; the same buy also went through for an SPL Token mint, on a pool constructed in the test from the snapshot pool (not one read from mainnet).
 
 The same limit applies: this is not mainnet.
 

@@ -11,7 +11,9 @@
 //! PumpSwap's slippage error · T4 compute units and transaction size · T5
 //! quote formula and real fee rate · T6 mayhem and cashback pools · T7 token
 //! accounts that are not associated token accounts · T8 buyback recipient ·
-//! T9 rent top-up of an older, shorter pool. T2-T4 need Rung's PumpSwap path.
+//! T9 rent top-up of an older, shorter pool · T10 Rung buys a mint of the other
+//! token program (the snapshot pool re-keyed to a new mint). T2-T4 and T10 need
+//! Rung's PumpSwap path.
 //! Run with `-- --nocapture` to see the numbers.
 
 mod common;
@@ -915,4 +917,88 @@ fn t9_short_pool_is_topped_up_by_user() {
         println!("T9 wallet paid {} = amount + ATAs + accumulator + fee + top-up {top_up}", b0 - env.balance(&me));
         assert_eq!(b0 - env.balance(&me), AMOUNT + base_ata + wsol + acc + SIG_FEE + top_up);
     }
+}
+
+// ---------------------------------------------------------------------------
+// T10: Rung buys a mint of the other token program from the real PumpSwap
+// ---------------------------------------------------------------------------
+
+/// Re-keys the snapshot pool to a new mint owned by `token_program`: a mint
+/// with the snapshot mint's base fields, its canonical pool (the snapshot
+/// pool's data with the mint, creator, bump and token accounts rewritten) and
+/// the pool's two token accounts at the snapshot's reserves. A constructed
+/// pool, not one read from mainnet.
+fn rekey_pool_to_new_mint(env: &mut Real, token_program: Pubkey) {
+    let old_mint = env.svm.get_account(&env.mint).unwrap();
+    let base = env.tokens(&env.pool.base_token_account).unwrap();
+    let quote = env.tokens(&env.pool.quote_token_account).unwrap();
+
+    let mint = Pubkey::new_unique();
+    let mint_data = old_mint.data[..82].to_vec();
+    let lamports = env.rent(mint_data.len());
+    env.svm.set_account(mint, Account { lamports, data: mint_data, owner: token_program, executable: false, rent_epoch: 0 }).unwrap();
+
+    let creator = pool_authority_pda(&mint);
+    let (address, bump) = pool_pda(0, &creator, &mint, &WSOL);
+    let pool = AmmPool {
+        address,
+        base_token_account: ata(&address, &mint, &token_program),
+        quote_token_account: ata(&address, &WSOL, &TOKEN),
+    };
+    let mut account = env.svm.get_account(&env.pool.address).unwrap();
+    account.data[8] = bump;
+    account.data[11..43].copy_from_slice(creator.as_ref());
+    account.data[43..75].copy_from_slice(mint.as_ref());
+    account.data[139..171].copy_from_slice(pool.base_token_account.as_ref());
+    account.data[171..203].copy_from_slice(pool.quote_token_account.as_ref());
+    env.svm.set_account(address, account).unwrap();
+
+    let rent = env.rent(165);
+    env.svm
+        .set_account(pool.base_token_account, Account { lamports: rent, data: pack_token_account(&mint, &address, base), owner: token_program, executable: false, rent_epoch: 0 })
+        .unwrap();
+    env.svm
+        .set_account(pool.quote_token_account, Account { lamports: rent + quote, data: pack_native_token_account(&address, quote, rent), owner: TOKEN, executable: false, rent_epoch: 0 })
+        .unwrap();
+
+    env.mint = mint;
+    env.token_program = token_program;
+    env.pool = pool;
+    assert_eq!(env.pool.address, canonical_pool(&mint));
+}
+
+#[test]
+fn t10_rung_buys_a_mint_of_the_other_token_program() {
+    let Some(mut env) = Real::load() else { return };
+    let other = if env.token_program == TOKEN { TOKEN_2022 } else { TOKEN };
+    let snapshot_quote = env.real_quote(AMOUNT);
+    rekey_pool_to_new_mint(&mut env, other);
+    println!("T10 snapshot mint was under another token program; constructed mint {} under {other}", env.mint);
+
+    // A plain wallet first: the real program accepts the constructed pool and
+    // prices it like the snapshot pool (same reserves, same fee tier).
+    let quote = env.real_quote(AMOUNT);
+    assert_eq!(quote, snapshot_quote);
+
+    let run = open_rung_order(&mut env, quote);
+    let user = run.user.pubkey();
+    let vault = vault_pda(&user);
+    let res = try_rung_tx(&mut env, &run, 0);
+    let cu = cu_of(&res);
+    if res.is_err() {
+        println!("T10 try_rung(0) FAILED: {:?} CU {cu}
+{}", err_of(&res), logs_of(&res));
+    }
+    ok(&res, "T10 try_rung(0) with the real PumpSwap");
+    let user_ata = ata(&user, &env.mint, &env.token_program);
+    let tokens = env.tokens(&user_ata).unwrap();
+    let o = env.order(&user);
+    println!("T10 OK try_rung CU {cu}; tokens {tokens}; user ATA rent {}", env.balance(&user_ata));
+    assert_eq!(o.status, OrderStatus::Filled);
+    assert_eq!(tokens, quote);
+    assert_eq!(o.tokens_bought, tokens);
+    assert_eq!(o.lamports_spent, AMOUNT);
+    assert_eq!(env.balance(&vault), 0);
+    assert!(env.account(&ata(&vault, &env.mint, &env.token_program)).is_none());
+    assert!(env.account(&wsol_ata(&vault)).is_none());
 }
