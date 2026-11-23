@@ -7,7 +7,7 @@ Work in progress for the Dev3pack Global Hackathon (Solana). Nothing in this rep
 | part | state |
 |---|---|
 | On-chain order program (Anchor) | written and tested locally, bonding curve only: against a test double of pump's buy instruction and against the real pump program dumped from mainnet, both inside LiteSVM. Deployed on **devnet** at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet). Not on mainnet. Reviewed once by an independent read-only pass, not audited. PumpSwap pools: not yet |
-| Android app (React Native + Expo, `app/`) | the buy flow works on **devnet** on an Android 15 emulator with Solana Mobile's mock wallet: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Screenshots from real devnet buys are in `docs/shots/`. Not tested: Custom mode, Phantom, Solflare, a real device, mainnet |
+| Android app (React Native + Expo, `app/`) | the buy flow works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys completed with Phantom, Solflare and Solana Mobile's mock wallet. Screenshots from real devnet buys are in `docs/shots/`; wallet notes in [`app/README.md`](app/README.md). Not tested: Custom mode, a real device, mainnet |
 | Web page (`web/`) | placeholder page only |
 | Measurement scripts | not yet in this repository |
 
@@ -87,6 +87,20 @@ cd web
 npm install
 npm run build
 ```
+
+## Wallets
+
+The wallet signs one transaction per buy, the order. Every try after that is signed by the one-time session key. Observed on an Android 15 emulator on devnet, Nov 23, 2026:
+
+| wallet | sheets per buy | what the wallet added to the order | order fee |
+|---|---|---|---|
+| Solflare | one (after the first connect) | `SetComputeUnitLimit(200000)`, `SetComputeUnitPrice(100000)` | 25,000 lamports |
+| Phantom | two: its Connect sheet, then Confirm | `SetComputeUnitPrice(375000)`, `SetComputeUnitLimit(200000)` | 80,000 lamports |
+| Solana Mobile mock wallet | one | nothing | 5,000 lamports |
+
+Neither wallet added any other instruction, and the added ones did not break the order. The fee of the order transaction is set by the wallet, which is why the app shows it as a separate line; the fees of the tries are set by the app.
+
+Phantom asks to connect again before every buy because it declines the saved authorization of an app whose identity it has not verified. The app asks the wallet to sign and sends the signed order itself: with the wallet sending, Phantom's transaction never reached devnet and Solflare kept the app in the background while the order's time ran out. An approval that takes longer than about a minute fails with "Approval took too long" and nothing is sent.
 
 ## Measurement
 
