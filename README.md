@@ -7,7 +7,7 @@ Work in progress for the Dev3pack Global Hackathon (Solana). Nothing in this rep
 | part | state |
 |---|---|
 | On-chain order program (Anchor) | written and tested locally, bonding curve only: against a test double of pump's buy instruction and against the real pump program dumped from mainnet, both inside LiteSVM. Deployed on **devnet** at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet). Not on mainnet. Reviewed once by an independent read-only pass, not audited. PumpSwap pools: not yet |
-| Android app (React Native + Expo, `app/`) | skeleton only: opens on an Android 15 emulator, connects and disconnects through Mobile Wallet Adapter with Solana Mobile's mock wallet (one approval screen). No buy screen yet. Not tested on a real device or with Phantom or Solflare |
+| Android app (React Native + Expo, `app/`) | the buy flow works on **devnet** on an Android 15 emulator with Solana Mobile's mock wallet: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Screenshots from real devnet buys are in `docs/shots/`. Not tested: Custom mode, Phantom, Solflare, a real device, mainnet |
 | Web page (`web/`) | placeholder page only |
 | Measurement scripts | not yet in this repository |
 
