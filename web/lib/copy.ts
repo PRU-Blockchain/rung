@@ -113,6 +113,7 @@ export const COPY = {
   orphanLine: (n: number) => `Events of orders opened before the oldest transaction read, not counted: ${n}.`,
   labels: {
     opened: "orders opened",
+    openedOnPools: "of which on pools",
     filled: "bought",
     notBought: "not bought (SOL refunded: expired or gave up)",
     cancelled: "cancelled by the user",
@@ -129,7 +130,7 @@ export const COPY = {
   rungDistHeading: "Which rung bought",
   rungDistHeader: ["rung", "slippage", "buys"],
   failedTriesLine: (slippage: number, orderFilled: number, other: number) =>
-    `Failed tries: ${slippage} on slippage (pump error 6042), ${orderFilled} refused because the order had already bought (Rung error 6012), ${other} other.`,
+    `Failed tries: ${slippage} on slippage (pump error 6042 or PumpSwap error 6040), ${orderFilled} refused because the order had already bought (Rung error 6012), ${other} other.`,
 
   // --- 8. Recent buys -------------------------------------------------------
   recentHeading: "Recent buys",

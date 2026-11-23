@@ -210,6 +210,7 @@ function CounterBody({ d }: { d: CounterData }) {
   const L = COPY.labels;
   const rows: [string, string][] = [
     [L.opened, String(d.opened)],
+    [L.openedOnPools, String(d.openedOnPools)],
     [L.filled, String(d.filled)],
     [L.notBought, String(d.notBought)],
     [L.cancelled, String(d.cancelled)],

@@ -1,23 +1,26 @@
-// Decoders for the accounts the client reads: Rung's `Order`, and pump's
-// `BondingCurve`, `Global` and Pump Fees' `FeeConfig` (docs/pump-arayuz.md E).
+// Decoders for the accounts the client reads: Rung's `Order`, pump's
+// `BondingCurve` and `Global`, Pump Fees' `FeeConfig`, PumpSwap's `Pool` and
+// `GlobalConfig`, and SPL token accounts (docs/pump-arayuz.md E).
 
 import { PublicKey } from "@solana/web3.js";
 
 import { Reader, startsWith } from "./bytes";
 import {
+  AMM_GLOBAL_CONFIG_DISCRIMINATOR,
   BONDING_CURVE_DISCRIMINATOR,
   FEE_CONFIG_DISCRIMINATOR,
   MAX_RUNGS,
   ORDER_DISCRIMINATOR,
+  POOL_DISCRIMINATOR,
   PUMP_GLOBAL_DISCRIMINATOR,
+  VENUES,
+  type Venue,
 } from "./constants";
 
 // --- Rung Order -------------------------------------------------------------
 
-export type Venue = "Curve" | "PumpSwap";
 export type OrderStatus = "Uninitialized" | "Open" | "Filled";
 
-export const VENUES: readonly Venue[] = ["Curve", "PumpSwap"];
 const STATUSES: readonly OrderStatus[] = ["Uninitialized", "Open", "Filled"];
 
 export function enumName<T>(names: readonly T[], index: number, what: string): T {
@@ -207,4 +210,113 @@ export function decodeMint(data: Uint8Array): MintInfo {
 
 export function tokenAccountAmount(data: Uint8Array): bigint {
   return new Reader(data, 64).u64();
+}
+
+export interface TokenAccount {
+  mint: PublicKey;
+  owner: PublicKey;
+  amount: bigint;
+}
+
+/** The first 72 bytes of a token account: mint, owner, amount (both token programs). */
+export function decodeTokenAccount(data: Uint8Array): TokenAccount {
+  const r = new Reader(data, 0);
+  return { mint: r.pubkey(), owner: r.pubkey(), amount: r.u64() };
+}
+
+// --- PumpSwap Pool -------------------------------------------------------------------
+
+export interface Pool {
+  poolBump: number;
+  index: number;
+  /** pump's pool authority for the mint when pump created the pool. */
+  creator: PublicKey;
+  baseMint: PublicKey;
+  quoteMint: PublicKey;
+  lpMint: PublicKey;
+  poolBaseTokenAccount: PublicKey;
+  poolQuoteTokenAccount: PublicKey;
+  /** Fields below are absent on older, shorter pools; read as zero / false / default. */
+  lpSupply: bigint;
+  coinCreator: PublicKey;
+  isMayhemMode: boolean;
+  isCashbackCoin: boolean;
+  /** Added to the quote balance to get the price's quote reserve. Can be negative. */
+  virtualQuoteReserves: bigint;
+  /** Bytes in the account. */
+  dataLength: number;
+}
+
+/** End of `pool_quote_token_account`: the least `pump_swap.rs` `parse_pool` accepts. */
+const POOL_MIN_LEN = 203;
+const POOL_VIRTUAL_QUOTE_RESERVES = 245;
+
+/**
+ * Reads a PumpSwap `Pool` like `pump_swap.rs` `parse_pool`: `virtual_quote_reserves`
+ * counts only when all 16 bytes are present, otherwise it is 0.
+ */
+export function decodePool(data: Uint8Array): Pool {
+  if (!startsWith(data, POOL_DISCRIMINATOR)) throw new Error("not a PumpSwap Pool account");
+  if (data.length < POOL_MIN_LEN) throw new Error(`PumpSwap Pool account too short (${data.length} bytes)`);
+  const padded = new Uint8Array(Math.max(data.length, POOL_VIRTUAL_QUOTE_RESERVES + 16));
+  padded.set(data);
+  const r = new Reader(padded, 8);
+  const pool = {
+    poolBump: r.u8(),
+    index: r.u16(),
+    creator: r.pubkey(),
+    baseMint: r.pubkey(),
+    quoteMint: r.pubkey(),
+    lpMint: r.pubkey(),
+    poolBaseTokenAccount: r.pubkey(),
+    poolQuoteTokenAccount: r.pubkey(),
+    lpSupply: r.u64(),
+    coinCreator: r.pubkey(),
+    isMayhemMode: r.bool(),
+    isCashbackCoin: r.bool(),
+    virtualQuoteReserves: r.i128(),
+    dataLength: data.length,
+  };
+  if (data.length < POOL_VIRTUAL_QUOTE_RESERVES + 16) pool.virtualQuoteReserves = 0n;
+  return pool;
+}
+
+// --- PumpSwap GlobalConfig (only what the client needs) ------------------------------
+
+export interface AmmGlobalConfig {
+  lpFeeBasisPoints: bigint;
+  protocolFeeBasisPoints: bigint;
+  disableFlags: number;
+  coinCreatorFeeBasisPoints: bigint;
+  isCashbackEnabled: boolean;
+  /** The eight wallets whose wrapped-SOL accounts may receive the buyback fee. */
+  buybackFeeRecipients: PublicKey[];
+  buybackBasisPoints: bigint;
+}
+
+/**
+ * Offsets from the `GlobalConfig` field list in docs/pump-arayuz.md E (the
+ * buyback basis points offset is the one real_pumpswap.rs T5 reads).
+ */
+const AMM_LP_FEE_BPS = 40;
+const AMM_PROTOCOL_FEE_BPS = 48;
+const AMM_DISABLE_FLAGS = 56;
+const AMM_COIN_CREATOR_FEE_BPS = 313;
+const AMM_IS_CASHBACK_ENABLED = 642;
+const AMM_BUYBACK_RECIPIENTS = 643;
+const AMM_BUYBACK_BPS = 899;
+
+export function decodeAmmGlobalConfig(data: Uint8Array): AmmGlobalConfig {
+  if (!startsWith(data, AMM_GLOBAL_CONFIG_DISCRIMINATOR)) throw new Error("not a PumpSwap GlobalConfig account");
+  const at = (offset: number) => new Reader(data, offset);
+  const recipients = at(AMM_BUYBACK_RECIPIENTS);
+  return {
+    lpFeeBasisPoints: at(AMM_LP_FEE_BPS).u64(),
+    protocolFeeBasisPoints: at(AMM_PROTOCOL_FEE_BPS).u64(),
+    disableFlags: at(AMM_DISABLE_FLAGS).u8(),
+    coinCreatorFeeBasisPoints: at(AMM_COIN_CREATOR_FEE_BPS).u64(),
+    isCashbackEnabled: at(AMM_IS_CASHBACK_ENABLED).bool(),
+    buybackFeeRecipients: Array.from({ length: 8 }, () => recipients.pubkey()),
+    buybackBasisPoints: at(AMM_BUYBACK_BPS).u64(),
+  };
 }

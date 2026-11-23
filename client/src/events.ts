@@ -4,10 +4,9 @@
 
 import { PublicKey } from "@solana/web3.js";
 
-import type { Venue } from "./accounts";
-import { VENUES, enumName } from "./accounts";
+import { enumName } from "./accounts";
 import { Reader, base64Decode, startsWith } from "./bytes";
-import { MAX_RUNGS, RUNG_EVENT, RUNG_PROGRAM_ID } from "./constants";
+import { MAX_RUNGS, RUNG_EVENT, RUNG_PROGRAM_ID, VENUES, type Venue } from "./constants";
 
 export type RefundReason = "Expired" | "GaveUp" | "Cancelled";
 const REFUND_REASONS: readonly RefundReason[] = ["Expired", "GaveUp", "Cancelled"];

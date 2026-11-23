@@ -13,16 +13,16 @@ import {
 } from "@solana/web3.js";
 
 import { Order, decodeOrder, rungDueSlot } from "./accounts";
-import { DEFAULT_CU_LIMIT, DEFAULT_CU_PRICE, DEFAULT_REFUND_CU_LIMIT, sweepFeeLamports } from "./budget";
+import { DEFAULT_CU_PRICE, DEFAULT_REFUND_CU_LIMIT, cuLimitFor, sweepFeeLamports } from "./budget";
 import { Failure, classifyFailure, describeFailure } from "./errors";
 import { OrderFilled, OrderRefunded, findEvent } from "./events";
-import { computeUnitLimitIx, computeUnitPriceIx, refundIx, tryRungIx } from "./instructions";
+import { PoolAccounts, computeUnitLimitIx, computeUnitPriceIx, refundIx, tryRungIx } from "./instructions";
 import { orderPda } from "./pdas";
 
 export type AttemptKind = "try" | "refund" | "sweep";
 export type Outcome =
   | "filled" // try_rung bought
-  | "slippage" // pump refused this rung's minimum
+  | "slippage" // the venue refused this rung's minimum (pump 6042, PumpSwap 6040)
   | "order-filled" // Rung says the order already bought
   | "failed" // any other error
   | "not-landed" // blockhash expired before the transaction landed
@@ -55,12 +55,18 @@ export interface LadderParams {
   user: PublicKey;
   mint: PublicKey;
   tokenProgram: PublicKey;
-  /** One of pump's `Global.buyback_fee_recipients`. */
+  /**
+   * Curve order: one of pump's `Global.buyback_fee_recipients`. PumpSwap
+   * order: the wrapped-SOL account of one of PumpSwap's (`findBuybackWsolAccounts`).
+   */
   buybackRecipient: PublicKey;
+  /** The canonical pool's accounts; required when the order's venue is PumpSwap. */
+  pool?: PoolAccounts;
   /** The order's one-time key. Pays every fee here; ends with 0 lamports. */
   sessionKeypair: Keypair;
   /** The order as read after `open_order`; fetched if omitted. */
   order?: Order;
+  /** Defaults to the order's venue limit (`cuLimitFor`). */
   cuLimit?: number;
   /** Micro-lamports per compute unit. */
   cuPrice?: bigint;
@@ -161,7 +167,6 @@ function attemptText(a: Attempt): string {
 
 export async function runLadder(p: LadderParams): Promise<LadderResult> {
   const { connection, user, sessionKeypair: session } = p;
-  const cuLimit = p.cuLimit ?? DEFAULT_CU_LIMIT;
   const cuPrice = p.cuPrice ?? DEFAULT_CU_PRICE;
   const pollMs = p.pollMs ?? 200;
   const attempts: Attempt[] = [];
@@ -194,6 +199,8 @@ export async function runLadder(p: LadderParams): Promise<LadderResult> {
   if (!order) throw new Error("order account not found");
   if (order.status !== "Open") throw new Error(`order is ${order.status}, not Open`);
   if (!order.sessionKey.equals(session.publicKey)) throw new Error("session key does not match the order");
+  if (order.venue === "PumpSwap" && !p.pool) throw new Error("a PumpSwap order needs the pool's accounts");
+  const cuLimit = p.cuLimit ?? cuLimitFor(order.venue);
 
   let stop = false;
   for (let i = 0; i < order.rungCount && !stop; i++) {
@@ -216,6 +223,8 @@ export async function runLadder(p: LadderParams): Promise<LadderResult> {
         tokenProgram: p.tokenProgram,
         buybackRecipient: p.buybackRecipient,
         rungIndex: i,
+        venue: order.venue,
+        pool: p.pool,
       }),
     ];
     const landed = await sendAndConfirm(connection, instructions, session, (signature) =>

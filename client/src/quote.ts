@@ -38,8 +38,19 @@ export function expectedTokensSeen(
   protocolFeeBps: bigint,
   creatorFeeBps: bigint,
 ): bigint {
-  let net = (spendable * BPS_DENOMINATOR) / (BPS_DENOMINATOR + protocolFeeBps + creatorFeeBps);
-  const fees = ceilDiv(net * protocolFeeBps, BPS_DENOMINATOR) + ceilDiv(net * creatorFeeBps, BPS_DENOMINATOR);
+  return quoteAfterFees(spendable, reserves, [protocolFeeBps, creatorFeeBps]);
+}
+
+/**
+ * pump A1's steps with any number of fees, each rounded up on its own:
+ * 1. `net = floor(s * 10_000 / (10_000 + sum(fees)))`
+ * 2. `fees = sum(ceil(net * fee / 10_000))`; if `net + fees > s`, `net -= net + fees - s`
+ * 3. `out = floor((net - 1) * tokens / (quote + net - 1))`
+ */
+function quoteAfterFees(spendable: bigint, reserves: Reserves, feeBps: readonly bigint[]): bigint {
+  const total = feeBps.reduce((a, b) => a + b, 0n);
+  let net = (spendable * BPS_DENOMINATOR) / (BPS_DENOMINATOR + total);
+  const fees = feeBps.reduce((sum, bps) => sum + ceilDiv(net * bps, BPS_DENOMINATOR), 0n);
   if (net + fees > spendable) net -= net + fees - spendable;
   if (net <= 1n) throw new RangeError("amount too small for a quote");
   return checkU64(
@@ -98,6 +109,74 @@ export function quoteOrder(amount: bigint, curve: BondingCurve, feeConfig: FeeCo
   const fees = curveFees(curve, feeConfig, mintSupply);
   const seen = expectedTokensSeen(amount, curve, fees.protocolFeeBps, fees.creatorFeeBps);
   const raw = rawQuote(amount, curve);
+  if (!quotesAgree(seen, raw)) {
+    throw new Error(`quote with fees (${seen}) is not within ${MAX_VENUE_FEE_BPS} bps below the fee-free quote (${raw})`);
+  }
+  return { ...fees, amount, expectedTokensSeen: seen, rawTokensSeen: raw };
+}
+
+// --- PumpSwap pool (docs/pump-arayuz.md K4, K5) ------------------------------------------
+
+/**
+ * The reserves a pool's price comes from (`pump_swap.rs` `pool_reserves`): the
+ * base token balance, and the wrapped-SOL balance plus `virtual_quote_reserves`.
+ */
+export function poolReserves(
+  pool: { virtualQuoteReserves: bigint },
+  baseBalance: bigint,
+  quoteBalance: bigint,
+): Reserves {
+  const effectiveQuote = quoteBalance + pool.virtualQuoteReserves;
+  if (baseBalance <= 0n || effectiveQuote <= 0n) throw new Error("pool has no usable reserves");
+  return { virtualTokenReserves: baseBalance, virtualQuoteReserves: checkU64(effectiveQuote, "pool quote reserve") };
+}
+
+/** Pool market cap in lamports (Pump Fees README `poolMarketCap`): `quote * supply / base`, effective quote. */
+export function poolMarketCapLamports(reserves: Reserves, mintSupply: bigint): bigint {
+  return (reserves.virtualQuoteReserves * mintSupply) / reserves.virtualTokenReserves;
+}
+
+export interface PoolFees {
+  lpFeeBps: bigint;
+  protocolFeeBps: bigint;
+  creatorFeeBps: bigint;
+  marketCapLamports: bigint;
+}
+
+/**
+ * Fee rates PumpSwap applies to a buy on a canonical pool: the AMM
+ * `fee_config` tier for the pool's market cap (real_pumpswap.rs T5: the
+ * BuyEvent's three rates were exactly this tier's).
+ */
+export function poolFees(reserves: Reserves, feeConfig: FeeConfig, mintSupply: bigint): PoolFees {
+  const marketCapLamports = poolMarketCapLamports(reserves, mintSupply);
+  const tier = pickFeeTier(feeConfig, marketCapLamports);
+  return {
+    lpFeeBps: tier.lpFeeBps,
+    protocolFeeBps: tier.protocolFeeBps,
+    creatorFeeBps: tier.creatorFeeBps,
+    marketCapLamports,
+  };
+}
+
+/** Tokens `buy_exact_quote_in_v2` returns for `spendable` lamports of wrapped SOL (K5, exact in T5). */
+export function poolExpectedTokens(spendable: bigint, reserves: Reserves, fees: Omit<PoolFees, "marketCapLamports">): bigint {
+  return quoteAfterFees(spendable, reserves, [fees.lpFeeBps, fees.protocolFeeBps, fees.creatorFeeBps]);
+}
+
+export interface PoolOrderQuote extends PoolFees {
+  amount: bigint;
+  /** With fees. Sent as `expected_tokens_seen`. */
+  expectedTokensSeen: bigint;
+  /** Without fees, on the same effective reserves. Sent as `raw_tokens_seen`. */
+  rawTokensSeen: bigint;
+}
+
+/** Both quotes `open_order` needs for a PumpSwap order, checked against the program's fee band. */
+export function quotePoolOrder(amount: bigint, reserves: Reserves, feeConfig: FeeConfig, mintSupply: bigint): PoolOrderQuote {
+  const fees = poolFees(reserves, feeConfig, mintSupply);
+  const seen = poolExpectedTokens(amount, reserves, fees);
+  const raw = rawQuote(amount, reserves);
   if (!quotesAgree(seen, raw)) {
     throw new Error(`quote with fees (${seen}) is not within ${MAX_VENUE_FEE_BPS} bps below the fee-free quote (${raw})`);
   }

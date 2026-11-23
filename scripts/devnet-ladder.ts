@@ -1,16 +1,18 @@
 // Devnet-only sender for Rung: open an order, try the rungs in turn, print a receipt.
 //
 //   npx tsx scripts/devnet-ladder.ts --mint <MINT> --amount 0.01 --mode tight
-//       [--rungs 100,300] [--cu-price 5000] [--cu-limit 200000] [--window 4] [--lifetime 150]
+//       [--venue auto|curve|pool] (auto: the curve while it is open, then the canonical PumpSwap pool)
+//       [--rungs 100,300] [--cu-price 5000] [--cu-limit <venue default>] [--window 4] [--lifetime 150]
 //       [--keypair ~/.config/solana/rung-devnet.json] [--rpc <url>] [--dry-run]
-//       [--push-after-open <SOL> | --push-pct <PERCENT>]   TEST AID: the wallet buys on pump
+//       [--push-after-open <SOL> | --push-pct <PERCENT>]   TEST AID: the wallet buys on the venue
 //         right after open_order, so the price the rungs meet is higher than the one quoted
-//   npx tsx scripts/devnet-ladder.ts --push-only --mint <MINT> --push-pct 4.5 [--wait-order <USER>]
+//   npx tsx scripts/devnet-ladder.ts --push-only --mint <MINT> --push-pct 4.5 [--wait-order <USER>] [--venue ...]
 //       TEST AID: only the push buy, e.g. while the app runs its own order; with --wait-order
 //       it fires as soon as that user's next order opens
 //   npx tsx scripts/devnet-ladder.ts --find-mint [--limit 25]
+//   npx tsx scripts/devnet-ladder.ts --find-pool [--limit 25]   canonical SOL pools from recent PumpSwap transactions
 //   npx tsx scripts/devnet-ladder.ts --status | --refund | --cancel
-//   npx tsx scripts/devnet-ladder.ts --mint <MINT> --amount 0.01 --simulate-buy --payer <PUBKEY>
+//   npx tsx scripts/devnet-ladder.ts --mint <MINT> --amount 0.01 --simulate-buy --payer <PUBKEY> [--venue ...]
 //
 // The keypair file is read, never printed. The session key lives only in memory.
 
@@ -34,40 +36,55 @@ import {
   Mode,
   ORDER_ACCOUNT_LEN,
   Order,
+  POOL_DISCRIMINATOR,
   PUMP_IX,
   PUMP_PROGRAM_ID,
+  PUMP_SWAP_PROGRAM_ID,
+  PoolMarket,
   PublicKey,
   PumpGlobal,
+  Reserves,
   TOKEN_2022_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
   TransactionMessage,
   VersionedTransaction,
+  WSOL_MINT,
+  ammUserVolumeAccumulatorPda,
   associatedTokenAddress,
   base58Decode,
   base64Decode,
   bondingCurvePda,
+  canonicalPoolPda,
   cancelIx,
   classifyFailure,
+  closeTokenAccountIx,
   computeUnitLimitIx,
   createAtaIdempotentIx,
+  cuLimitFor,
   decodeBondingCurve,
   decodeFeeConfig,
   decodeMint,
   decodeOrder,
+  decodePool,
   decodePumpGlobal,
   describeFailure,
   feeBudget,
   fetchOrder,
+  fetchPoolMarket,
   minTokensForRung,
   openOrderIx,
   orderPda,
+  poolReserves,
   pumpBuyExactQuoteInV3Ix,
   pumpFeeConfigPda,
   pumpGlobalPda,
+  pumpSwapBuyExactQuoteInV2Ix,
   quoteOrder,
+  quotePoolOrder,
   rawQuote,
   refundIx,
   rentReserve,
+  resolveVenue,
   runLadder,
   sendAndConfirm,
   startsWith,
@@ -75,6 +92,8 @@ import {
   txFeeLamports,
   userVolumeAccumulatorPda,
   vaultPda,
+  wrapSolIxs,
+  wsolAta,
 } from "../client/src/index";
 
 // `solana genesis-hash -u devnet` / `-u mainnet-beta`, checked 2026-11-23.
@@ -167,7 +186,8 @@ async function assertDevnet(connection: Connection) {
 
 // --- market --------------------------------------------------------------------
 
-interface Market {
+interface CurveMarket {
+  venue: "Curve";
   mint: PublicKey;
   tokenProgram: PublicKey;
   decimals: number;
@@ -175,10 +195,92 @@ interface Market {
   curve: BondingCurve;
   feeConfig: FeeConfig;
   global: PumpGlobal;
+  /** One of pump's buyback wallets. */
   buybackRecipient: PublicKey;
 }
 
-async function loadMarket(connection: Connection, mint: PublicKey): Promise<Market> {
+interface PoolMarketPlan {
+  venue: "PumpSwap";
+  mint: PublicKey;
+  tokenProgram: PublicKey;
+  decimals: number;
+  supply: bigint;
+  pm: PoolMarket;
+  /** A listed buyback wallet's wrapped-SOL account that exists. */
+  buybackRecipient: PublicKey;
+}
+
+type Market = CurveMarket | PoolMarketPlan;
+
+/** What the venue quotes for `amount`, in one shape for both venues. */
+interface Quote {
+  expectedTokensSeen: bigint;
+  rawTokensSeen: bigint;
+  marketCapLamports: bigint;
+  /** Sum of the fee rates, for the push estimate. */
+  feeBps: bigint;
+  feeText: string;
+}
+
+const pick = <T>(list: T[]) => list[Math.floor(Math.random() * list.length)];
+
+/** `--venue auto|curve|pool`: auto asks `resolveVenue`. */
+async function loadMarket(connection: Connection, mint: PublicKey, venueFlag = "auto"): Promise<Market> {
+  if (!["auto", "curve", "pool"].includes(venueFlag)) throw new Error("--venue must be auto, curve or pool");
+  if (venueFlag === "curve") return loadCurveMarket(connection, mint);
+  const r = await resolveVenue(connection, mint);
+  if (!r.ok) throw new Error(`no venue for this mint: ${r.reason}`);
+  if (r.venue === "Curve") {
+    if (venueFlag === "pool") throw new Error("the bonding curve is still open: this token has no canonical pool yet");
+    return loadCurveMarket(connection, mint);
+  }
+  const pm = await fetchPoolMarket(connection, mint, r);
+  return {
+    venue: "PumpSwap",
+    mint,
+    tokenProgram: pm.tokenProgram,
+    decimals: pm.decimals,
+    supply: pm.supply,
+    pm,
+    buybackRecipient: pick(pm.buybackWsolAccounts),
+  };
+}
+
+function quoteMarket(m: Market, amount: bigint): Quote {
+  if (m.venue === "Curve") {
+    const q = quoteOrder(amount, m.curve, m.feeConfig, m.supply);
+    return {
+      ...q,
+      feeBps: q.protocolFeeBps + q.creatorFeeBps,
+      feeText: `protocol ${q.protocolFeeBps} bps + creator ${q.creatorFeeBps} bps`,
+    };
+  }
+  const q = quotePoolOrder(amount, m.pm.reserves, m.pm.feeConfig, m.supply);
+  return {
+    ...q,
+    feeBps: q.lpFeeBps + q.protocolFeeBps + q.creatorFeeBps,
+    feeText: `lp ${q.lpFeeBps} + protocol ${q.protocolFeeBps} + creator ${q.creatorFeeBps} bps (AMM fee_config tier)`,
+  };
+}
+
+/** The reserves the price comes from now: the curve's, or the pool's effective ones. */
+async function reservesNow(connection: Connection, m: Market): Promise<{ slot: number; reserves: Reserves }> {
+  if (m.venue === "Curve") {
+    const info = await connection.getAccountInfoAndContext(bondingCurvePda(m.mint), "confirmed");
+    if (!info.value) throw new Error("curve vanished");
+    return { slot: info.context.slot, reserves: decodeBondingCurve(info.value.data) };
+  }
+  const a = m.pm.poolAccounts;
+  const got = await connection.getMultipleAccountsInfoAndContext([a.address, a.baseTokenAccount, a.quoteTokenAccount], "confirmed");
+  const [pool, base, quote] = got.value;
+  if (!pool || !base || !quote) throw new Error("pool vanished");
+  return {
+    slot: got.context.slot,
+    reserves: poolReserves(decodePool(pool.data), tokenAccountAmount(base.data), tokenAccountAmount(quote.data)),
+  };
+}
+
+async function loadCurveMarket(connection: Connection, mint: PublicKey): Promise<CurveMarket> {
   const [mintInfo, curveInfo, feeInfo, globalInfo] = await connection.getMultipleAccountsInfo([
     mint,
     bondingCurvePda(mint),
@@ -203,6 +305,7 @@ async function loadMarket(connection: Connection, mint: PublicKey): Promise<Mark
   if (recipients.length === 0) throw new Error("pump global lists no buyback fee recipients");
   const { supply, decimals } = decodeMint(mintInfo.data);
   return {
+    venue: "Curve",
     mint,
     tokenProgram,
     decimals,
@@ -210,7 +313,7 @@ async function loadMarket(connection: Connection, mint: PublicKey): Promise<Mark
     curve,
     feeConfig: decodeFeeConfig(feeInfo.data),
     global,
-    buybackRecipient: recipients[Math.floor(Math.random() * recipients.length)],
+    buybackRecipient: pick(recipients),
   };
 }
 
@@ -225,7 +328,7 @@ interface Plan {
   lifetimeSlots: bigint;
   cuLimit: number;
   cuPrice: bigint;
-  quote: ReturnType<typeof quoteOrder>;
+  quote: Quote;
   reserve: Awaited<ReturnType<typeof rentReserve>>;
   budget: ReturnType<typeof feeBudget>;
   openFee: bigint;
@@ -268,17 +371,17 @@ async function makePlan(connection: Connection, flags: Flags, mint: PublicKey): 
   if (lifetimeSlots <= BigInt(rungs.length - 1) * windowSlots || lifetimeSlots > MAX_LIFETIME_SLOTS) {
     throw new Error("--lifetime must outlast the last rung and be at most 300 slots");
   }
-  const cuLimit = Number(int(flags, "cu-limit", 200_000n));
   const cuPrice = int(flags, "cu-price", 5_000n);
 
-  const market = await loadMarket(connection, mint);
-  const quote = quoteOrder(amount, market.curve, market.feeConfig, market.supply);
+  const market = await loadMarket(connection, mint, str(flags, "venue"));
+  const cuLimit = Number(int(flags, "cu-limit", BigInt(cuLimitFor(market.venue))));
+  const quote = quoteMarket(market, amount);
   const rentCache = new Map<number, bigint>();
   const rentFor = async (len: number) => {
     if (!rentCache.has(len)) rentCache.set(len, BigInt(await connection.getMinimumBalanceForRentExemption(len)));
     return rentCache.get(len)!;
   };
-  const reserve = await rentReserve(rentFor, market.tokenProgram);
+  const reserve = await rentReserve(rentFor, market.tokenProgram, undefined, market.venue);
   const budget = feeBudget({ rungCount: rungs.length, rentExemptMinimum: await rentFor(0), cuLimit, cuPrice });
   return {
     market,
@@ -303,8 +406,17 @@ function printPlan(p: Plan, user?: PublicKey, userBalance?: bigint, orderExists?
   const { market: m, quote: q } = p;
   console.log("Plan (devnet)");
   console.log(`  mint            ${m.mint.toBase58()} (${tokenProgramName(m.tokenProgram)}, ${m.decimals} decimals)`);
-  console.log(`  curve           virtual token ${m.curve.virtualTokenReserves}, virtual SOL ${m.curve.virtualQuoteReserves} lamports, real token ${m.curve.realTokenReserves}`);
-  console.log(`  market cap      ${sol(q.marketCapLamports)}; fee tier: protocol ${q.protocolFeeBps} bps + creator ${q.creatorFeeBps} bps`);
+  if (m.venue === "Curve") {
+    console.log("  venue           Curve (pump bonding curve)");
+    console.log(`  curve           virtual token ${m.curve.virtualTokenReserves}, virtual SOL ${m.curve.virtualQuoteReserves} lamports, real token ${m.curve.realTokenReserves}`);
+  } else {
+    const pm = m.pm;
+    console.log("  venue           PumpSwap (canonical pool)");
+    console.log(`  pool            ${pm.poolAccounts.address.toBase58()} (${pm.pool.dataLength} bytes${pm.pool.isMayhemMode ? ", mayhem" : ""})`);
+    console.log(`  reserves        base ${pm.baseBalance}; quote ${pm.quoteBalance} lamports + virtual ${pm.pool.virtualQuoteReserves} = ${pm.reserves.virtualQuoteReserves} effective`);
+    console.log(`  buyback account ${m.buybackRecipient.toBase58()} (${pm.buybackWsolAccounts.length}/8 listed wallets have one)`);
+  }
+  console.log(`  market cap      ${sol(q.marketCapLamports)}; fee tier: ${q.feeText}`);
   console.log(`  amount          ${sol(p.amount)}`);
   console.log(`  quote           ${units(q.expectedTokensSeen, m.decimals)} tokens (fee-free ${units(q.rawTokensSeen, m.decimals)})`);
   console.log(`  price seen      ${pricePerToken(p.amount, q.expectedTokensSeen, m.decimals)}`);
@@ -318,7 +430,9 @@ function printPlan(p: Plan, user?: PublicKey, userBalance?: bigint, orderExists?
   console.log(`  If no rung fills, max fee: ${sol(maxFeeIfNoFill(p)).replace(" SOL", "")} SOL`);
   console.log(`    = ${p.rungs.length} tries x ${sol(p.budget.tries / BigInt(p.rungs.length))} (CU limit ${p.cuLimit}, CU price ${p.cuPrice} micro-lamports)`);
   console.log(`      + refund ${sol(p.budget.refund)} + sweep ${sol(p.budget.sweep)} + open_order ${sol(p.openFee)}`);
-  console.log(`  rent reserve    ${sol(p.reserve.total)} (your token account ${sol(p.reserve.userTokenAccount)}, vault token account ${sol(p.reserve.vaultTokenAccount)}, pump volume account ${sol(p.reserve.accumulator)}, margin ${sol(p.reserve.margin)}); unspent comes back`);
+  const wsolPart = p.reserve.vaultWsolAccount ? `, vault wrapped-SOL account ${sol(p.reserve.vaultWsolAccount)}` : "";
+  const accName = m.venue === "Curve" ? "pump" : "PumpSwap";
+  console.log(`  rent reserve    ${sol(p.reserve.total)} (your token account ${sol(p.reserve.userTokenAccount)}, vault token account ${sol(p.reserve.vaultTokenAccount)}${wsolPart}, ${accName} volume account ${sol(p.reserve.accumulator)}, margin ${sol(p.reserve.margin)}); unspent comes back`);
   console.log(`  fee budget      ${sol(p.budget.total)} to the session key (includes ${sol(p.budget.rentExemptMinimum)} rent-exempt minimum); unspent comes back`);
   console.log(`  order account   ${orderExists ? "exists, reused" : `${sol(p.orderRent)} rent, returned when the order account is closed`}`);
   const leaving = p.amount + p.reserve.total + p.budget.total + (orderExists ? 0n : p.orderRent) + p.openFee;
@@ -342,14 +456,17 @@ async function run(connection: Connection, flags: Flags, mint: PublicKey) {
     console.log(`(no wallet: ${(e as Error).message})`);
   }
   const plan = await makePlan(connection, flags, mint);
+  const m = plan.market;
   const u = user?.publicKey;
   const vault = u ? vaultPda(u) : undefined;
+  const accumulatorOf = (owner: PublicKey) =>
+    m.venue === "Curve" ? userVolumeAccumulatorPda(owner) : ammUserVolumeAccumulatorPda(owner);
   const before = u
     ? await connection.getMultipleAccountsInfo([
         u,
         orderPda(u),
-        associatedTokenAddress(u, mint, plan.market.tokenProgram),
-        userVolumeAccumulatorPda(vault!),
+        associatedTokenAddress(u, mint, m.tokenProgram),
+        accumulatorOf(vault!),
       ])
     : [];
   const [userInfo, orderInfo, ataInfo, accInfo] = before;
@@ -371,8 +488,9 @@ async function run(connection: Connection, flags: Flags, mint: PublicKey) {
     user: u,
     sessionKey: session.publicKey,
     mint,
+    pool: m.venue === "PumpSwap" ? m.pm.poolAccounts : undefined,
     args: {
-      venue: "Curve",
+      venue: m.venue,
       rungsBps: plan.rungs,
       amount: plan.amount,
       rentReserve: plan.reserve.total,
@@ -398,8 +516,9 @@ async function run(connection: Connection, flags: Flags, mint: PublicKey) {
     connection,
     user: u,
     mint,
-    tokenProgram: plan.market.tokenProgram,
-    buybackRecipient: plan.market.buybackRecipient,
+    tokenProgram: m.tokenProgram,
+    buybackRecipient: m.buybackRecipient,
+    pool: m.venue === "PumpSwap" ? m.pm.poolAccounts : undefined,
     sessionKeypair: session,
     order,
     cuLimit: plan.cuLimit,
@@ -413,12 +532,12 @@ async function run(connection: Connection, flags: Flags, mint: PublicKey) {
   const balanceAfter = BigInt(await connection.getBalance(u, "confirmed"));
   const after = await connection.getMultipleAccountsInfo([
     orderPda(u),
-    associatedTokenAddress(u, mint, plan.market.tokenProgram),
-    userVolumeAccumulatorPda(vault!),
+    associatedTokenAddress(u, mint, m.tokenProgram),
+    accumulatorOf(vault!),
   ]);
   // Where the price stands after the last try (fee-free quote for the order amount).
-  const curveNow = await connection.getAccountInfoAndContext(bondingCurvePda(mint), "confirmed");
-  const rawNow = curveNow.value ? rawQuote(order.amount, decodeBondingCurve(curveNow.value.data)) : undefined;
+  const now = await reservesNow(connection, m).catch(() => undefined);
+  const rawNow = now ? rawQuote(order.amount, now.reserves) : undefined;
   printReceipt({
     plan,
     order,
@@ -427,7 +546,7 @@ async function run(connection: Connection, flags: Flags, mint: PublicKey) {
     balanceBefore,
     balanceAfter,
     push,
-    priceNow: rawNow ? { slot: curveNow.context.slot, rawTokens: rawNow } : undefined,
+    priceNow: rawNow && now ? { slot: now.slot, rawTokens: rawNow } : undefined,
     rents: {
       order: !orderInfo && after[0] ? BigInt(after[0].lamports) : 0n,
       // An earlier order's account, reused and now closed by refund: its rent comes back.
@@ -443,6 +562,32 @@ async function run(connection: Connection, flags: Flags, mint: PublicKey) {
 // Not part of the app. The same wallet buys directly on pump right after
 // open_order, so the rungs see a higher price than the one quoted.
 
+/**
+ * A plain wallet's buy on the venue (the base token account must exist).
+ * PumpSwap is paid in wrapped SOL: wrap `spendable`, buy, then close the
+ * wrapped-SOL account so what is left and its rent come back as SOL.
+ */
+function directBuyIxs(m: Market, buyer: PublicKey, spendable: bigint, minTokensOut: bigint) {
+  if (m.venue === "Curve") {
+    return [
+      pumpBuyExactQuoteInV3Ix({ buyer, mint: m.mint, tokenProgram: m.tokenProgram, buybackRecipient: m.buybackRecipient, spendable, minTokensOut }),
+    ];
+  }
+  return [
+    ...wrapSolIxs(buyer, spendable),
+    pumpSwapBuyExactQuoteInV2Ix({
+      buyer,
+      mint: m.mint,
+      tokenProgram: m.tokenProgram,
+      pool: m.pm.poolAccounts,
+      buybackWsolAccount: m.buybackRecipient,
+      spendable,
+      minTokensOut,
+    }),
+    closeTokenAccountIx({ account: wsolAta(buyer), destination: buyer, owner: buyer, tokenProgram: TOKEN_PROGRAM_ID }),
+  ];
+}
+
 interface Push {
   signature: string;
   slot?: number;
@@ -457,49 +602,38 @@ async function pushPrice(connection: Connection, flags: Flags, user: Keypair, pl
   const solText = str(flags, "push-after-open");
   const pctText = str(flags, "push-pct");
   if (!solText && !pctText) return undefined;
-  const mint = plan.market.mint;
-  const read = async () => {
-    const info = await connection.getAccountInfoAndContext(bondingCurvePda(mint), "confirmed");
-    if (!info.value) throw new Error("curve vanished");
-    return { slot: info.context.slot, curve: decodeBondingCurve(info.value.data) };
-  };
-  const before = await read();
-  const { virtualQuoteReserves: vq } = before.curve;
+  const m = plan.market;
+  const mint = m.mint;
+  const before = await reservesNow(connection, m);
+  const vq = before.reserves.virtualQuoteReserves;
   let spendable: bigint;
   if (pctText) {
-    // Price ~ vq / vt; a net buy of dq multiplies it by (1 + dq / vq)^2.
+    // Price ~ quote / tokens; a net buy of dq multiplies it by (1 + dq / quote)^2.
     const target = Number(pctText) / 100;
     if (!(target > 0 && target < 1)) throw new Error("--push-pct must be between 0 and 100");
     const net = BigInt(Math.ceil(Number(vq) * (Math.sqrt(1 + target) - 1)));
-    const feeBps = plan.quote.protocolFeeBps + plan.quote.creatorFeeBps;
-    spendable = (net * (10_000n + feeBps)) / 10_000n + 2n; // + 1 lamport the curve formula keeps back
+    spendable = (net * (10_000n + plan.quote.feeBps)) / 10_000n + 2n; // + 1 lamport the formula keeps back
   } else spendable = parseSol(solText!);
 
-  console.log(`\nTEST AID: pushing the price with a direct pump buy of ${sol(spendable)}${pctText ? ` (target +${pctText}%)` : ""}`);
+  const where = m.venue === "Curve" ? "pump buy" : "PumpSwap buy (wraps SOL first)";
+  console.log(`\nTEST AID: pushing the price with a direct ${where} of ${sol(spendable)}${pctText ? ` (target +${pctText}%)` : ""}`);
   const balanceBefore = BigInt(await connection.getBalance(user.publicKey, "confirmed"));
   const ixs = [
     computeUnitLimitIx(200_000),
-    createAtaIdempotentIx({ payer: user.publicKey, owner: user.publicKey, mint, tokenProgram: plan.market.tokenProgram }),
-    pumpBuyExactQuoteInV3Ix({
-      buyer: user.publicKey,
-      mint,
-      tokenProgram: plan.market.tokenProgram,
-      buybackRecipient: plan.market.buybackRecipient,
-      spendable,
-      minTokensOut: 1n,
-    }),
+    createAtaIdempotentIx({ payer: user.publicKey, owner: user.publicKey, mint, tokenProgram: m.tokenProgram }),
+    ...directBuyIxs(m, user.publicKey, spendable, 1n),
   ];
   const landed = await sendAndConfirm(connection, ixs, user);
   // A rate-limited balance read must not hide that the push landed.
   const balanceAfter = BigInt(await connection.getBalance(user.publicKey, "confirmed").catch(() => Number(balanceBefore)));
   const ok = landed.landed && !landed.err;
   console.log(`TEST AID: push buy ${landed.signature} slot ${landed.slot ?? "?"} fee ${landed.fee ?? "?"} CU ${landed.computeUnits ?? "?"} ${ok ? "ok" : `FAILED ${JSON.stringify(landed.err ?? "not landed")}`}`);
-  const after = await read();
-  const price = (c: BondingCurve) => Number(c.virtualQuoteReserves) / Number(c.virtualTokenReserves);
-  const change = (price(after.curve) / price(before.curve) - 1) * 100;
-  const quoteChange = Number((rawQuote(plan.amount, before.curve) * 1_000_000n) / rawQuote(plan.amount, after.curve) - 1_000_000n) / 10_000;
-  console.log(`TEST AID: reserves before (slot ${before.slot}) vt ${before.curve.virtualTokenReserves} vq ${before.curve.virtualQuoteReserves}`);
-  console.log(`TEST AID: reserves after  (slot ${after.slot}) vt ${after.curve.virtualTokenReserves} vq ${after.curve.virtualQuoteReserves}`);
+  const after = await reservesNow(connection, m);
+  const price = (c: Reserves) => Number(c.virtualQuoteReserves) / Number(c.virtualTokenReserves);
+  const change = (price(after.reserves) / price(before.reserves) - 1) * 100;
+  const quoteChange = Number((rawQuote(plan.amount, before.reserves) * 1_000_000n) / rawQuote(plan.amount, after.reserves) - 1_000_000n) / 10_000;
+  console.log(`TEST AID: reserves before (slot ${before.slot}) tokens ${before.reserves.virtualTokenReserves} quote ${before.reserves.virtualQuoteReserves}`);
+  console.log(`TEST AID: reserves after  (slot ${after.slot}) tokens ${after.reserves.virtualTokenReserves} quote ${after.reserves.virtualQuoteReserves}`);
   console.log(`TEST AID: spot price +${change.toFixed(4)}%; price for ${sol(plan.amount)} +${quoteChange.toFixed(4)}%`);
   return {
     signature: landed.signature,
@@ -521,8 +655,9 @@ async function pushOnly(connection: Connection, flags: Flags, mint: PublicKey) {
   if (!str(flags, "push-pct") && !str(flags, "push-after-open")) throw new Error("--push-only needs --push-pct or --push-after-open");
   const user = loadKeypair(str(flags, "keypair") ?? DEFAULT_KEYPAIR);
   const amount = parseSol(str(flags, "amount") ?? "0.01");
-  const market = await loadMarket(connection, mint);
-  const plan = { market, amount, quote: quoteOrder(amount, market.curve, market.feeConfig, market.supply) } as Plan;
+  const market = await loadMarket(connection, mint, str(flags, "venue"));
+  console.log(`TEST AID: venue ${market.venue}${market.venue === "PumpSwap" ? `, pool ${market.pm.poolAccounts.address.toBase58()}` : ""}`);
+  const plan = { market, amount, quote: quoteMarket(market, amount) } as Plan;
   const waitFor = str(flags, "wait-order");
   if (waitFor) {
     const owner = new PublicKey(waitFor);
@@ -644,7 +779,10 @@ function printReceipt(r: {
   console.log(`    buy           ${sol(-spent)}`);
   console.log(`    fees          ${sol(-totalFees)}`);
   if (r.rents.userTokenAccount) console.log(`    rent kept     ${sol(-r.rents.userTokenAccount)} your new token account`);
-  if (r.rents.accumulator) console.log(`    rent kept     ${sol(-r.rents.accumulator)} pump volume account of the vault`);
+  if (r.rents.accumulator) {
+    const owner = plan.market.venue === "Curve" ? "pump" : "PumpSwap";
+    console.log(`    rent kept     ${sol(-r.rents.accumulator)} ${owner} volume account of the vault`);
+  }
   if (r.rents.order) console.log(`    rent kept     ${sol(-r.rents.order)} order account (back with --refund after slot ${r.order.lastSlot})`);
   const pushCost = r.push?.walletCost ?? 0n;
   if (r.push) console.log(`    TEST AID push ${sol(-pushCost)} (direct pump buy, its fee and any rent it paid; not part of the order)`);
@@ -791,6 +929,60 @@ async function findMints(connection: Connection, limit: number) {
   });
 }
 
+/**
+ * Pools from PumpSwap's recent devnet transactions (the first account of each
+ * PumpSwap instruction, kept when it is a `Pool`), and which of them Rung can
+ * buy from: canonical (pump's migration pool), paired with SOL, not cashback.
+ */
+async function findPools(connection: Connection, limit: number) {
+  const sigs = (await connection.getSignaturesForAddress(PUMP_SWAP_PROGRAM_ID, { limit })).filter((s) => !s.err);
+  const candidates = new Set<string>();
+  for (const s of sigs) {
+    const tx = await getTx(connection, s.signature);
+    await pause(1_000); // the public devnet RPC allows about 10 getTransaction calls per 10 s
+    if (!tx?.meta) continue;
+    const keys = tx.transaction.message.getAccountKeys({ accountKeysFromLookups: tx.meta.loadedAddresses });
+    const ixs = [
+      ...tx.transaction.message.compiledInstructions.map((c) => ({ program: keys.get(c.programIdIndex)!, first: c.accountKeyIndexes[0] })),
+      ...(tx.meta.innerInstructions ?? []).flatMap((g) => g.instructions.map((c) => ({ program: keys.get(c.programIdIndex)!, first: c.accounts[0] }))),
+    ];
+    for (const ix of ixs) {
+      if (ix.program.equals(PUMP_SWAP_PROGRAM_ID) && ix.first !== undefined) candidates.add(keys.get(ix.first)!.toBase58());
+    }
+  }
+  const list = [...candidates].slice(0, 100).map((k) => new PublicKey(k));
+  const infos = list.length ? await connection.getMultipleAccountsInfo(list) : [];
+  const pools = list
+    .map((address, i) => ({ address, info: infos[i] }))
+    .filter((x) => x.info?.owner.equals(PUMP_SWAP_PROGRAM_ID) && startsWith(x.info.data, POOL_DISCRIMINATOR))
+    .map((x) => ({ address: x.address, pool: decodePool(x.info!.data) }));
+  console.log(`scanned ${sigs.length} recent successful PumpSwap transactions on devnet: ${pools.length} pools`);
+
+  const usable = pools.filter(
+    (p) => p.address.equals(canonicalPoolPda(p.pool.baseMint)) && p.pool.quoteMint.equals(WSOL_MINT) && !p.pool.isCashbackCoin,
+  );
+  for (const p of pools.filter((x) => !usable.includes(x))) {
+    const why = !p.address.equals(canonicalPoolPda(p.pool.baseMint))
+      ? "not canonical"
+      : !p.pool.quoteMint.equals(WSOL_MINT)
+        ? `quote ${p.pool.quoteMint.toBase58()}`
+        : "cashback";
+    console.log(`    ${p.address.toBase58()}  mint ${p.pool.baseMint.toBase58()}  skipped: ${why}`);
+  }
+  if (usable.length === 0) return console.log("no canonical, SOL-paired, non-cashback pool in these transactions");
+  const balances = await connection.getMultipleAccountsInfo(usable.flatMap((p) => [p.pool.poolBaseTokenAccount, p.pool.poolQuoteTokenAccount]));
+  console.log("canonical SOL pools (usable with --venue pool):");
+  usable.forEach((p, i) => {
+    const [b, q] = [balances[2 * i], balances[2 * i + 1]];
+    const base = b ? tokenAccountAmount(b.data) : 0n;
+    const quote = q ? tokenAccountAmount(q.data) : 0n;
+    console.log(
+      `  * mint ${p.pool.baseMint.toBase58()}  pool ${p.address.toBase58()}  base ${base}  quote ${quote} + virtual ${p.pool.virtualQuoteReserves}` +
+        `${p.pool.isMayhemMode ? "  mayhem" : ""}  (${p.pool.dataLength} bytes)`,
+    );
+  });
+}
+
 const fmtFees = (f: { lpFeeBps: bigint; protocolFeeBps: bigint; creatorFeeBps: bigint }) =>
   `lp ${f.lpFeeBps} / protocol ${f.protocolFeeBps} / creator ${f.creatorFeeBps} bps`;
 
@@ -803,47 +995,46 @@ async function simulateBuy(connection: Connection, flags: Flags, mint: PublicKey
   const amountText = str(flags, "amount");
   if (!amountText) throw new Error("--amount <SOL> is required");
   const amount = parseSol(amountText);
-  const m = await loadMarket(connection, mint);
-  const q = quoteOrder(amount, m.curve, m.feeConfig, m.supply);
+  const m = await loadMarket(connection, mint, str(flags, "venue"));
+  const q = quoteMarket(m, amount);
   const ata = associatedTokenAddress(payer, mint, m.tokenProgram);
   const [payerInfo, ataInfo] = await connection.getMultipleAccountsInfo([payer, ata]);
   const before = ataInfo ? tokenAccountAmount(ataInfo.data) : 0n;
-  const instructions = [
-    computeUnitLimitIx(400_000),
-    createAtaIdempotentIx({ payer, owner: payer, mint, tokenProgram: m.tokenProgram }),
-    pumpBuyExactQuoteInV3Ix({
-      buyer: payer,
-      mint,
-      tokenProgram: m.tokenProgram,
-      buybackRecipient: m.buybackRecipient,
-      spendable: amount,
-      minTokensOut: q.expectedTokensSeen,
-    }),
-  ];
-  const message = new TransactionMessage({
-    payerKey: payer,
-    recentBlockhash: PublicKey.default.toBase58(), // replaced by the RPC
-    instructions,
-  }).compileToV0Message();
-  const sim = await connection.simulateTransaction(new VersionedTransaction(message), {
-    sigVerify: false,
-    replaceRecentBlockhash: true,
-    commitment: "confirmed",
-    accounts: { encoding: "base64", addresses: [ata.toBase58()] },
-  });
-  const v = sim.value;
-  console.log(`simulated pump buy_exact_quote_in_v3 by ${payer.toBase58()} (${sol(BigInt(payerInfo?.lamports ?? 0))}), ${sol(amount)} of ${mint.toBase58()} (${tokenProgramName(m.tokenProgram)})`);
-  console.log(`  min_tokens_out = our quote ${q.expectedTokensSeen} (fee tier ${q.protocolFeeBps}+${q.creatorFeeBps} bps; raw ${q.rawTokensSeen})`);
-  console.log(`  result: ${v.err ? JSON.stringify(v.err) : "ok"}; compute units ${v.unitsConsumed ?? "?"}`);
-  const post = v.accounts?.[0];
-  if (post) {
-    const got = tokenAccountAmount(base64Decode((post.data as unknown as [string, string])[0])) - before;
-    console.log(`  tokens received ${got} (quote ${q.expectedTokensSeen}, difference ${got - q.expectedTokensSeen})`);
-  }
-  if (v.err) {
-    console.log(`  ${describeFailure(classifyFailure(v.err, v.logs ?? [], instructions.map((i) => i.programId)))}`);
-  }
-  for (const line of (v.logs ?? []).filter((l) => /invoke \[1\]|failed|Error|consumed .* of/.test(l)).slice(-12)) console.log(`  | ${line}`);
+  const what = m.venue === "Curve" ? "pump buy_exact_quote_in_v3" : `PumpSwap wrap + buy_exact_quote_in_v2 on pool ${m.pm.poolAccounts.address.toBase58()}`;
+  console.log(`simulated ${what} by ${payer.toBase58()} (${sol(BigInt(payerInfo?.lamports ?? 0))}), ${sol(amount)} of ${mint.toBase58()} (${tokenProgramName(m.tokenProgram)})`);
+  console.log(`  quote ${q.expectedTokensSeen} (fee tier ${q.feeText}; fee-free ${q.rawTokensSeen})`);
+
+  const simulate = async (minTokensOut: bigint) => {
+    const instructions = [
+      computeUnitLimitIx(400_000),
+      createAtaIdempotentIx({ payer, owner: payer, mint, tokenProgram: m.tokenProgram }),
+      ...directBuyIxs(m, payer, amount, minTokensOut),
+    ];
+    const message = new TransactionMessage({
+      payerKey: payer,
+      recentBlockhash: PublicKey.default.toBase58(), // replaced by the RPC
+      instructions,
+    }).compileToV0Message();
+    const v = (
+      await connection.simulateTransaction(new VersionedTransaction(message), {
+        sigVerify: false,
+        replaceRecentBlockhash: true,
+        commitment: "confirmed",
+        accounts: { encoding: "base64", addresses: [ata.toBase58()] },
+      })
+    ).value;
+    console.log(`  min_tokens_out ${minTokensOut}: ${v.err ? JSON.stringify(v.err) : "ok"}; compute units ${v.unitsConsumed ?? "?"}`);
+    const post = v.accounts?.[0];
+    if (post && !v.err) {
+      const got = tokenAccountAmount(base64Decode((post.data as unknown as [string, string])[0])) - before;
+      console.log(`    tokens received ${got} (quote ${q.expectedTokensSeen}, difference ${got - q.expectedTokensSeen})`);
+    }
+    if (v.err) console.log(`    ${describeFailure(classifyFailure(v.err, v.logs ?? [], instructions.map((i) => i.programId)))}`);
+    for (const line of (v.logs ?? []).filter((l) => /invoke \[1\]|failed|Error|consumed .* of/.test(l)).slice(-12)) console.log(`    | ${line}`);
+    return v.err;
+  };
+  // With the quote as the minimum, then (if that fails) with 1 to see what the venue gives.
+  if (await simulate(q.expectedTokensSeen)) await simulate(1n);
 }
 
 // --- main ----------------------------------------------------------------------------------
@@ -853,6 +1044,10 @@ async function main() {
   const connection = new Connection(str(flags, "rpc") ?? DEFAULT_RPC, "confirmed");
   await assertDevnet(connection);
 
+  if (flags["find-pool"]) {
+    await findPools(connection, Number(int(flags, "limit", 25n)));
+    return;
+  }
   if (flags["find-mint"] || (!flags.mint && !flags.status && !flags.refund && !flags.cancel)) {
     await findMints(connection, Number(int(flags, "limit", 25n)));
     return;

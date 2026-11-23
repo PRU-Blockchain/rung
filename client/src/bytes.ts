@@ -107,6 +107,9 @@ export class Reader {
     const hi = this.u64();
     return (hi << 64n) | lo;
   }
+  i128(): bigint {
+    return BigInt.asIntN(128, this.u128());
+  }
   pubkey(): PublicKey {
     return new PublicKey(this.bytes(32));
   }

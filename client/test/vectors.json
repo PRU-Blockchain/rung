@@ -133,6 +133,108 @@
         "ComputeBudget111111111111111111111111111111",
         "Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio"
       ]
+    },
+    {
+      "err": {
+        "InstructionError": [
+          1,
+          {
+            "Custom": 6040
+          }
+        ]
+      },
+      "expected": {
+        "code": 6040,
+        "kind": "slippage",
+        "program": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"
+      },
+      "logs": [
+        "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+        "Program ComputeBudget111111111111111111111111111111 success",
+        "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio invoke [1]",
+        "Program log: Instruction: TryRung",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]",
+        "Program log: CreateIdempotent",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: GetAccountDataSize",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1569 of 1359378 compute units",
+        "Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA=",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program 11111111111111111111111111111111 invoke [3]",
+        "Program 11111111111111111111111111111111 success",
+        "Program log: Initialize the associated token account",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: InitializeImmutableOwner",
+        "Program log: Please upgrade to SPL Token 2022 for immutable owner support",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1405 of 1352899 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: InitializeAccount3",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 4188 of 1349068 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 21731 of 1366307 compute units",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]",
+        "Program log: CreateIdempotent",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: GetAccountDataSize",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1569 of 1335151 compute units",
+        "Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA=",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program 11111111111111111111111111111111 invoke [3]",
+        "Program 11111111111111111111111111111111 success",
+        "Program log: Initialize the associated token account",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: InitializeImmutableOwner",
+        "Program log: Please upgrade to SPL Token 2022 for immutable owner support",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1405 of 1328672 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: InitializeAccount3",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 4188 of 1324843 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 20130 of 1340502 compute units",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]",
+        "Program log: CreateIdempotent",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: GetAccountDataSize",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1569 of 1307821 compute units",
+        "Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA=",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program 11111111111111111111111111111111 invoke [3]",
+        "Program 11111111111111111111111111111111 success",
+        "Program log: Initialize the associated token account",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: InitializeImmutableOwner",
+        "Program log: Please upgrade to SPL Token 2022 for immutable owner support",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1405 of 1301342 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: InitializeAccount3",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 3158 of 1297504 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 20609 of 1314672 compute units",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success",
+        "Program 11111111111111111111111111111111 invoke [2]",
+        "Program 11111111111111111111111111111111 success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [2]",
+        "Program log: Instruction: SyncNative",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 3045 of 1291084 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA invoke [2]",
+        "Program log: Instruction: BuyExactQuoteInV2",
+        "Program log: AnchorError thrown in test-programs/mock-pump-amm/src/lib.rs:160. Error Code: BuySlippageBelowMinBaseAmountOut. Error Number: 6040. Error Message: buy: slippage - would buy less tokens than expected min_base_amount_out.",
+        "Program pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA consumed 15932 of 1284318 compute units",
+        "Program pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA failed: custom program error: 0x1798",
+        "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio consumed 131464 of 1399850 compute units",
+        "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio failed: custom program error: 0x1798"
+      ],
+      "name": "pumpswap_slippage",
+      "program_ids": [
+        "ComputeBudget111111111111111111111111111111",
+        "Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio"
+      ]
     }
   ],
   "instructions": {
@@ -774,6 +876,165 @@
         "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio failed: custom program error: 0x179a"
       ],
       "name": "try_rung_slippage"
+    },
+    {
+      "events": [
+        {
+          "amount": "100000000",
+          "expectedTokensSeen": "232234089032",
+          "expectedTokensStart": "232234089032",
+          "lastSlot": "1100",
+          "mint": "3qbR1eZRqXUWroWKKYhbDmR3FfqTHfqSU8zZSxtANzYh",
+          "name": "OrderOpened",
+          "rungCount": 2,
+          "rungsBps": [
+            100,
+            300
+          ],
+          "sessionKey": "HqznL4EpJTbWZmqqetb4sJPftBUN1s6uNdQURBAfAsBr",
+          "startSlot": "1000",
+          "user": "GhFJh9xhWQULf6W1WJLNTViiTWEs4wAj3FevZ616wxL2",
+          "venue": "PumpSwap",
+          "windowSlots": "4"
+        }
+      ],
+      "logs": [
+        "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio invoke [1]",
+        "Program log: Instruction: OpenOrder",
+        "Program 11111111111111111111111111111111 invoke [2]",
+        "Program 11111111111111111111111111111111 success",
+        "Program 11111111111111111111111111111111 invoke [2]",
+        "Program 11111111111111111111111111111111 success",
+        "Program 11111111111111111111111111111111 invoke [2]",
+        "Program 11111111111111111111111111111111 success",
+        "Program data: Av7FGCmm4TjpLrYFT+m8aCobzzt1n2WrOKTPvYHE0fM0LkzJze2LC/pINBR/bmkMNpPv9hM2BGQDzYrioU8xs8QHNYVpI5VlKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioBAOH1BQAAAAACZAAsAQAAAAAAAEj6OhI2AAAASPo6EjYAAADoAwAAAAAAAAQAAAAAAAAATAQAAAAAAAA=",
+        "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio consumed 29455 of 200000 compute units",
+        "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio success"
+      ],
+      "name": "open_order_pumpswap"
+    },
+    {
+      "events": [
+        {
+          "expectedTokensSeen": "232234089032",
+          "expectedTokensStart": "232234089032",
+          "lamportsSpent": "100000000",
+          "mint": "3qbR1eZRqXUWroWKKYhbDmR3FfqTHfqSU8zZSxtANzYh",
+          "name": "OrderFilled",
+          "rungBps": 300,
+          "rungIndex": 1,
+          "slot": "1004",
+          "tokensBought": "227685663401",
+          "user": "GhFJh9xhWQULf6W1WJLNTViiTWEs4wAj3FevZ616wxL2"
+        }
+      ],
+      "logs": [
+        "Program ComputeBudget111111111111111111111111111111 invoke [1]",
+        "Program ComputeBudget111111111111111111111111111111 success",
+        "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio invoke [1]",
+        "Program log: Instruction: TryRung",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]",
+        "Program log: CreateIdempotent",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: GetAccountDataSize",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1569 of 1359377 compute units",
+        "Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA=",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program 11111111111111111111111111111111 invoke [3]",
+        "Program 11111111111111111111111111111111 success",
+        "Program log: Initialize the associated token account",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: InitializeImmutableOwner",
+        "Program log: Please upgrade to SPL Token 2022 for immutable owner support",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1405 of 1352898 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: InitializeAccount3",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 4188 of 1349067 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 21731 of 1366306 compute units",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]",
+        "Program log: CreateIdempotent",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: GetAccountDataSize",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1569 of 1335150 compute units",
+        "Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA=",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program 11111111111111111111111111111111 invoke [3]",
+        "Program 11111111111111111111111111111111 success",
+        "Program log: Initialize the associated token account",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: InitializeImmutableOwner",
+        "Program log: Please upgrade to SPL Token 2022 for immutable owner support",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1405 of 1328671 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: InitializeAccount3",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 4188 of 1324842 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 20130 of 1340501 compute units",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL invoke [2]",
+        "Program log: CreateIdempotent",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: GetAccountDataSize",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1569 of 1307820 compute units",
+        "Program return: TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA pQAAAAAAAAA=",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program 11111111111111111111111111111111 invoke [3]",
+        "Program 11111111111111111111111111111111 success",
+        "Program log: Initialize the associated token account",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: InitializeImmutableOwner",
+        "Program log: Please upgrade to SPL Token 2022 for immutable owner support",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 1405 of 1301341 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: InitializeAccount3",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 3158 of 1297503 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL consumed 20609 of 1314671 compute units",
+        "Program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL success",
+        "Program 11111111111111111111111111111111 invoke [2]",
+        "Program 11111111111111111111111111111111 success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [2]",
+        "Program log: Instruction: SyncNative",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 3045 of 1291083 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA invoke [2]",
+        "Program log: Instruction: BuyExactQuoteInV2",
+        "Program 11111111111111111111111111111111 invoke [3]",
+        "Program 11111111111111111111111111111111 success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: TransferChecked",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 6238 of 1266175 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [3]",
+        "Program log: Instruction: TransferChecked",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 6147 of 1258000 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA consumed 33272 of 1284317 compute units",
+        "Program pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [2]",
+        "Program log: Instruction: CloseAccount",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 2915 of 1249333 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [2]",
+        "Program log: Instruction: TransferChecked",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 6147 of 1244509 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA invoke [2]",
+        "Program log: Instruction: CloseAccount",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA consumed 2916 of 1236636 compute units",
+        "Program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA success",
+        "Program 11111111111111111111111111111111 invoke [2]",
+        "Program 11111111111111111111111111111111 success",
+        "Program data: eHxtQvl0rh7pLrYFT+m8aCobzzt1n2WrOKTPvYHE0fM0LkzJze2LCyoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqASwBqYIfAzUAAAAA4fUFAAAAAEj6OhI2AAAASPo6EjYAAADsAwAAAAAAAA==",
+        "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio consumed 170467 of 1399850 compute units",
+        "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio success"
+      ],
+      "name": "try_rung_filled_pumpswap"
     }
   ],
   "math": {
@@ -867,5 +1128,466 @@
     "vault": "EdvbDQD2Babz8TV5otmGRVJD4Cs9nRfYXVvohtiqGLTg",
     "vault_accumulator": "tvgvdhFeJid4YSjxmwbk49HDR9m7HxrCM862MFor1vY",
     "vault_ata_spl": "5o9KuJkyhwwfL3uqhLonvSGYrD8sqStrd2ZzEQ2eqYxt"
+  },
+  "pumpswap": {
+    "direct_buy": {
+      "accounts": [
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "7gos52PBuTaabYmn9TXGUoSEruEw9hPiwQ2rwd4ibmei"
+        },
+        {
+          "is_signer": true,
+          "is_writable": true,
+          "pubkey": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "ADyA8hdefvWN2dbGGWFotbzWxrAvLW83WG6QCVXvJKqw"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "So11111111111111111111111111111111111111112"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "HwD4QpS4bsutLbWZWhbmFUZfkXC5Au1DbkzYEzjDgps8"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "7i4VVk55NzhtekVjPg7EZzoSGznZYixPyd5cCeDxi7rW"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "B5XpyDaMUt2vntW5DxdxF9jQuDdEFeXB18hauq5ECaxm"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "7Q3RKS6YeMD5bHbeKKgZt6Eyefp3115yWKCbsHcqvT72"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "11111111111111111111111111111111"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "DRwEWMguQzPGhaZiNPp3u9svNyJwdvPmtv3EzZjnPDUm"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "5PHirr8joyTMp9JMm6nW7hNDVyEYdkzDqazxPD7RaTjx"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "HjQjngTDqoHE6aaGhUqfz9aQ7WZcBRjy5xB8PScLSr8i"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "GS4CU59F31iL7aR2Q8zVS8DRrcRnXX1yjQ66TqNVQnaR"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"
+        }
+      ],
+      "data": "c2ab1c46684d5b2f00e1f50500000000e40122f113000000",
+      "program_id": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"
+    },
+    "inputs": {
+      "buyback_wallet": "5YxQFdt3Tr9zJLvkFccqXVUwhdTWJQc1fFg2YPbxvxeD",
+      "direct_buy": {
+        "min_tokens_out": "85649916388",
+        "spendable": "100000000"
+      },
+      "open_order_args": {
+        "amount": "100000000",
+        "expected_tokens_seen": "85649916388",
+        "fee_budget": "913730",
+        "lifetime_slots": "150",
+        "raw_tokens_seen": "86677037219",
+        "rent_reserve": "6362320",
+        "rungs_bps": [
+          100,
+          300
+        ],
+        "venue": "PumpSwap",
+        "window_slots": "4"
+      },
+      "try_rung_index": 1
+    },
+    "open_order": {
+      "accounts": [
+        {
+          "is_signer": true,
+          "is_writable": true,
+          "pubkey": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "HLi8ywZRnroyqu1cndAAGFshJQRkTvsnia3Z7ReDpwrf"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "EdvbDQD2Babz8TV5otmGRVJD4Cs9nRfYXVvohtiqGLTg"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "7gos52PBuTaabYmn9TXGUoSEruEw9hPiwQ2rwd4ibmei"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "11111111111111111111111111111111"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "B5XpyDaMUt2vntW5DxdxF9jQuDdEFeXB18hauq5ECaxm"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "7Q3RKS6YeMD5bHbeKKgZt6Eyefp3115yWKCbsHcqvT72"
+        }
+      ],
+      "data": "ce58588f268832e0010200000064002c0100e1f50500000000d01461000000000042f10d0000000000e40122f113000000a3a05a2e1400000004000000000000009600000000000000",
+      "program_id": "Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio"
+    },
+    "pdas": {
+      "buyback_wsol": "HjQjngTDqoHE6aaGhUqfz9aQ7WZcBRjy5xB8PScLSr8i",
+      "canonical_pool": "7gos52PBuTaabYmn9TXGUoSEruEw9hPiwQ2rwd4ibmei",
+      "event_authority": "GS4CU59F31iL7aR2Q8zVS8DRrcRnXX1yjQ66TqNVQnaR",
+      "fee_config": "5PHirr8joyTMp9JMm6nW7hNDVyEYdkzDqazxPD7RaTjx",
+      "global_config": "ADyA8hdefvWN2dbGGWFotbzWxrAvLW83WG6QCVXvJKqw",
+      "pool_authority": "CkbXQ7Uh8o1bYaKbZ9JWntykUQqpnqe9YwfjahcJjVeA",
+      "pool_base_2022": "J5y8NiqUSrC7WPnjL5PhHpY8EEt1PcGBCwAmqvippz9h",
+      "pool_base_spl": "B5XpyDaMUt2vntW5DxdxF9jQuDdEFeXB18hauq5ECaxm",
+      "pool_quote": "7Q3RKS6YeMD5bHbeKKgZt6Eyefp3115yWKCbsHcqvT72",
+      "vault_accumulator": "CTqv92FKBfNWv9QXgxRg4weZ7ntoNm3LfjLdY1pq4Jmy",
+      "vault_wsol": "38rRdFHws4U3W1ZchfKuFPtc3Ut9mwbahBhqZjsUQoiJ"
+    },
+    "try_rung_2022": {
+      "accounts": [
+        {
+          "is_signer": true,
+          "is_writable": true,
+          "pubkey": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "HLi8ywZRnroyqu1cndAAGFshJQRkTvsnia3Z7ReDpwrf"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "EdvbDQD2Babz8TV5otmGRVJD4Cs9nRfYXVvohtiqGLTg"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "2FmyddzbW9FLZhBEdPGFddmUMp6XJjQctmyb95hWhqVe"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "EfEdrGRaNdEGUrNJmAst5UruZc5GjPmn6Gu4Cj5JYUAo"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "11111111111111111111111111111111"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "7gos52PBuTaabYmn9TXGUoSEruEw9hPiwQ2rwd4ibmei"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "EdvbDQD2Babz8TV5otmGRVJD4Cs9nRfYXVvohtiqGLTg"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "ADyA8hdefvWN2dbGGWFotbzWxrAvLW83WG6QCVXvJKqw"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "So11111111111111111111111111111111111111112"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "EfEdrGRaNdEGUrNJmAst5UruZc5GjPmn6Gu4Cj5JYUAo"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "38rRdFHws4U3W1ZchfKuFPtc3Ut9mwbahBhqZjsUQoiJ"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "J5y8NiqUSrC7WPnjL5PhHpY8EEt1PcGBCwAmqvippz9h"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "7Q3RKS6YeMD5bHbeKKgZt6Eyefp3115yWKCbsHcqvT72"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "11111111111111111111111111111111"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "CTqv92FKBfNWv9QXgxRg4weZ7ntoNm3LfjLdY1pq4Jmy"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "5PHirr8joyTMp9JMm6nW7hNDVyEYdkzDqazxPD7RaTjx"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "HjQjngTDqoHE6aaGhUqfz9aQ7WZcBRjy5xB8PScLSr8i"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "GS4CU59F31iL7aR2Q8zVS8DRrcRnXX1yjQ66TqNVQnaR"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"
+        }
+      ],
+      "data": "8c5ffc31ac0b0dec01",
+      "program_id": "Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio"
+    },
+    "try_rung_spl": {
+      "accounts": [
+        {
+          "is_signer": true,
+          "is_writable": true,
+          "pubkey": "8qbHbw2BbbTHBW1sbeqakYXVKRQM8Ne7pLK7m6CVfeR"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "HLi8ywZRnroyqu1cndAAGFshJQRkTvsnia3Z7ReDpwrf"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "4vJ9JU1bJJE96FWSJKvHsmmFADCg4gpZQff4P3bkLKi"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "EdvbDQD2Babz8TV5otmGRVJD4Cs9nRfYXVvohtiqGLTg"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "HwD4QpS4bsutLbWZWhbmFUZfkXC5Au1DbkzYEzjDgps8"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "5o9KuJkyhwwfL3uqhLonvSGYrD8sqStrd2ZzEQ2eqYxt"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "11111111111111111111111111111111"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "7gos52PBuTaabYmn9TXGUoSEruEw9hPiwQ2rwd4ibmei"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "EdvbDQD2Babz8TV5otmGRVJD4Cs9nRfYXVvohtiqGLTg"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "ADyA8hdefvWN2dbGGWFotbzWxrAvLW83WG6QCVXvJKqw"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "CktRuQ2mttgRGkXJtyksdKHjUdc2C4TgDzyB98oEzy8"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "So11111111111111111111111111111111111111112"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "5o9KuJkyhwwfL3uqhLonvSGYrD8sqStrd2ZzEQ2eqYxt"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "38rRdFHws4U3W1ZchfKuFPtc3Ut9mwbahBhqZjsUQoiJ"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "B5XpyDaMUt2vntW5DxdxF9jQuDdEFeXB18hauq5ECaxm"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "7Q3RKS6YeMD5bHbeKKgZt6Eyefp3115yWKCbsHcqvT72"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "11111111111111111111111111111111"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "CTqv92FKBfNWv9QXgxRg4weZ7ntoNm3LfjLdY1pq4Jmy"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "5PHirr8joyTMp9JMm6nW7hNDVyEYdkzDqazxPD7RaTjx"
+        },
+        {
+          "is_signer": false,
+          "is_writable": true,
+          "pubkey": "HjQjngTDqoHE6aaGhUqfz9aQ7WZcBRjy5xB8PScLSr8i"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "GS4CU59F31iL7aR2Q8zVS8DRrcRnXX1yjQ66TqNVQnaR"
+        },
+        {
+          "is_signer": false,
+          "is_writable": false,
+          "pubkey": "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA"
+        }
+      ],
+      "data": "8c5ffc31ac0b0dec01",
+      "program_id": "Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio"
+    }
   }
 }

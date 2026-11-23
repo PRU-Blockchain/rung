@@ -14,7 +14,7 @@ use anchor_lang::{
     pubkey,
     solana_program::instruction::{error::InstructionError, Instruction},
 };
-use common::*;
+use common::{amm::*, *};
 use litesvm::types::TransactionResult;
 use rung::{
     events::{OrderFilled, OrderOpened, OrderRefunded},
@@ -59,6 +59,93 @@ fn fixed_env(seed: u8) -> Env {
     env.mint = mint;
     env.svm.airdrop(&env.user.pubkey(), USER_AIRDROP).unwrap();
     env
+}
+
+/// The PumpSwap counterpart of `fixed_env`: the AMM double, and a fixed mint
+/// with its canonical pool at the default pool reserves.
+fn fixed_amm_env(seed: u8) -> AmmEnv {
+    let mut amm = AmmEnv::new();
+    amm.env.user = Keypair::new_from_array([seed; 32]);
+    amm.env.session = Keypair::new_from_array([seed + 1; 32]);
+    let mint = key(seed + 2);
+    amm.env.create_mint(&mint, TOKEN);
+    amm.env.mint = mint;
+    amm.pool = amm.create_pool(&mint, 0, &pool_authority_pda(&mint), &WSOL, POOL_BASE, POOL_QUOTE, 0);
+    let user = amm.env.user.pubkey();
+    amm.env.svm.airdrop(&user, USER_AIRDROP).unwrap();
+    amm
+}
+
+/// Instructions and PDAs of a PumpSwap order with fixed inputs.
+fn pumpswap_vectors(user: &Pubkey, session: &Pubkey, mint: &Pubkey) -> Value {
+    let pool_with = |token_program: &Pubkey| {
+        let address = canonical_pool(mint);
+        AmmPool {
+            address,
+            base_token_account: ata(&address, mint, token_program),
+            quote_token_account: ata(&address, &WSOL, &TOKEN),
+        }
+    };
+    let (pool_spl, pool_2022) = (pool_with(&TOKEN), pool_with(&TOKEN_2022));
+    let args = OpenOrderArgs {
+        venue: Venue::PumpSwap,
+        rungs_bps: vec![100, 300],
+        amount: 100_000_000,
+        rent_reserve: 6_362_320,
+        fee_budget: 913_730,
+        expected_tokens_seen: 85_649_916_388,
+        raw_tokens_seen: 86_677_037_219,
+        window_slots: 4,
+        lifetime_slots: 150,
+    };
+    let reserves = [
+        AccountMeta::new_readonly(pool_spl.base_token_account, false),
+        AccountMeta::new_readonly(pool_spl.quote_token_account, false),
+    ];
+    let open = open_order_ix_with_remaining(user, session, mint, &pool_spl.address, args, &reserves);
+    let vault = vault_pda(user);
+    let try_ix = |token_program: &Pubkey, pool: &AmmPool| {
+        let mut accounts = TryRungAccounts::new(session, user, mint, token_program);
+        accounts.remaining = amm_buy_accounts(&vault, mint, token_program, pool, &buyback_wsol_account(), false);
+        accounts.ix(1)
+    };
+    let direct = Instruction {
+        program_id: PUMP_SWAP,
+        accounts: amm_buy_accounts(user, mint, &TOKEN, &pool_spl, &buyback_wsol_account(), true),
+        data: amm_buy_data(100_000_000, 85_649_916_388),
+    };
+    assert_eq!(amm_global_config_pda(), AMM_GLOBAL_CONFIG);
+    assert_eq!(amm_fee_config_pda(), AMM_FEE_CONFIG);
+    json!({
+        "inputs": {
+            "open_order_args": {
+                "venue": "PumpSwap", "rungs_bps": [100, 300], "amount": "100000000",
+                "rent_reserve": "6362320", "fee_budget": "913730",
+                "expected_tokens_seen": "85649916388", "raw_tokens_seen": "86677037219",
+                "window_slots": "4", "lifetime_slots": "150"
+            },
+            "try_rung_index": 1,
+            "buyback_wallet": BUYBACK_RECIPIENT.to_string(),
+            "direct_buy": { "spendable": "100000000", "min_tokens_out": "85649916388" }
+        },
+        "open_order": ix_json(&open),
+        "try_rung_spl": ix_json(&try_ix(&TOKEN, &pool_spl)),
+        "try_rung_2022": ix_json(&try_ix(&TOKEN_2022, &pool_2022)),
+        "direct_buy": ix_json(&direct),
+        "pdas": {
+            "pool_authority": pool_authority_pda(mint).to_string(),
+            "canonical_pool": pool_spl.address.to_string(),
+            "pool_base_spl": pool_spl.base_token_account.to_string(),
+            "pool_base_2022": pool_2022.base_token_account.to_string(),
+            "pool_quote": pool_spl.quote_token_account.to_string(),
+            "global_config": amm_global_config_pda().to_string(),
+            "fee_config": amm_fee_config_pda().to_string(),
+            "event_authority": amm_event_authority_pda().to_string(),
+            "vault_accumulator": amm_accumulator_pda(&vault).to_string(),
+            "vault_wsol": wsol_ata(&vault).to_string(),
+            "buyback_wsol": buyback_wsol_account().to_string(),
+        },
+    })
 }
 
 fn logs_of(res: &TransactionResult) -> Vec<String> {
@@ -190,6 +277,8 @@ fn write_client_vectors() {
         "cu_limit": ix_json(&cu_limit_ix(200_000)),
     });
 
+    let pumpswap = pumpswap_vectors(&user, &session, &mint);
+
     let vault = vault_pda(&user);
     let pdas = json!({
         "order": order_pda(&user).to_string(),
@@ -268,23 +357,40 @@ fn write_client_vectors() {
     let cancelled = c.cancel(&user_c);
     assert_ok(&cancelled);
 
+    // Order D, on the canonical pool (AMM double, 1.2% fee): the pool price
+    // rises 2% after the order opens, so the 1% rung fails in PumpSwap (6040)
+    // and the 3% rung fills.
+    let mut d = fixed_amm_env(40);
+    let spec = d.spec();
+    let pool_opened = d.open_order(&spec);
+    assert_ok(&pool_opened);
+    d.set_reserves(POOL_BASE, quote_reserves_up(POOL_QUOTE, 200));
+    let pool_slippage = d.try_rung(0);
+    d.warp(START_SLOT + WINDOW);
+    let pool_filled = d.try_rung(1);
+    assert_ok(&pool_filled);
+
     let logs = json!([
         log_case("open_order", &opened),
         log_case("try_rung_filled", &filled),
         log_case("refund_gave_up", &gave_up),
         log_case("cancel", &cancelled),
         log_case("try_rung_slippage", &slippage),
+        log_case("open_order_pumpswap", &pool_opened),
+        log_case("try_rung_filled_pumpswap", &pool_filled),
     ]);
     let errors = json!([
         error_case("pump_slippage", &slippage, &PUMP, PUMP_SLIPPAGE, "slippage"),
         error_case("rung_not_due", &not_due, &rung::ID, rung_code(rung::error::RungError::RungNotDue), "rung"),
         error_case("order_filled", &after_fill, &rung::ID, rung_code(rung::error::RungError::OrderFilled), "order-filled"),
+        error_case("pumpswap_slippage", &pool_slippage, &PUMP_SWAP, AMM_SLIPPAGE, "slippage"),
     ]);
 
     let out = json!({
         "about": "Written by programs/rung/tests/client_vectors.rs; do not edit by hand.",
         "instructions": instructions,
         "pdas": pdas,
+        "pumpswap": pumpswap,
         "math": { "min_tokens": min_cases, "raw_quote": raw_cases },
         "logs": logs,
         "errors": errors,

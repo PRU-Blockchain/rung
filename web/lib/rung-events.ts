@@ -25,6 +25,17 @@ export type RungIx = keyof typeof RUNG_IX;
 export const PUMP_PROGRAM_ID = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P";
 /** pump's `BuySlippageBelowMinTokensOut`. */
 export const PUMP_SLIPPAGE_ERROR = 6042;
+export const PUMP_SWAP_PROGRAM_ID = "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA";
+/** PumpSwap's `BuySlippageBelowMinBaseAmountOut` (from pump, 6040 means something else). */
+export const PUMP_SWAP_SLIPPAGE_ERROR = 6040;
+
+/** client/src/errors.ts isVenueSlippage: a venue refused the rung's minimum. */
+export function isVenueSlippage(programId: string | undefined, code: number | undefined): boolean {
+  return (
+    (programId === PUMP_PROGRAM_ID && code === PUMP_SLIPPAGE_ERROR) ||
+    (programId === PUMP_SWAP_PROGRAM_ID && code === PUMP_SWAP_SLIPPAGE_ERROR)
+  );
+}
 /** Rung's `OrderFilled` error: a try after the order already bought. */
 export const RUNG_ORDER_FILLED_ERROR = 6012;
 
@@ -33,8 +44,12 @@ const MAX_RUNGS = 5;
 export type RefundReason = "Expired" | "GaveUp" | "Cancelled";
 const REFUND_REASONS: readonly RefundReason[] = ["Expired", "GaveUp", "Cancelled"];
 
+/** client/src/constants.ts VENUES (Borsh index = position). */
+export type Venue = "Curve" | "PumpSwap";
+const VENUES: readonly Venue[] = ["Curve", "PumpSwap"];
+
 export type RungEvent =
-  | { name: "OrderOpened"; user: string; rungCount: number; rungsBps: number[]; amount: number }
+  | { name: "OrderOpened"; user: string; venue: Venue; rungCount: number; rungsBps: number[]; amount: number }
   | { name: "OrderFilled"; user: string; rungIndex: number; rungBps: number; lamportsSpent: number }
   | { name: "OrderRefunded"; user: string; reason: RefundReason; lamportsReturned: number };
 
@@ -126,11 +141,12 @@ export function decodeEvent(data: Uint8Array): RungEvent | null {
     const user = r.pubkeyHex();
     r.pubkeyHex(); // session key
     r.pubkeyHex(); // mint
-    r.u8(); // venue
+    const venue = VENUES[r.u8()];
+    if (!venue) throw new Error("unknown venue");
     const amount = r.u64();
     const rungCount = r.u8();
     const rungs = Array.from({ length: MAX_RUNGS }, () => r.u16());
-    return { name: "OrderOpened", user, rungCount, rungsBps: rungs.slice(0, rungCount), amount };
+    return { name: "OrderOpened", user, venue, rungCount, rungsBps: rungs.slice(0, rungCount), amount };
   }
   if (startsWith(data, RUNG_EVENT.OrderFilled)) {
     const r = new Reader(data, 8);

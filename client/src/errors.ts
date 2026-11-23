@@ -1,10 +1,18 @@
 // Error codes are only meaningful together with the program that raised them:
-// 6042 is a slippage failure only when pump raised it. The failing program is
-// read from the logs (the first `Program <id> failed` line is the innermost).
+// 6042 is a slippage failure only when pump raised it, 6040 only when PumpSwap
+// did (from pump, 6040 means "not enough SOL for rent"). The failing program
+// is read from the logs (the first `Program <id> failed` line is the innermost).
 
 import { PublicKey } from "@solana/web3.js";
 
-import { COMPUTE_BUDGET_PROGRAM_ID, PUMP_PROGRAM_ID, PUMP_SLIPPAGE_ERROR, RUNG_PROGRAM_ID } from "./constants";
+import {
+  COMPUTE_BUDGET_PROGRAM_ID,
+  PUMP_PROGRAM_ID,
+  PUMP_SLIPPAGE_ERROR,
+  PUMP_SWAP_PROGRAM_ID,
+  PUMP_SWAP_SLIPPAGE_ERROR,
+  RUNG_PROGRAM_ID,
+} from "./constants";
 
 /** Rung's `RungError` (target/idl/rung.json `errors`; a test compares them). */
 export const RUNG_ERRORS: Readonly<Record<number, string>> = {
@@ -55,6 +63,27 @@ export const PUMP_ERRORS: Readonly<Record<number, string>> = {
   6107: "QuoteCurveAwaitingMigration",
 };
 
+/**
+ * The PumpSwap errors a buy can raise (docs/pump-arayuz.md G; 6027 and 6053
+ * as observed in real_pumpswap.rs T8).
+ */
+export const PUMP_SWAP_ERRORS: Readonly<Record<number, string>> = {
+  6004: "ExceededSlippage",
+  6020: "DisabledBuy",
+  // A listed buyback wallet's wrapped-SOL account that does not exist.
+  6027: "AccountTypeNotSupported",
+  6039: "BuyNotEnoughQuoteTokensToCoverFees",
+  6040: "BuySlippageBelowMinBaseAmountOut",
+  6041: "MayhemModeDisabled",
+  // The buyback account belongs to a wallet that is not on the list.
+  6053: "BuybackFeeRecipientNotAuthorized",
+  6059: "MissingCashbackAccounts",
+  6062: "InvalidPoolV2",
+  6079: "CashbackCoinNotSupported",
+  6080: "MayhemPoolNotSupported",
+  6083: "FeeConfigTooShort",
+};
+
 /** Anchor framework errors, raised by any Anchor program (a few common ones). */
 export const ANCHOR_ERRORS: Readonly<Record<number, string>> = {
   100: "InstructionMissing",
@@ -73,7 +102,7 @@ export const ANCHOR_ERRORS: Readonly<Record<number, string>> = {
 };
 
 export type FailureKind =
-  /** pump refused the buy at this rung's minimum: try the next rung. */
+  /** pump (6042) or PumpSwap (6040) refused the buy at this rung's minimum: try the next rung. */
   | "slippage"
   /** Rung says the order already bought: stop. */
   | "order-filled"
@@ -96,12 +125,21 @@ export interface Failure {
 
 /** Name of `code` as raised by `programId`. Codes below 6000 are Anchor's own. */
 export function errorName(programId: PublicKey | undefined, code: number): string | undefined {
-  if (programId && code < 6000 && (programId.equals(RUNG_PROGRAM_ID) || programId.equals(PUMP_PROGRAM_ID))) {
-    return ANCHOR_ERRORS[code];
-  }
+  const anchor = [RUNG_PROGRAM_ID, PUMP_PROGRAM_ID, PUMP_SWAP_PROGRAM_ID];
+  if (programId && code < 6000 && anchor.some((id) => programId.equals(id))) return ANCHOR_ERRORS[code];
   if (programId?.equals(RUNG_PROGRAM_ID)) return RUNG_ERRORS[code];
   if (programId?.equals(PUMP_PROGRAM_ID)) return PUMP_ERRORS[code];
+  if (programId?.equals(PUMP_SWAP_PROGRAM_ID)) return PUMP_SWAP_ERRORS[code];
   return undefined;
+}
+
+/** A venue's own "fewer tokens than the minimum" error: pump 6042, PumpSwap 6040. */
+export function isVenueSlippage(programId: PublicKey | undefined, code: number | undefined): boolean {
+  if (!programId || code === undefined) return false;
+  return (
+    (programId.equals(PUMP_PROGRAM_ID) && code === PUMP_SLIPPAGE_ERROR) ||
+    (programId.equals(PUMP_SWAP_PROGRAM_ID) && code === PUMP_SWAP_SLIPPAGE_ERROR)
+  );
 }
 
 const FAILED = /^Program (\S+) failed: (.*)$/;
@@ -148,7 +186,7 @@ export function classifyFailure(err: unknown, logs: readonly string[] = [], prog
   if (failure.code !== undefined) failure.name = errorName(failure.programId, failure.code);
 
   const by = (id: PublicKey) => failure.programId?.equals(id) ?? false;
-  if (by(PUMP_PROGRAM_ID) && failure.code === PUMP_SLIPPAGE_ERROR) failure.kind = "slippage";
+  if (isVenueSlippage(failure.programId, failure.code)) failure.kind = "slippage";
   else if (by(RUNG_PROGRAM_ID) && failure.name === "OrderFilled") failure.kind = "order-filled";
   else if (by(RUNG_PROGRAM_ID)) failure.kind = "rung";
   return failure;
@@ -161,7 +199,9 @@ export function describeFailure(f: Failure): string {
       ? "rung"
       : f.programId.equals(PUMP_PROGRAM_ID)
         ? "pump"
-        : f.programId.equals(COMPUTE_BUDGET_PROGRAM_ID)
+        : f.programId.equals(PUMP_SWAP_PROGRAM_ID)
+          ? "PumpSwap"
+          : f.programId.equals(COMPUTE_BUDGET_PROGRAM_ID)
           ? "compute budget"
           : f.programId.toBase58()
     : "unknown program";

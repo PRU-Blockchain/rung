@@ -11,6 +11,18 @@ export const ASSOCIATED_TOKEN_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZb
 export const WSOL_MINT = new PublicKey("So11111111111111111111111111111111111111112");
 export const SYSTEM_PROGRAM_ID = SystemProgram.programId;
 export const COMPUTE_BUDGET_PROGRAM_ID = new PublicKey("ComputeBudget111111111111111111111111111111");
+/** PumpSwap, pump.fun's AMM (programs/rung/src/pump_swap.rs). */
+export const PUMP_SWAP_PROGRAM_ID = new PublicKey("pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA");
+/** PumpSwap `GlobalConfig`, `["global_config"]` (docs/pump-arayuz.md 0, K1). */
+export const AMM_GLOBAL_CONFIG = new PublicKey("ADyA8hdefvWN2dbGGWFotbzWxrAvLW83WG6QCVXvJKqw");
+/** Pump Fees `fee_config` of PumpSwap, `["fee_config", PumpSwap id]` (docs/pump-arayuz.md 0, K1). */
+export const AMM_FEE_CONFIG = new PublicKey("5PHirr8joyTMp9JMm6nW7hNDVyEYdkzDqazxPD7RaTjx");
+
+// --- Venues -----------------------------------------------------------------
+
+/** Where an order buys: pump's bonding curve, or the token's canonical PumpSwap pool. Borsh index = position. */
+export type Venue = "Curve" | "PumpSwap";
+export const VENUES: readonly Venue[] = ["Curve", "PumpSwap"];
 
 // --- Seeds ----------------------------------------------------------------
 
@@ -23,6 +35,9 @@ export const GLOBAL_SEED = ascii("global");
 export const EVENT_AUTHORITY_SEED = ascii("__event_authority");
 export const USER_VOLUME_ACCUMULATOR_SEED = ascii("user_volume_accumulator");
 export const FEE_CONFIG_SEED = ascii("fee_config");
+export const POOL_SEED = ascii("pool");
+export const POOL_AUTHORITY_SEED = ascii("pool-authority");
+export const GLOBAL_CONFIG_SEED = ascii("global_config");
 
 // --- Limits (programs/rung/src/constants.rs; a test compares them) -----------
 
@@ -83,6 +98,13 @@ export const BONDING_CURVE_DISCRIMINATOR = [23, 183, 248, 55, 96, 216, 172, 96] 
 export const PUMP_GLOBAL_DISCRIMINATOR = [167, 232, 232, 177, 200, 108, 114, 127] as const;
 export const FEE_CONFIG_DISCRIMINATOR = [143, 52, 146, 187, 219, 123, 76, 155] as const;
 
+/** PumpSwap's buy (idl/pump_amm.json; same bytes as pump's, told apart by the program id). */
+export const PUMP_SWAP_IX = {
+  buyExactQuoteInV2: [194, 171, 28, 70, 104, 77, 91, 47],
+} as const;
+export const POOL_DISCRIMINATOR = [241, 154, 109, 4, 17, 177, 109, 188] as const;
+export const AMM_GLOBAL_CONFIG_DISCRIMINATOR = [149, 8, 156, 202, 160, 252, 176, 217] as const;
+
 // --- Account sizes ------------------------------------------------------------
 
 /** 8-byte discriminator + `Order::INIT_SPACE`. */
@@ -93,8 +115,13 @@ export const SPL_TOKEN_ACCOUNT_LEN = 165;
 /** Token-2022 account with the ImmutableOwner extension the ATA program adds. */
 export const TOKEN_2022_ACCOUNT_LEN = 170;
 
+/** PumpSwap's `UserVolumeAccumulator`: 137 bytes as well (real_pumpswap.rs T1). */
+export const AMM_USER_VOLUME_ACCUMULATOR_LEN = 137;
+
 /** pump's slippage error `BuySlippageBelowMinTokensOut`. */
 export const PUMP_SLIPPAGE_ERROR = 6042;
+/** PumpSwap's slippage error `BuySlippageBelowMinBaseAmountOut`. Not the same code as pump's. */
+export const PUMP_SWAP_SLIPPAGE_ERROR = 6040;
 
 /** Lamports per signature, the base transaction fee. */
 export const LAMPORTS_PER_SIGNATURE = 5_000n;

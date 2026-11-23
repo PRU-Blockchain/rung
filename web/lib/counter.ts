@@ -5,15 +5,15 @@
 import { cacheLife } from "next/cache";
 
 import {
-  PUMP_PROGRAM_ID,
-  PUMP_SLIPPAGE_ERROR,
   RUNG_IX,
   RUNG_ORDER_FILLED_ERROR,
   base58Decode,
   failingProgramFromLogs,
+  isVenueSlippage,
   parseEvents,
   startsWith,
   type RungIx,
+  type Venue,
 } from "./rung-events";
 import { STATUS } from "./status";
 
@@ -59,6 +59,8 @@ export interface CounterData {
   hitSignatureCap: boolean;
   transactionsSkipped: number;
   opened: number;
+  /** Of `opened`, orders on a PumpSwap pool (the rest are on a bonding curve). */
+  openedOnPools: number;
   filled: number;
   notBought: number;
   cancelled: number;
@@ -296,6 +298,7 @@ async function readTransactions(sigs: SignatureInfo[], programId: string, signal
 // --- Counting -------------------------------------------------------------------
 
 interface OrderState {
+  venue: Venue;
   fills: { rungIndex: number; rungBps: number; signature: string; time: number | null }[];
   outcome?: { kind: "not bought" | "cancelled"; signature: string; time: number | null };
 }
@@ -329,7 +332,7 @@ async function readCounter(signal: AbortSignal): Promise<CounterData> {
       failedTxs++;
       if (tx.rungIxs.includes("tryRung")) {
         const f = failingProgramFromLogs(tx.logs);
-        if (f?.programId === PUMP_PROGRAM_ID && f.code === PUMP_SLIPPAGE_ERROR) failedTries.slippage++;
+        if (isVenueSlippage(f?.programId, f?.code)) failedTries.slippage++;
         else if (f?.programId === programId && f.code === RUNG_ORDER_FILLED_ERROR) failedTries.orderFilled++;
         else failedTries.other++;
       }
@@ -338,7 +341,7 @@ async function readCounter(signal: AbortSignal): Promise<CounterData> {
 
     for (const ev of parseEvents(tx.logs, programId)) {
       if (ev.name === "OrderOpened") {
-        const order: OrderState = { fills: [] };
+        const order: OrderState = { venue: ev.venue, fills: [] };
         orders.push(order);
         current.set(ev.user, order);
         continue;
@@ -392,6 +395,7 @@ async function readCounter(signal: AbortSignal): Promise<CounterData> {
     hitSignatureCap: sigs.length >= MAX_SIGNATURES,
     transactionsSkipped: skipped,
     opened: orders.length,
+    openedOnPools: orders.filter((o) => o.venue === "PumpSwap").length,
     filled: filledOrders.length,
     notBought,
     cancelled,
