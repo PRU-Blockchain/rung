@@ -86,7 +86,7 @@ The app's own devnet buys (Phantom, Solflare, a not-bought run and its "Retry wi
 |---|---|
 | On-chain order program (Anchor) | deployed on **devnet** at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet). Buys on pump.fun bonding curves and on PumpSwap pools. Reviewed twice by independent read-only passes, not audited |
 | Mainnet | not yet: no mainnet deployment, no decision on it yet |
-| PumpSwap pools | in the program, the client and the command-line script. Tested locally against a test double and the real PumpSwap program dumped from mainnet, and with real buys on a devnet pool through the script. Not yet: the Android app does not build pool orders |
+| PumpSwap pools | in the program, the client, the command-line script and the Android app. Tested locally against a test double and the real PumpSwap program dumped from mainnet, on a local fork of mainnet, and with real buys on a devnet pool through the script and through the app (runs in [`app/README.md`](app/README.md#pumpswap-pools)). Not yet: a buy on mainnet |
 | Android app (`app/`) | works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. Not tested: Custom mode, a real device, Seeker, mainnet |
 | APK | not yet |
 | Web page (`web/`) | live at https://rung-drab.vercel.app/; the counter is computed from the program's devnet events |
