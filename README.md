@@ -20,6 +20,7 @@ Work in progress for the Dev3pack Global Hackathon (Solana). Nothing in this rep
 | `test-programs/mock-pump/` | Test double that imitates the interface of pump's `buy_exact_quote_in_v3`. Not pump's code, never deployed |
 | `client/` | TypeScript client (web3.js v1 only): addresses, instruction builders, quote, fee budget, the sender that tries the rungs. Checked byte for byte against the Rust program |
 | `web/` | Next.js web page, deployed on Vercel |
+| `measure/` | The scripts behind the measured numbers (public RPC only, raw data not in the repository), their results of Nov 22, 2026 and the method notes |
 | `scripts/` | Helper scripts (`set-rpc-url.sh` stores the RPC URL in the git-ignored `.env.local`) |
 | `docs/pump-arayuz.md` | Extract of pump's public IDL and docs that the buy call is written from (Turkish notes, English quotes) |
 | `docs/is-listesi.md` | Work list (Turkish), kept in step with the code |
@@ -86,6 +87,10 @@ cd web
 npm install
 npm run build
 ```
+
+## Measurement
+
+The numbers about typed and needed slippage come from our own measurement of three 13-minute windows of mainnet blocks. The scripts are in [`measure/`](measure/README.md), with the tables they produced on Nov 22, 2026 in `measure/results/`. They use public RPC endpoints only; the raw blocks are not in the repository and are downloaded again by the scripts (about 20 to 25 minutes per window). After being cleaned up for this repository the scripts were verified on a small slice against the original ones, not re-run end to end.
 
 ## Devnet runs
 

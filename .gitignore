@@ -52,6 +52,7 @@ measure/data/
 measure/rows_*.json
 measure/pool_age*.json
 measure/tmp/
+measure/idl/
 
 # --- OS / editors ---
 .DS_Store
