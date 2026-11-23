@@ -755,7 +755,7 @@ function printReceipt(r: {
       // Fee-free quotes for the same amount: price ratio = raw seen / raw now.
       const above = (plan.quote.rawTokensSeen * 1_000_000n) / r.priceNow.rawTokens - 1_000_000n;
       console.log(
-        `  price now       ${(Number(above) / 10_000).toFixed(4)}% above the price seen (curve read at slot ${r.priceNow.slot}; last try landed in slot ${lastTry?.slot ?? "?"})`,
+        `  price now       ${(Number(above) / 10_000).toFixed(4)}% above the price seen (price read at slot ${r.priceNow.slot}; last try landed in slot ${lastTry?.slot ?? "?"})`,
       );
     }
   } else {
@@ -803,7 +803,7 @@ function printReceipt(r: {
   }
   if (r.rents.order) console.log(`    rent kept     ${sol(-r.rents.order)} order account (back with --refund after slot ${r.order.lastSlot})`);
   const pushCost = r.push?.walletCost ?? 0n;
-  if (r.push) console.log(`    TEST AID push ${sol(-pushCost)} (direct pump buy, its fee and any rent it paid; not part of the order)`);
+  if (r.push) console.log(`    TEST AID push ${sol(-pushCost)} (direct buy on the venue, its fee and any rent it paid; not part of the order)`);
   if (r.rents.orderReturned) {
     console.log(`    rent back     ${sol(r.rents.orderReturned)} order account of an earlier order, closed by this refund`);
   }
