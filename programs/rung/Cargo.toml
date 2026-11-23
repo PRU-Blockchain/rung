@@ -35,6 +35,9 @@ solana-account = "3.4.0"
 solana-transaction-error = "3.4.0"
 # Test double loaded at pump's address; linked only for its discriminator and quote helper.
 mock-pump = { path = "../../test-programs/mock-pump", features = ["no-entrypoint"] }
+# Already in Cargo.lock: read the mainnet fixtures of tests/real_pump.rs.
+serde_json = "1"
+base64 = "0.22"
 
 
 [lints.rust]

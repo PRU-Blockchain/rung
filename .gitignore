@@ -19,6 +19,8 @@ target/
 test-ledger/
 .surfpool/
 **/*.rs.bk
+# pump's dumped program and mainnet account snapshots (re-created by scripts/fetch-pump-fixtures.mjs)
+programs/rung/tests/fixtures/pump/
 
 # --- Node ---
 node_modules/

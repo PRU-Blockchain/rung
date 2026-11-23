@@ -6,7 +6,7 @@ Work in progress for the Dev3pack Global Hackathon (Solana). Nothing in this rep
 
 | part | state |
 |---|---|
-| On-chain order program (Anchor) | written and tested locally against a test double of pump's buy instruction (bonding curve only). Not yet tested against the real pump program, not reviewed, not deployed. PumpSwap pools: not yet |
+| On-chain order program (Anchor) | written and tested locally, bonding curve only: against a test double of pump's buy instruction and against the real pump program dumped from mainnet, both inside LiteSVM. Not reviewed, not deployed, no transaction sent to mainnet yet. PumpSwap pools: not yet |
 | Android app (React Native + Expo) | not yet |
 | Web page (`web/`) | placeholder page only |
 | Measurement scripts | not yet in this repository |
@@ -64,7 +64,21 @@ anchor test        # builds the program and the test double, then runs `cargo te
 
 The tests load the built program into LiteSVM and load the test double at pump's address. 117 tests: unit tests of the rung arithmetic, the ladder scenarios (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, and security tests (wrong signer, substituted accounts, a fake buy program, a buy program that delivers too few tokens, pre-funded accounts, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
 
-What these tests do not show: that the real pump program accepts the program's vault as the buyer. That is the next step, on a local copy of the real program.
+### Against the real pump program
+
+```bash
+node scripts/fetch-pump-fixtures.mjs     # read-only: dumps pump's program and one live curve's accounts from mainnet
+cargo test -p rung --test real_pump -- --nocapture
+```
+
+The script picks a recent `buy_exact_quote_in_v3` transaction, saves the accounts it used and writes which transaction and slot it took to `programs/rung/tests/fixtures/pump/SOURCE.md`. The fixtures are git-ignored; without them these seven tests print "fixtures missing" and pass without running. With them, the real program is loaded at pump's address in LiteSVM and:
+
+- the program's vault (a program-derived address) buys through `try_rung`, and the tokens arrive in the user's token account (a Token-2022 mint in the snapshot of Nov 23, 2026);
+- a rung that is too tight fails with pump's own error 6042 `BuySlippageBelowMinTokensOut`, and the order stays open;
+- a `try_rung` that buys used about 129,000 compute units, one that fails on slippage about 103,000;
+- the quote formula in pump's IDL matched the tokens received exactly, with the fees read from pump's fee config in that snapshot (95 + 30 basis points).
+
+What this does not show: behaviour on mainnet itself. LiteSVM runs with its own copies of the token programs and with every feature enabled; only a real transaction settles it.
 
 ```bash
 cd web
