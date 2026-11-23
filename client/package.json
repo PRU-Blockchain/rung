@@ -1,0 +1,22 @@
+{
+  "name": "@rung/client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TypeScript client for the Rung Solana program: PDAs, accounts, quotes, instructions, events, errors and the rung sender.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "node --import tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.scripts.json",
+    "ladder": "tsx ../scripts/devnet-ladder.ts"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.99.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.3"
+  }
+}
