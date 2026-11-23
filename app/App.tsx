@@ -4,7 +4,7 @@ import "./src/polyfills";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, LogBox, View } from "react-native";
+import { ActivityIndicator, BackHandler, LogBox, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { PublicKey } from "../client/src";
@@ -93,6 +93,32 @@ function Main() {
     setError(null);
     setScreen(next);
   };
+
+  // Android Back: it closed the app from History (and from the receipt
+  // screens). History goes back to where it was opened from, the receipt and
+  // "not bought" screens to the buy screen. While a ladder runs Back is
+  // ignored: the tries and the refund are sent from this app's JS, so it must
+  // keep running. On the buy screen Back does what Android does.
+  useEffect(() => {
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (busy) return true; // a wallet request or a retry is on its way
+      switch (screen.name) {
+        case "history":
+          go(screen.back);
+          return true;
+        case "receipt":
+        case "not-bought":
+          go({ name: "buy" });
+          return true;
+        case "ladder":
+        case "start":
+          return true;
+        default:
+          return false;
+      }
+    });
+    return () => sub.remove();
+  }, [screen, busy]);
 
   switch (screen.name) {
     case "start":

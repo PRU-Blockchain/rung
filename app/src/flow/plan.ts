@@ -10,9 +10,11 @@ import {
   Mode,
   ORDER_ACCOUNT_LEN,
   OrderQuote,
+  PoolOrderQuote,
   RentReserve,
   feeBudget,
   quoteOrder,
+  quotePoolOrder,
   rentReserve,
   txFeeLamports,
 } from "../../../client/src";
@@ -73,16 +75,21 @@ export interface Plan {
   mode: Mode;
   rungs: number[];
   amount: bigint;
-  quote: OrderQuote;
+  quote: OrderQuote | PoolOrderQuote;
   reserve: RentReserve;
+  /** Tries priced at the venue's compute unit limit (`cuLimitFor`): higher in a pool. */
   budget: FeeBudget;
   orderRent: bigint;
 }
 
 export async function makePlan(market: Market, mode: Mode, rungs: number[], amount: bigint): Promise<Plan> {
-  const quote = quoteOrder(amount, market.curve, market.feeConfig, market.supply);
-  const reserve = await rentReserve(rentFor, market.tokenProgram);
-  const budget = feeBudget({ rungCount: rungs.length, rentExemptMinimum: await rentFor(0) });
+  const venue = market.venue;
+  const quote =
+    market.venue === "Curve"
+      ? quoteOrder(amount, market.curve, market.feeConfig, market.supply)
+      : quotePoolOrder(amount, market.pool.reserves, market.pool.feeConfig, market.supply);
+  const reserve = await rentReserve(rentFor, market.tokenProgram, undefined, venue);
+  const budget = feeBudget({ rungCount: rungs.length, rentExemptMinimum: await rentFor(0), venue });
   return { market, mode, rungs, amount, quote, reserve, budget, orderRent: await rentFor(ORDER_ACCOUNT_LEN) };
 }
 

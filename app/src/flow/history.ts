@@ -16,6 +16,8 @@ export interface Receipt {
   id: string;
   time: number;
   mint: string;
+  /** "Curve" or "PumpSwap"; missing in receipts written before pools were supported (all curve buys). */
+  venue?: "Curve" | "PumpSwap";
   decimals: number;
   mode: string;
   rungsBps: number[];
@@ -39,6 +41,14 @@ export interface Receipt {
   orderDeposit: string;
   transactions: TxLink[];
 }
+
+export const receiptVenue = (r: Receipt) => r.venue ?? "Curve";
+
+/** The receipt line for the venue's volume account the fill created. */
+export const accumulatorLabel = (r: Receipt) =>
+  receiptVenue(r) === "PumpSwap" ? "PumpSwap volume account (one time)" : "pump.fun volume account (one time)";
+
+export const venueName = (r: Receipt) => (receiptVenue(r) === "PumpSwap" ? "PumpSwap pool" : "pump.fun bonding curve");
 
 export async function loadHistory(): Promise<Receipt[]> {
   try {

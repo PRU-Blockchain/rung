@@ -17,6 +17,7 @@ import {
   PublicKey,
   TransactionMessage,
   VersionedTransaction,
+  ammUserVolumeAccumulatorPda,
   associatedTokenAddress,
   cancelIx,
   classifyFailure,
@@ -135,10 +136,11 @@ async function waitConfirmed(signature: string, lastValidBlockHeight: number): P
 export async function openBuy(plan: Plan, user: PublicKey, signOpen: SignOpen): Promise<Opened> {
   const { market } = plan;
   const vault = vaultPda(user);
+  const pool = market.venue === "PumpSwap" ? market.pool.poolAccounts : undefined;
   const [orderInfo, ataInfo, accInfo] = await connection.getMultipleAccountsInfo([
     orderPda(user),
     associatedTokenAddress(user, market.mint, market.tokenProgram),
-    userVolumeAccumulatorPda(vault),
+    market.venue === "PumpSwap" ? ammUserVolumeAccumulatorPda(vault) : userVolumeAccumulatorPda(vault),
   ]);
   const earlier = orderInfo ? decodeOrder(orderInfo.data) : null;
 
@@ -149,6 +151,12 @@ export async function openBuy(plan: Plan, user: PublicKey, signOpen: SignOpen): 
   const pending: PendingOrder = {
     user: user.toBase58(),
     mint: market.mint.toBase58(),
+    venue: market.venue,
+    pool: pool && {
+      address: pool.address.toBase58(),
+      baseTokenAccount: pool.baseTokenAccount.toBase58(),
+      quoteTokenAccount: pool.quoteTokenAccount.toBase58(),
+    },
     tokenProgram: market.tokenProgram.toBase58(),
     buybackRecipient: market.buybackRecipient.toBase58(),
     decimals: market.decimals,
@@ -175,8 +183,9 @@ export async function openBuy(plan: Plan, user: PublicKey, signOpen: SignOpen): 
         user,
         sessionKey: session.publicKey,
         mint: market.mint,
+        pool,
         args: {
-          venue: "Curve",
+          venue: market.venue,
           rungsBps: plan.rungs,
           amount: plan.amount,
           rentReserve: plan.reserve.total,

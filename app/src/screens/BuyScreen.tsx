@@ -1,13 +1,13 @@
 import * as Clipboard from "expo-clipboard";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Keyboard, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Mode, PublicKey, bondingCurvePda, decodeBondingCurve, orderPda } from "../../../client/src";
+import { Mode, PublicKey, orderPda } from "../../../client/src";
 
 import { connection } from "../flow/connection";
 import { bpsText, parseSol, priceText, shortAddress, sol, tokens } from "../flow/format";
-import { Market, MarketError, NOT_ON_CURVE, POOL_TOKEN, curveAgeSeconds, loadMarket, parseMint } from "../flow/market";
+import { Market, MarketError, curveAgeSeconds, loadMarket, parseMint, priceKeys, venueText, withPrice } from "../flow/market";
 import {
   MODE_OPTIONS,
   Plan,
@@ -83,9 +83,10 @@ export function BuyScreen(props: {
     const t = setTimeout(() => setAgeTick((n) => n + 1), left * 1000 + 100);
     return () => clearTimeout(t);
   }, [createdAt]);
-  const young = createdAt !== null && Date.now() / 1000 - createdAt < YOUNG_CURVE_SECONDS;
+  // Only a token still on its curve can be that young; a pool token gets no suggestion.
+  const young = market?.venue === "Curve" && createdAt !== null && Date.now() / 1000 - createdAt < YOUNG_CURVE_SECONDS;
 
-  // Refresh the curve (quote), the wallet balance and the order account every few seconds.
+  // Refresh the curve or pool (quote), the wallet balance and the order account every few seconds.
   const marketRef = useRef(market);
   marketRef.current = market;
   useEffect(() => {
@@ -95,13 +96,16 @@ export function BuyScreen(props: {
       const m = marketRef.current;
       if (!m) return;
       try {
-        const keys = [bondingCurvePda(m.mint), ...(props.user ? [props.user, orderPda(props.user)] : [])];
-        const [curveInfo, userInfo, orderInfo] = await connection.getMultipleAccountsInfo(keys);
+        const price = priceKeys(m);
+        const keys = [...price, ...(props.user ? [props.user, orderPda(props.user)] : [])];
+        const infos = await connection.getMultipleAccountsInfo(keys);
         if (!live) return;
-        if (!curveInfo) throw new MarketError(NOT_ON_CURVE);
-        const curve = decodeBondingCurve(curveInfo.data);
-        if (curve.complete) throw new MarketError(POOL_TOKEN);
-        setMarket({ ...m, curve });
+        const [userInfo, orderInfo] = infos.slice(price.length);
+        const next = withPrice(m, infos.slice(0, price.length));
+        // The curve completed while the screen was open: read the token again (pool or not yet).
+        const fresh = next === "moved" ? await loadMarket(m.mint) : next;
+        if (!live) return;
+        setMarket(fresh);
         if (props.user) {
           setBalance(BigInt(userInfo?.lamports ?? 0));
           // An earlier order record (open ones are cancelled in the same transaction) is reused.
@@ -119,6 +123,18 @@ export function BuyScreen(props: {
       clearInterval(id);
     };
   }, [market?.mint.toBase58(), props.user?.toBase58()]);
+
+  // A buy that failed (e.g. "Approval took too long") is reported at the
+  // bottom of the screen. Coming back from the wallet or the launcher, Android
+  // reopened the keyboard on the address field and it covered that line:
+  // close it and scroll to the message.
+  const scrollRef = useRef<ScrollView>(null);
+  useEffect(() => {
+    if (!props.error) return;
+    Keyboard.dismiss();
+    const t = setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300);
+    return () => clearTimeout(t);
+  }, [props.error]);
 
   const custom = useMemo(() => parseCustomRungs(customText), [customText]);
   const rungs = mode === "custom" ? ("rungs" in custom ? custom.rungs : null) : rungsForMode(mode);
@@ -157,7 +173,7 @@ export function BuyScreen(props: {
 
   return (
     <SafeAreaView style={s.screen}>
-      <ScrollView contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
+      <ScrollView ref={scrollRef} contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
         <Header
           right={
             <Pressable onPress={props.onHistory} accessibilityRole="button">
@@ -183,6 +199,7 @@ export function BuyScreen(props: {
         {market && (
           <View style={s.box}>
             <Text style={s.body}>Token {shortAddress(market.mint.toBase58())}</Text>
+            <Text style={s.small}>{venueText(market.venue)}</Text>
             {plan && (
               <>
                 <Text style={s.body}>

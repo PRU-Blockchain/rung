@@ -2,7 +2,7 @@ import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { bpsText, pctText, priceText, shortAddress, sol, tokens } from "../flow/format";
-import { Receipt } from "../flow/history";
+import { Receipt, accumulatorLabel } from "../flow/history";
 import { paidAboveSeenPct } from "../flow/ladder";
 import { Button, Header, Row, TxLinkText, s } from "./ui";
 
@@ -49,7 +49,7 @@ export function ReceiptScreen({ r, onNew, onHistory }: { r: Receipt; onNew: () =
             <Row label="your token account deposit" value={sol(BigInt(r.userTokenAccountDeposit))} />
           )}
           {r.accumulatorDeposit !== "0" && (
-            <Row label="pump.fun volume account (one time)" value={sol(BigInt(r.accumulatorDeposit))} />
+            <Row label={accumulatorLabel(r)} value={sol(BigInt(r.accumulatorDeposit))} />
           )}
           {r.orderDeposit !== "0" && (
             <Row label="order record deposit (returns when the order closes)" value={sol(BigInt(r.orderDeposit))} />

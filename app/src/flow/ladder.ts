@@ -10,10 +10,9 @@ import {
   associatedTokenAddress,
   DEFAULT_CU_PRICE,
   DEFAULT_REFUND_CU_LIMIT,
-  bondingCurvePda,
+  ammUserVolumeAccumulatorPda,
   computeUnitLimitIx,
   computeUnitPriceIx,
-  decodeBondingCurve,
   refundIx,
   decodeOrder,
   orderPda,
@@ -28,7 +27,18 @@ import {
 import { connection } from "./connection";
 import { bpsText } from "./format";
 import { Receipt, addReceipt } from "./history";
-import { PendingOrder, clearPending, deleteSessionKey, endSession, loadPending, loadSessionKey, savePending } from "./session";
+import { reservesNow } from "./market";
+import {
+  PendingOrder,
+  clearPending,
+  deleteSessionKey,
+  endSession,
+  loadPending,
+  loadSessionKey,
+  pendingPool,
+  pendingVenue,
+  savePending,
+} from "./session";
 
 export interface Running {
   pending: PendingOrder;
@@ -91,6 +101,8 @@ export async function runOrder(run: Running, onEvent: (e: LadderEvent) => void):
   const user = new PublicKey(p.user);
   const mint = new PublicKey(p.mint);
   const tokenProgram = new PublicKey(p.tokenProgram);
+  const venue = pendingVenue(p);
+  const pool = pendingPool(p);
   const note = (label: string, signature: string, fee: bigint | undefined, outcome: string) => {
     p.attempts = [...(p.attempts ?? []), { label, signature, fee: fee?.toString(), outcome }];
     savePending(p).catch(() => undefined);
@@ -115,6 +127,8 @@ export async function runOrder(run: Running, onEvent: (e: LadderEvent) => void):
         mint,
         tokenProgram,
         buybackRecipient: new PublicKey(p.buybackRecipient),
+        // runLadder picks the compute unit limit from the order's venue.
+        pool,
         sessionKeypair: run.session,
         order: run.order,
         pollMs: 500,
@@ -165,13 +179,13 @@ export async function runOrder(run: Running, onEvent: (e: LadderEvent) => void):
   }
 
   const vault = vaultPda(user);
-  const [after, curveInfo, opened] = await Promise.all([
+  const [after, reserves, opened] = await Promise.all([
     connection.getMultipleAccountsInfo([
       orderPda(user),
       associatedTokenAddress(user, mint, tokenProgram),
-      userVolumeAccumulatorPda(vault),
+      venue === "PumpSwap" ? ammUserVolumeAccumulatorPda(vault) : userVolumeAccumulatorPda(vault),
     ]),
-    connection.getAccountInfo(bondingCurvePda(mint), "confirmed"),
+    filled ? Promise.resolve(null) : reservesNow(venue, mint, pool).catch(() => null),
     p.openSignature
       ? connection.getTransaction(p.openSignature, { commitment: "confirmed", maxSupportedTransactionVersion: 0 }).catch(() => null)
       : Promise.resolve(null),
@@ -179,10 +193,8 @@ export async function runOrder(run: Running, onEvent: (e: LadderEvent) => void):
 
   const amount = BigInt(p.amount);
   let priceNowAbovePct: number | undefined;
-  if (!filled && curveInfo) {
-    const curve = decodeBondingCurve(curveInfo.data);
-    // A curve that completed meanwhile has no tokens left to quote.
-    const rawNow = curve.complete ? 0n : rawQuote(amount, curve);
+  if (!filled && reserves) {
+    const rawNow = rawQuote(amount, reserves);
     if (rawNow > 0n) priceNowAbovePct = Number((BigInt(p.rawTokensSeen) * 1_000_000n) / rawNow - 1_000_000n) / 10_000;
   }
   const attempts = p.attempts ?? [];
@@ -192,6 +204,7 @@ export async function runOrder(run: Running, onEvent: (e: LadderEvent) => void):
     id: `${Date.now()}-${p.openSignature ?? "resumed"}`,
     time: Date.now(),
     mint: p.mint,
+    venue,
     decimals: p.decimals,
     mode: p.mode,
     rungsBps: p.rungsBps,

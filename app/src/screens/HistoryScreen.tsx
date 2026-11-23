@@ -3,7 +3,7 @@ import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { bpsText, priceText, shortAddress, sol } from "../flow/format";
-import { Receipt, loadHistory } from "../flow/history";
+import { Receipt, loadHistory, venueName } from "../flow/history";
 import { TxLinks } from "./ReceiptScreen";
 import { Button, Header, Row, s } from "./ui";
 
@@ -31,6 +31,7 @@ export function HistoryScreen({ onBack }: { onBack: () => void }) {
             <View key={r.id} style={s.box}>
               <Text style={s.small}>{new Date(r.time).toLocaleString()}</Text>
               <Row label="Token" value={shortAddress(r.mint)} />
+              <Row label="Venue" value={venueName(r)} />
               <Row label="Mode" value={`${MODE_NAMES[r.mode] ?? r.mode} (${r.rungsBps.map(bpsText).join(", ")})`} />
               <Row label="Rung" value={filled ? `try ${bpsText(r.filledRungBps ?? 0)}` : "not bought"} />
               <Row label="Price you saw" value={priceText(amount, seen, r.decimals)} />

@@ -4,7 +4,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 
-import { Keypair } from "../../../client/src";
+import { Keypair, PoolAccounts, PublicKey, Venue } from "../../../client/src";
 
 const KEY = "rung.session-key";
 const PENDING = "rung.pending-order";
@@ -31,7 +31,12 @@ export async function deleteSessionKey(): Promise<void> {
 export interface PendingOrder {
   user: string;
   mint: string;
+  /** Missing in notes written before pools were supported: those were curve orders. */
+  venue?: Venue;
+  /** PumpSwap orders: the canonical pool and its two token accounts. */
+  pool?: { address: string; baseTokenAccount: string; quoteTokenAccount: string };
   tokenProgram: string;
+  /** Curve: a pump buyback wallet. Pool: a PumpSwap buyback wallet's wrapped-SOL account. */
   buybackRecipient: string;
   decimals: number;
   mode: string;
@@ -47,6 +52,17 @@ export interface PendingOrder {
   /** Transactions sent so far, so a resumed order's receipt still lists them. */
   attempts?: { label: string; signature: string; fee?: string; outcome: string }[];
   createdAt: number;
+}
+
+export const pendingVenue = (p: PendingOrder): Venue => p.venue ?? "Curve";
+
+export function pendingPool(p: PendingOrder): PoolAccounts | undefined {
+  if (!p.pool) return undefined;
+  return {
+    address: new PublicKey(p.pool.address),
+    baseTokenAccount: new PublicKey(p.pool.baseTokenAccount),
+    quoteTokenAccount: new PublicKey(p.pool.quoteTokenAccount),
+  };
 }
 
 export async function savePending(p: PendingOrder): Promise<void> {
@@ -66,4 +82,5 @@ export async function clearPending(): Promise<void> {
 export async function endSession(): Promise<void> {
   await deleteSessionKey();
   await clearPending();
+  console.log("RUNG session key deleted");
 }

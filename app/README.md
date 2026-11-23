@@ -7,7 +7,10 @@ Mobile Wallet Adapter (MWA). Started from
 v3.0.0 (commit `04cdd54`).
 
 Screens (`src/screens/`, one file each): buy, ladder (live), receipt, not
-bought (with retry), history. Logic (`src/flow/`): market and quote, plan and
+bought (with retry), history. Two venues: a token still on its pump.fun
+bonding curve, and a token whose curve is complete and that trades in its
+canonical PumpSwap pool (`client`'s `resolveVenue`; the token box says "On a
+pump.fun bonding curve" or "In a PumpSwap pool"). Logic (`src/flow/`): market and quote, plan and
 fees, opening the order (the wallet signs with `signTransactions`, the app
 sends; see "Wallet notes" below), running the ladder
 (`client`'s `runLadder`), resume after a restart, history. `App.tsx` is a
@@ -119,7 +122,92 @@ new order opens. About 4.5% gives "not bought" in Tight mode; about 1.5% makes
 the first rung slip and the second fill. Small devnet curves run out of tokens
 quickly (the curve completes and every rung fails with pump error 6005).
 
+## PumpSwap pools
+
+`src/flow/market.ts` calls `resolveVenue(connection, mint)`. Curve: as before.
+PumpSwap: `fetchPoolMarket` (pool, reserves, AMM fee tier, a buyback wallet's
+wrapped-SOL account picked at random), `quotePoolOrder`, `rentReserve(...,
+"PumpSwap")` (adds the vault's wrapped-SOL account), `feeBudget({venue})`,
+`openOrderIx({pool})` and `runLadder({pool})`, which takes the compute unit
+limit from the order's venue (260,000 in a pool, 200,000 on the curve). "If no
+rung fills, max fee" is the client's budget: 0.00002915 SOL in a pool, 0.00002825
+SOL on the curve (Tight, 3 rungs, 5,000 micro-lamports per CU). The quote
+refreshes the pool and its two token accounts every 2.5 s; a curve that
+completes while the screen is open is read again (pool, or "pool does not
+exist yet").
+
+- The pending-order notes (`session.ts`) keep `venue` and the pool's three
+  accounts, so a pool order is resumed after a restart. Notes and receipts
+  written before this have no `venue` and are read as curve orders.
+- Receipts keep `venue`; History shows a "Venue" row, and the volume-account
+  line reads "PumpSwap volume account (one time)" in a pool.
+- The Launch suggestion is shown only for a token still on its curve and
+  younger than two minutes, never for a pool token.
+- Messages for `resolveVenue`'s reasons: "No token was found at this
+  address.", "This address is not a token.", "This token is not a pump.fun
+  token.", "This token is not paired with SOL.", "This kind of pump.fun token is
+  not supported yet.", "This token's curve is complete but its pool does not
+  exist yet.", "This token's pool could not be read.", "This token's pool is not
+  paired with SOL.", "Cashback pools are not supported.", otherwise "This token
+  cannot be bought here."; `fetchPoolMarket` failures: "PumpSwap is not
+  available on this network." / "This token's pool could not be read."
+
+Runs on 2026-11-24 (emulator `rung-play35`, `com.solana.mwallet`, devnet, 0.01 SOL):
+
+- Pool `CSyeF5X2hcMVMDiGPRmEuc6p7gXQRHgjUNT8mi1hHvae` (Token-2022), Tight: open
+  `3uZi8KdT4DKkyxtSRCjw2GSHCzhmbFkXMQQ8ThbgqodeHv6FSAyYhmGsPV81oJoTy33UJw5T6LT7hFzz1ZdiZaZJ`,
+  filled on try 1% `2idduN253t7rkMag14Fi4nu4bdwSkMJNkZ8rwrEe1i1yie54Yyjbdh9TmG3UsikZJ7Qz55hhXpPQpbqZveK2dzQR`
+  (180,008 CU of 260,000, fee 6,300 lamports; first fill, creates the PumpSwap
+  volume account) ([buy screen](../docs/shots/app-14-pool-buy.png),
+  [receipt](../docs/shots/app-15-pool-receipt.png)).
+- Pool, +4.5% push (TEST AID) right after the open
+  `571NuBoHZ6MEFComeyhpGbd8toUxeDG34MzmrvXfc8NYhgDpftyxrqain92muKoecApPJhbvw2bPZgsqawXUdqYw`:
+  tries 1/2/3% failed with PumpSwap 6040 (~128,800 CU, 6,300 lamports each),
+  refund `41sCkVwiunaWjDsnzjH1afax7ZkTYu9GBDiMkBRn9zLWfqcio1f52MxDDoFqZrevr4N1wT8DZHqVPSwEfBBMwWeh`,
+  "Price went above your cap. Not bought. Your SOL is back." (price +4.5%)
+  ([screen](../docs/shots/app-16-pool-not-bought.png)). "Retry with Launch mode":
+  open `zPpUYkLiaF9LcHq1CzzEAbWXnXRfDu8aK5EwBF6rAWc515X63xpRuvogVMaMwb7FMTsq5Eawn6EguB98Z3AigDN`,
+  filled on try 10% `3Zy3LzRf5tR6c74n8GMgkNQogEXeWyuEy4oNnYYzqZKM6LrP5ceFgxCfN79dkj7AHc4Eb2Y7UgSzwH6fPkFXbA5g` (163,372 CU).
+- Pool, app force-stopped right after the open was sent and started again:
+  the order was resumed and filled on try 1%
+  (`5f1NU9gzt1diAwpUoZDfATgJuqw5YumAUXSGYyg2bkNR917f7K1wQcYtbZNFoLSWWijRSpNrjknU6bg2Q9J9MGAY`,
+  try `3jBWuK8Bv25N8g38d9tix1LrjBhB329dMDBVkjRV9Qav1Pn2Q8bJVqKEPNjZ1yYmMs9yPcXpCBRsXGALwPugGdhS`).
+- Curve (regression) `9ZootZ8ZhnsqgYFfvKMs3vVy5EsgcH7WTuip6NHwqc6U`: open
+  `2f9qjiXSqp5nivyTmQ8e1EVFd7TtSXT3AavdePqPhng15d8GfazqoSR4CM2WgybW6jkLpWVHsy6szUhBubn8q4mM`,
+  filled on try 1% `5RcQxB1iJ6NEsR2jA6rZ5jU2vbP2TSkSecaFWHbQ3yfesGyAbHfUBoFrsPNpNeLf1EW3VWUnzou4bDMygbtZTmc1`
+  (130,384 CU of 200,000, 6,000 lamports).
+- WSOL: "This token is not a pump.fun token."; `DUGVXePDcWjCBuGdbRDLJsvBK7SYUposnUajmXeuCWrR`
+  (curve complete, no canonical pool): "This token's curve is complete but its
+  pool does not exist yet."
+
+## Android Back
+
+History goes back to the screen it was opened from; the receipt and "not
+bought" screens go to the buy screen. While the ladder runs (and while a wallet
+request or a retry is on its way) Back is ignored: the tries and the refund are
+sent by this app's JS, so the app must stay alive. On the buy screen Back does
+what Android does. Checked on the emulator for receipt, History and the ladder.
+
 ## Known issues / wallet notes
+
+- **The ladder does not run while Rung is in the background** (seen
+  2026-11-24): approved, then Home within a second; the open was sent before
+  Rung left the front (`3HjqzGkgPTyfjZ8aDK1v6GzVXZwmvZph9EmT1e7T6E7h7EzwiLZFo7SDtdfCkZAeUup1cvEyKeL41C6UhshWbyC9`),
+  no rung was tried during the 58 s in the background, and on return the order
+  had expired and was refunded (`3Axzk13iyWjEMPn72xUziZUmkkv7N6KZuTsSou8TBPajgEh8ntpcdLii5i3fP3YahH27c689WxBLXVbskDnNPiXM`):
+  "The order ran out of time before any rung was tried. Not bought. Your SOL is
+  back." React Native's timers stop in the background, so the ladder's slot
+  polling waits. Nothing is lost (the refund works), but the buy does not happen.
+  Keeping it running would need a native foreground service; not done.
+- **"Approval took too long" was hidden by the keyboard** (fixed 2026-11-24):
+  approve, Home at once, back after 60 s: the send fails with `Blockhash not
+  found`, nothing is sent, the session key is deleted, and the message was set,
+  but Android reopened the keyboard on the address field and it covered the
+  message at the bottom. The buy screen now closes the keyboard and scrolls to
+  an error when one appears; the message was seen
+  ([screen](../docs/shots/app-17-approval-too-long.png)). A restart afterwards
+  resumed nothing, and the next buy filled on try 1%
+  (`4DCSwW9LhjcqrqdgzVEfNwf4dndHamkHQY7mmTwH7D7ZfB7naqktSb542YLN3RfkNgqsE4D5dq2f43Hr5DyWHPMN`).
 
 Observed on the `rung-play35` emulator (Android 15 image) on 2026-11-23, devnet,
 Tight mode, 0.01 SOL, token `27wsVth5k9sUpxR9JGQoWbi1EDP4yRU7twNGW6mhqRSK`.
@@ -236,13 +324,14 @@ Seen, not changed:
 - Backgrounding the app right after approving in the wallet (before Rung sent
   the transaction) for about 30 s: the send failed with `Blockhash not found`
   and nothing was sent (same cause as "Approval took too long" above).
-- Android Back on the History screen closes the app instead of going back to
-  the previous screen (the screen's own Back button works).
+- Android Back on the History screen closed the app instead of going back to
+  the previous screen (fixed since; see "Android Back").
 - Typing a 44-character address quickly with `adb shell input text` dropped
   characters in the address field; pasting or typing in chunks did not.
 - An invalid pasted text shows "This is not a token address."; a completed
-  curve "Pool tokens are not supported yet."; a token without a curve (wSOL)
-  "This token is not on a pump.fun bonding curve."; a program address and
+  curve "Pool tokens are not supported yet." (pools are supported since; see
+  "PumpSwap pools"); a token without a curve (wSOL) "This token is not on a
+  pump.fun bonding curve." (now "This token is not a pump.fun token."); a program address and
   another non-token account "This address is not a token."; amounts 0.0009 and 0.51 "Amount must be
   between 0.001 and 0.5 SOL."; an amount above the connected wallet's balance
   "Not enough SOL in the wallet for this buy." (all with the Buy button off).
