@@ -1,6 +1,7 @@
 [workspace]
 members = [
-    "programs/*"
+    "programs/*",
+    "test-programs/mock-pump"
 ]
 resolver = "2"
 

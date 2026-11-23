@@ -31,8 +31,8 @@ Bu liste kodla birlikte güncel tutulur: bir işin durumu değiştiğinde aynı 
 
 | kimlik | KT | ne yapılır | bitti ölçütü | bekler | yan yana | durum |
 |---|---|---|---|---|---|---|
-| Z-1 | KT1 | Sahte alım programı (fiyatı test belirler; en az token tutmazsa düşer) ve aşağıdaki KT1 senaryo testleri, koddan önce yazılır. | Testler derleniyor ve kod yokken kırmızı. | O-7 | Y-1 | [ ] |
-| Z-2 | KT1 | Emir programı (çekirdek 1): `emir_ac`, `dene(kademe)`, `iade`, `iptal`; kasa PDA'sı (sistem sahipli, veri tutmayan); olaylar; hata kodları; emir başına üst tutar; girdi sınırları ve `checked_*`; erişim kontrolü; aynı kullanıcının iki açık emrinde paranın karışmaması kararı. | Z-1'deki on test ve erişim kontrolü ile girdi sınırı testleri yeşil; kasa kararı test edildi ve bildirildi. | Z-1 | Y-1, Y-2 | [ ] |
+| Z-1 | KT1 | Sahte alım programı (fiyatı test belirler; en az token tutmazsa düşer) ve aşağıdaki KT1 senaryo testleri, koddan önce yazılır. | Testler derleniyor ve kod yokken kırmızı. | O-7 | Y-1 | [x] |
+| Z-2 | KT1 | Emir programı (çekirdek 1): `emir_ac`, `dene(kademe)`, `iade`, `iptal`; kasa PDA'sı (sistem sahipli, veri tutmayan); olaylar; hata kodları; emir başına üst tutar; girdi sınırları ve `checked_*`; erişim kontrolü; aynı kullanıcının iki açık emrinde paranın karışmaması kararı. | Z-1'deki on test ve erişim kontrolü ile girdi sınırı testleri yeşil; kasa kararı test edildi ve bildirildi. | Z-1 | Y-1, Y-2 | [x] |
 | Z-3 | KT1 | pump eğrisinden alım CPI ile (çekirdek 2), mainnet'ten kopyalanmış programla yerelde: güncel IDL, alım talimatı sürümünün seçimi ve nedeni, kasa alıcı, pump'ın kira istediği hesaplar, Token-2022 ve SPL Token. | Eğriden alım testleri (Token-2022 tokenı dahil) yerel kopyada yeşil. | Z-2 | Z-4, Y-2 | [ ] |
 | Z-4 | KT1 | PumpSwap'tan alım CPI ile (çekirdek 3), aynı yerel kopya düzeniyle. Tutmazsa yalnız eğriyle devam, README'de açıkça yazılır, KT4'te yeniden değerlendirilir. | Havuzdan alım testi yerel kopyada yeşil ya da düşme kararı bildirildi. | Z-2 | Z-3, Y-2 | [ ] |
 | Z-5 | KT1 | Mainnet dağıtımından önce bağımsız güvenlik incelemesi: kodu yalnız okuyabilen ayrı bir alt ajan (erişim kontrolü, PDA ve hesap sahipliği, taşma, kasadan çıkış yolları). | Bulgular özetlenip iletildi; düzeltmeler testli. | Z-3, Z-4 | Y-2, Y-3 | [ ] |
@@ -52,16 +52,16 @@ Bu liste kodla birlikte güncel tutulur: bir işin durumu değiştiğinde aynı 
 - Düşük öncelik ücreti denemeleri geç sokarsa (Z-8): öncelik bir düzey artar ve X ekranda büyür, ya da basamak aralığı 8 slota çıkar, ya da basamak sayısı azalır.
 
 **KT1 senaryo testleri (Z-1'de yazılır, Z-2 ile yeşile döner):**
-- [ ] (a) 1. basamak düşer, 2. basamak tutar, token kullanıcıya geçer.
-- [ ] (b) Dolduktan sonraki deneme "emir dolu" ile düşer.
-- [ ] (c) Tavanın üstündeki basamak reddedilir.
-- [ ] (d) Zamanı gelmemiş üst basamak reddedilir.
-- [ ] (e) Başka anahtarın denemesi reddedilir.
-- [ ] (f) Süre dolunca üçüncü bir adresin çağırdığı `iade` parayı kullanıcıya verir.
-- [ ] (g) `iptal` yalnız kullanıcıyla.
-- [ ] (h) Emir başına üst sınır aşılamaz.
-- [ ] (i) Anahtarın ücret payı X'i aşan harcamaya yetmez.
-- [ ] (ek) Önceden fonlanmış emir adresi: emir hesabı `init` ile açılır ve önceden fonlanmış adreste kilitlenmez.
+- [x] (a) 1. basamak düşer, 2. basamak tutar, token kullanıcıya geçer.
+- [x] (b) Dolduktan sonraki deneme "emir dolu" ile düşer.
+- [x] (c) Tavanın üstündeki basamak reddedilir.
+- [x] (d) Zamanı gelmemiş üst basamak reddedilir.
+- [x] (e) Başka anahtarın denemesi reddedilir.
+- [x] (f) Süre dolunca üçüncü bir adresin çağırdığı `iade` parayı kullanıcıya verir.
+- [x] (g) `iptal` yalnız kullanıcıyla.
+- [x] (h) Emir başına üst sınır aşılamaz.
+- [x] (i) Anahtarın ücret payı X'i aşan harcamaya yetmez.
+- [x] (ek) Önceden fonlanmış emir adresi: emir hesabı `init` ile açılır ve önceden fonlanmış adreste kilitlenmez.
 
 ## Yüz kolu (uygulama, web, vitrin)
 

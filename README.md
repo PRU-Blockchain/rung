@@ -6,7 +6,7 @@ Work in progress for the Dev3pack Global Hackathon (Solana). Nothing in this rep
 
 | part | state |
 |---|---|
-| On-chain order program (Anchor) | not yet. `programs/rung` is still the unmodified Anchor template; it only proves the toolchain builds and tests |
+| On-chain order program (Anchor) | written and tested locally against a test double of pump's buy instruction (bonding curve only). Not yet tested against the real pump program, not reviewed, not deployed. PumpSwap pools: not yet |
 | Android app (React Native + Expo) | not yet |
 | Web page (`web/`) | placeholder page only |
 | Measurement scripts | not yet in this repository |
@@ -15,8 +15,12 @@ Work in progress for the Dev3pack Global Hackathon (Solana). Nothing in this rep
 
 | path | what |
 |---|---|
-| `programs/rung/` | Anchor program and its Rust tests (LiteSVM) |
+| `programs/rung/` | The order program: `open_order`, `try_rung`, `refund`, `cancel` |
+| `programs/rung/tests/` | Scenario and security tests (Rust, LiteSVM) |
+| `test-programs/mock-pump/` | Test double that imitates the interface of pump's `buy_exact_quote_in_v3`. Not pump's code, never deployed |
 | `web/` | Next.js web page, deployed on Vercel |
+| `scripts/` | Helper scripts (`set-rpc-url.sh` stores the RPC URL in the git-ignored `.env.local`) |
+| `docs/pump-arayuz.md` | Extract of pump's public IDL and docs that the buy call is written from (Turkish notes, English quotes) |
 | `docs/is-listesi.md` | Work list (Turkish), kept in step with the code |
 
 ## Setup
@@ -55,9 +59,12 @@ emulator -avd rung-play35
 ## Tests
 
 ```bash
-anchor build
-anchor test        # runs `cargo test`; the tests load the built program into LiteSVM
+anchor test        # builds the program and the test double, then runs `cargo test`
 ```
+
+The tests load the built program into LiteSVM and load the test double at pump's address. 117 tests: unit tests of the rung arithmetic, the ladder scenarios (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, and security tests (wrong signer, substituted accounts, a fake buy program, a buy program that delivers too few tokens, pre-funded accounts, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
+
+What these tests do not show: that the real pump program accepts the program's vault as the buyer. That is the next step, on a local copy of the real program.
 
 ```bash
 cd web
