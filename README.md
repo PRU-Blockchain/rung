@@ -360,6 +360,24 @@ Same arrangement: the fixtures go to `programs/rung/tests/fixtures/pumpswap/` (g
 
 The same limit applies: this is not mainnet.
 
+### Against a local fork of mainnet
+
+```bash
+surfpool start --network mainnet --no-tui --no-deploy       # a local validator that fetches mainnet accounts as they are read
+solana program deploy -u http://127.0.0.1:8899 -k <throwaway keypair> --program-id target/deploy/rung-keypair.json target/deploy/rung.so
+npx tsx scripts/devnet-ladder.ts --local-fork --rpc http://127.0.0.1:8899 --keypair <throwaway keypair> --mint <MINT> --amount 0.01 --mode tight
+```
+
+`--local-fork` is accepted only when the RPC is on the same machine, so nothing can reach a real network; the wallet is a throwaway key funded by the fork's own airdrop. On Nov 24, 2026 the same client code and the same program build, run this way against mainnet's pump and PumpSwap programs and three live tokens:
+
+- a buy from a live PumpSwap pool filled on the 1% rung (174,577 compute units for the try);
+- a buy from a live bonding curve filled on the 1% rung (136,166 compute units);
+- on another live curve, with the price pushed 1.5% by a second buy right after the order opened (a test aid), the 1% rung failed with pump's error 6042 and the 2% rung filled, 1.49% above the price seen;
+- on the same pool, with the price pushed 4.5% right after the order opened (above the 3% cap), all three rungs failed with PumpSwap's error 6040, the order was refunded, and the fees came to 0.00003415 SOL, the "max fee" the plan had printed before the order;
+- deploying the program in the fork took 1.556 SOL from the wallet, nearly all of it the rent deposit of the program's accounts at mainnet's rent rate.
+
+What this does not show: mainnet itself. A fork has no other traders, no validators and no landing delay; the transactions exist only on the machine that ran them.
+
 ### Web page
 
 ```bash

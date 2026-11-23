@@ -13,6 +13,8 @@
 //   npx tsx scripts/devnet-ladder.ts --find-pool [--limit 25]   canonical SOL pools from recent PumpSwap transactions
 //   npx tsx scripts/devnet-ladder.ts --status | --refund | --cancel
 //   npx tsx scripts/devnet-ladder.ts --mint <MINT> --amount 0.01 --simulate-buy --payer <PUBKEY> [--venue ...]
+//   ... --local-fork --rpc http://127.0.0.1:8899 ...   TEST AID: a local fork of mainnet (e.g. `surfpool start`)
+//       instead of devnet. Accepted only when the RPC host is this machine; nothing reaches a real network.
 //
 // The keypair file is read, never printed. The session key lives only in memory.
 
@@ -157,7 +159,10 @@ function pricePerToken(lamports: bigint, tokens: bigint, decimals: number): stri
 }
 
 const pct = (bps: number | bigint) => `${(Number(bps) / 100).toFixed(2)}%`;
-const explorer = (sig: string) => `https://explorer.solana.com/tx/${sig}?cluster=devnet`;
+let localFork = false;
+const networkName = () => (localFork ? "local fork" : "devnet");
+const explorer = (sig: string) =>
+  localFork ? `(local fork; not on any explorer) ${sig}` : `https://explorer.solana.com/tx/${sig}?cluster=devnet`;
 const tokenProgramName = (p: PublicKey) =>
   p.equals(TOKEN_2022_PROGRAM_ID) ? "Token-2022" : p.equals(TOKEN_PROGRAM_ID) ? "SPL Token" : p.toBase58();
 
@@ -182,6 +187,19 @@ async function assertDevnet(connection: Connection) {
   const hash = await connection.getGenesisHash();
   if (hash === MAINNET_GENESIS_HASH) throw new Error("this RPC is MAINNET. This script runs on devnet only; nothing was sent.");
   if (hash !== DEVNET_GENESIS_HASH) throw new Error(`this RPC is not devnet (genesis ${hash}); nothing was sent.`);
+}
+
+/** `--local-fork`: the RPC must be on this machine, so no transaction can reach a real network. */
+function assertLocal(rpc: string) {
+  let host: string;
+  try {
+    host = new URL(rpc).hostname;
+  } catch {
+    throw new Error("--local-fork needs --rpc <http://127.0.0.1:PORT>");
+  }
+  if (host !== "127.0.0.1" && host !== "localhost" && host !== "[::1]") {
+    throw new Error(`--local-fork accepts only an RPC on this machine, not ${host}; nothing was sent.`);
+  }
 }
 
 // --- market --------------------------------------------------------------------
@@ -404,7 +422,7 @@ const maxFeeIfNoFill = (p: Plan) => p.budget.tries + p.budget.refund + p.budget.
 
 function printPlan(p: Plan, user?: PublicKey, userBalance?: bigint, orderExists?: boolean) {
   const { market: m, quote: q } = p;
-  console.log("Plan (devnet)");
+  console.log(`Plan (${networkName()})`);
   console.log(`  mint            ${m.mint.toBase58()} (${tokenProgramName(m.tokenProgram)}, ${m.decimals} decimals)`);
   if (m.venue === "Curve") {
     console.log("  venue           Curve (pump bonding curve)");
@@ -894,7 +912,7 @@ async function findMints(connection: Connection, limit: number) {
       if (name === "buy_exact_quote_in_v3" || name === "buy_v3") v3Buyers.add(keys.get(ix.accounts[8])!.toBase58());
     }
   }
-  console.log(`scanned ${sigs.length} recent successful pump transactions on devnet`);
+  console.log(`scanned ${sigs.length} recent successful pump transactions on ${networkName()}`);
   console.log("pump instructions seen:");
   for (const [name, n] of [...counts].sort((a, b) => b[1] - a[1])) console.log(`  ${String(n).padStart(4)}  ${name}`);
   if (v3Buyers.size) console.log(`recent v3 buyers (for --simulate-buy --payer): ${[...v3Buyers].slice(0, 3).join(", ")}`);
@@ -956,7 +974,7 @@ async function findPools(connection: Connection, limit: number) {
     .map((address, i) => ({ address, info: infos[i] }))
     .filter((x) => x.info?.owner.equals(PUMP_SWAP_PROGRAM_ID) && startsWith(x.info.data, POOL_DISCRIMINATOR))
     .map((x) => ({ address: x.address, pool: decodePool(x.info!.data) }));
-  console.log(`scanned ${sigs.length} recent successful PumpSwap transactions on devnet: ${pools.length} pools`);
+  console.log(`scanned ${sigs.length} recent successful PumpSwap transactions on ${networkName()}: ${pools.length} pools`);
 
   const usable = pools.filter(
     (p) => p.address.equals(canonicalPoolPda(p.pool.baseMint)) && p.pool.quoteMint.equals(WSOL_MINT) && !p.pool.isCashbackCoin,
@@ -1041,8 +1059,15 @@ async function simulateBuy(connection: Connection, flags: Flags, mint: PublicKey
 
 async function main() {
   const flags = parseFlags(process.argv.slice(2));
-  const connection = new Connection(str(flags, "rpc") ?? DEFAULT_RPC, "confirmed");
-  await assertDevnet(connection);
+  const rpc = str(flags, "rpc") ?? DEFAULT_RPC;
+  const connection = new Connection(rpc, "confirmed");
+  if (flags["local-fork"]) {
+    assertLocal(rpc);
+    localFork = true;
+    console.log("LOCAL FORK: a copy of a network running on this machine. Nothing here is a real buy.");
+  } else {
+    await assertDevnet(connection);
+  }
 
   if (flags["find-pool"]) {
     await findPools(connection, Number(int(flags, "limit", 25n)));
