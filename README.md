@@ -1,17 +1,267 @@
-# Rung
+# Rung — stop guessing slippage. Stop feeding sandwich bots.
 
-Work in progress for the Dev3pack Global Hackathon (Solana). Nothing in this repository is usable yet.
+On Solana, set slippage too wide and a sandwich bot takes the gap; set it too tight and your buy fails. Rung finds the lowest slippage that fills: it tries 1% first, climbs only to your cap, and buys once. One approval.
+
+- 2 out of 3 manual buys set more than 5× the slippage they needed (median typed 20%, needed 1.1%).
+- 1 in 4 manual buys had no slippage protection at all.
+- On established tokens, 97% of buys fill on the first 1% try.
+
+**Live web page:** https://rung-drab.vercel.app/ (its counter reads devnet)<br>
+**Program address (devnet):** [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet) · mainnet: not yet<br>
+**Demo video:** not yet
+
+<p>
+  <img src="docs/shots/app-1-buy.png" width="260" alt="Rung buy screen on devnet: token, price you saw, five modes with Tight selected, amount 0.01 SOL, the max fee line and the single buy button">
+  <img src="docs/shots/app-7-climb.png" width="260" alt="Rung ladder on devnet: try 1% failed because the price was above the rung, try 2% bought 1.48% above the price you saw, try 3% not needed">
+</p>
+
+*Left: the buy screen. Right: a ladder that climbed — the 1% try missed, the 2% try bought 1.48% above the price you saw, the 3% try was not needed. Both are screenshots of real transactions on **devnet** (test SOL) from the Android emulator. In the right-hand run the price was pushed up on purpose by a buy from our own second wallet, as a test aid, so that the first rung would miss.*
+
+---
+
+*Slippage* is the most you accept paying above the price you saw; if the price moves past it, the buy fails and only the fee is spent.
+
+A *sandwich bot* buys right before you, pushes the price up to your slippage limit, and sells right after you: it can take at most your slippage.
+
+(1) *No guessing.* Even if you don't know what to type, you buy at the right slippage: Rung starts tightest and climbs only as needed. (2) *Sandwich protection.* An attacker can take at most your cap, and on Rung the first try starts at 1%; even for brand-new tokens, Launch mode starts at 10%, not 20–30%. (3) *You don't overpay.* If the price jumped above your cap, Rung doesn't buy; if it buys, you pay at most your cap above the price you saw. (4) *One approval, one buy.* Every try is covered by one wallet approval; the program allows at most one buy; if nothing fills, your SOL comes back.
+
+| mode | rungs | for | fills (3 windows) |
+|---|---|---|---|
+| Tight | 1% → 2% → 3% | established tokens | 98.7–99.4% |
+| Normal | 2% → 3% → 5% | established tokens, everyday buys | 99.3–99.7% |
+| Fast | 5% → 10% → 15% | most-traded, fast-moving pools | 99.2–100% |
+| Launch | 10% → 20% → 30% | a token's first two minutes | 93.6–95.2% |
+| Custom | you choose 1–5 rungs and the cap | | |
+
+At launch, Tight fills 80–81% of buys; the rest are buys where the price ran above 3%. Rung shows them as *not bought, your SOL is back*. If you must get in at launch, pick Launch.
+
+- On a typical buy the price doesn't change; Rung makes the difference during attacks and spikes.
+- Sandwich numbers are Bitquery's; our measurement shows the gap between the slippage typed and the slippage needed.
+- Measured on three 13-minute windows from the week of Nov 19–22, 2026, 232,770 buys; 'manual buy' is a behaviour rule (at most three transactions in the window, one per block, no custom program).
+
+---
+
+## How to try
+
+Everything below runs on **devnet** (test SOL). Rung is not on mainnet yet.
+
+| way | state |
+|---|---|
+| Install the APK | not yet: no APK is published |
+| Build the Android app from source and run it on an emulator | works on an Android 15 emulator with Phantom, Solflare or Solana Mobile's mock wallet, set to devnet. Steps in [`app/README.md`](app/README.md) |
+| Run the ladder from the command line | works: [`scripts/devnet-ladder.ts`](scripts/devnet-ladder.ts) opens an order and tries the rungs on devnet, see below |
+| No Android at hand | the [web page](https://rung-drab.vercel.app/) shows the counter of the program's devnet transactions, and the explorer links below show real devnet runs |
+
+### Command line (devnet only; the script refuses any other cluster)
+
+```bash
+cd client && npm install && cd ..
+client/node_modules/.bin/tsx scripts/devnet-ladder.ts --find-mint
+client/node_modules/.bin/tsx scripts/devnet-ladder.ts --mint <MINT> --amount 0.01 --mode tight --dry-run
+```
+
+Drop `--dry-run` to send real devnet transactions. The script signs with a devnet keypair file (default `~/.config/solana/rung-devnet.json`, or `--keypair <file>`) that you fund with devnet SOL yourself.
+
+### Devnet runs
+
+Real transactions on devnet (test SOL, pump's devnet deployment, a live devnet curve), sent with `scripts/devnet-ladder.ts` on Nov 23, 2026. Tight mode (1% → 2% → 3%), 0.01 SOL, mint `B8fRBPHkEVfqE6FfUYsPKkyZvdjH3SxvQpYpyYRtG511`. The wallet signs one transaction (`open_order`); every try is signed by the one-time session key.
+
+In the second and third run the price was moved on purpose by a buy from our own wallet right after the order opened. That push is a test aid of the script, not part of the product.
+
+| run | what happened | paid vs. seen | fees |
+|---|---|---|---|
+| price did not move | [rung 1% filled](https://explorer.solana.com/tx/5rG3LwqhXeFhrws96mwfUV57uoJy3SypETcBcymZoMotRhiPgswsowYL6JSrajkezuxMBVRXGwhybE2xn8ghJjnm?cluster=devnet) | +0.00% | 0.000016 SOL |
+| price pushed +1.5% | [rung 1% failed](https://explorer.solana.com/tx/3qyr6rUPTvSjsKZfmU2j8v4QZsecooCRWytbTpvzML6Tm67zrfSpLf9mDKtThGxsWTSgchcGmtNbBz2wQYTT6qiF?cluster=devnet) with pump's error 6042, [rung 2% filled](https://explorer.solana.com/tx/3gZ8WhEJkWruaDSDrzyA3xT7xMBHo2gro89aStjz6FqxE3Ski6fwwnWGHh1jZPcVQCALJzK14q1fofr7P6uX3ftr?cluster=devnet) four slots later | +1.49% | 0.000022 SOL |
+| price pushed +4.5%, above the 3% cap | rungs [1%](https://explorer.solana.com/tx/35SeeE5X7q9J3QFkLquzBiWCZR3BbpX7ypYurbv6sJiJRZj8yRxGgHCpA9yYTNKkV9jJioQ7yYdDDF9YRc2z7wGg?cluster=devnet), [2%](https://explorer.solana.com/tx/26P3nKWRRRHNVL5A2rwtPDC6i5wMnhbZXg6BL15GMdEB5D14hLv5mtf4SWcW5Kq2xSyfBaoc2Rkbv1iaJG29o6Wy?cluster=devnet) and [3%](https://explorer.solana.com/tx/3FbWyrKHhjQJsdGeF5RthSBYTTYd8c45mwPbxpDicFiaLiX5eg6TytVweCd7HuWPq9ccymeu8hHZE9Trxg2QwH1C?cluster=devnet) all failed, then the [refund](https://explorer.solana.com/tx/2Q2XYpHszQS6P62587rnmjNdmSzJKAWcZDdv2Pgg8o1FFhWfrTFDncor7R4LkN8EoVtZnJhMKfGZ4HupZ9Vy75xQ?cluster=devnet): not bought, the order amount and the rent reserve came back in full | not bought | 0.00003325 SOL |
+
+Measured on devnet in these runs: a `try_rung` that buys used about 123,000 compute units, one that fails on slippage about 94,000, the refund about 9,000. With a compute-unit limit of 200,000 and a price of 5,000 micro-lamports each try cost 6,000 lamports whether it bought or not.
+
+The app's own devnet buys (Phantom, Solflare, a not-bought run and its "Retry with Launch mode") are listed with their signatures in [`app/README.md`](app/README.md#known-issues--wallet-notes). Screenshots: [buy](docs/shots/app-1-buy.png), [wallet approval](docs/shots/app-2-approval.png), [ladder](docs/shots/app-3-ladder.png), [receipt](docs/shots/app-4-receipt.png), [not bought](docs/shots/app-5-not-bought.png), [retry](docs/shots/app-6-retry.png), [climb](docs/shots/app-7-climb.png), [history offline](docs/shots/app-8-history-offline.png).
 
 ## Status
 
 | part | state |
 |---|---|
-| On-chain order program (Anchor) | written and tested locally, bonding curve only: against a test double of pump's buy instruction and against the real pump program dumped from mainnet, both inside LiteSVM. Deployed on **devnet** at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet). Not on mainnet. Reviewed once by an independent read-only pass, not audited. PumpSwap pools: not yet |
-| Android app (React Native + Expo, `app/`) | the buy flow works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys completed with Phantom, Solflare and Solana Mobile's mock wallet. Screenshots from real devnet buys are in `docs/shots/`; wallet notes in [`app/README.md`](app/README.md). Not tested: Custom mode, a real device, mainnet |
-| Web page (`web/`) | placeholder page only |
-| Measurement scripts | not yet in this repository |
+| On-chain order program (Anchor) | deployed on **devnet** at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet). Buys on pump.fun **bonding curves** only. Reviewed once by an independent read-only pass, not audited |
+| Mainnet | not yet: no mainnet deployment, no decision on it yet |
+| PumpSwap pools | not yet: the program rejects a pool order (`VenueNotSupported`) |
+| Android app (`app/`) | works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. Not tested: Custom mode, a real device, Seeker, mainnet |
+| APK | not yet |
+| Web page (`web/`) | live at https://rung-drab.vercel.app/; the counter is computed from the program's devnet events |
+| Measurement scripts (`measure/`) | in the repository; verified on a small slice, not re-run end to end |
+| Demo video | not yet |
+| Team's own mainnet buys | not yet |
 
-## Repository layout
+## Problem
+
+Every manual buy on a memecoin asks for one number, the slippage, and both ways of getting it wrong cost money.
+
+**Too wide.** A sandwich bot can push the price up to your limit and take the gap. Bitquery counted 6,850,144 sandwiches on Solana between Oct 30, 2025 and Oct 7, 2026, $29.7M gross, 96% of them on pump.fun curves and PumpSwap. In its sample of 10,000 Jupiter swaps, buys at 1–3% slippage had 8 victims, buys at 20–50% had 148. Yet in our measurement, manual-like buys of $5–500 typed a median of 20.0% when they needed 1.10%, and 26.8% of manual-like buys had no protection at all. The settings screens of Axiom and Photon come set to 20% for buys (our own reading).
+
+**Too tight.** The price moves past your limit, the buy fails and you still pay the fee: a median of $0.00041 for a failed slippage try across all buys, $0.016 for manual-like buys. Then you guess again.
+
+You have to pick that number before the buy. Rung does not ask for it: it starts at the tightest rung and climbs only as far as you allow.
+
+## How it works
+
+```mermaid
+sequenceDiagram
+    actor U as You
+    participant A as Rung app
+    participant W as Wallet
+    participant P as Rung program
+    participant V as Vault (PDA)
+    participant F as pump.fun curve
+
+    A->>F: read the curve: the price you saw, tokens expected
+    A->>A: make a one-time session key, keep it in secure storage
+    A->>U: If no rung fills, max fee: X SOL + approval fee set by your wallet
+    U->>W: approve once
+    W->>P: open_order (signed by your wallet, the only signature you give)
+    P->>F: read the price again (start of the ladder)
+    P->>V: amount + rent reserve go into the vault
+    P->>A: small fee budget goes to the session key
+    loop each rung when it is due, signed by the session key
+        A->>P: try_rung(i)
+        P->>P: check the rules again
+        P->>F: buy_exact_quote_in_v3, vault is the buyer, min tokens set by the program
+        alt price inside the rung
+            F-->>V: tokens
+            P->>U: tokens and leftover SOL, order filled
+        else price above the rung
+            F-->>P: fails, the whole try is undone, order stays open
+        end
+    end
+    opt nothing filled
+        A->>P: refund (or anyone after expiry)
+        P->>U: all SOL back
+    end
+```
+
+1. **Quote.** The app reads the pump.fun bonding curve and shows the price you saw and how many tokens your amount buys now.
+2. **One approval.** The app makes a one-time session key for this buy and keeps it in the phone's secure storage (`expo-secure-store`). Your wallet then signs one transaction, `open_order`. It writes the order on chain (rungs, cap, amount, the tokens you expect at the price you saw, timing, the session key), moves the amount and a small rent reserve into a vault the program controls (a program-derived address per user; one open order per user), and sends the session key a small fee budget for the tries.
+3. **The rungs.** The session key sends one `try_rung` per rung as it becomes due (4 slots apart in the devnet runs). The program buys through pump.fun's `buy_exact_quote_in_v3` with the vault as the buyer. If the price is above the rung, pump fails the transaction, nothing moves, the order stays open and only that try's fee is spent.
+4. **Filled or refunded.** On a fill the tokens go to your token account and the SOL that was not spent goes back to your wallet, in the same transaction; the order is marked filled and every later try is rejected (`OrderFilled`). If no rung fills, the session key calls `refund` (anyone may call it once the order has expired) and the vault's SOL and the order account's rent go back to you. You can also `cancel` with your own wallet, which is a second approval. Afterwards the app sends what is left of the fee budget back to your wallet and deletes the session key.
+
+### How does one approval cover every try?
+
+Your wallet signs only the transaction that writes the order and its rules on chain. The tries are sent by the one-time session key tied to that order, and the program checks the rules again on every try:
+
+- the signer is the session key written in the order;
+- the order is still open and has not bought yet (at most one buy per order);
+- the rung exists in the order, so it is not above the cap;
+- the rung is due (`start slot + rung × window`) and the order has not expired;
+- the fewest tokens the buy may return is computed by the program from the order, not by the key.
+
+The session key cannot loosen any of these, cannot send SOL anywhere but to you, and holds only the fee budget.
+
+**Two references.** The fewest tokens a rung may buy is the stricter of two limits: (1) the cap measured from the price you saw when you tapped Buy, so no buy is ever more than your cap above that price; (2) the rung measured from the price the program read from the curve when the order landed on chain, which is where the ladder starts.
+
+**The program measures the buy itself.** After pump returns, the program checks the increase in the vault's token account against the rung's minimum, and checks that the SOL that left the vault is at most the order amount plus a small rent allowance (0.0025 SOL). It does not take pump's word for either.
+
+### Fees
+
+Before you approve, the app shows **"If no rung fills, max fee: X SOL"** and **"+ approval fee set by your wallet"**.
+
+```
+X = rungs × (base fee + compute-unit limit × compute-unit price ÷ 1,000,000)     (lamports; price in micro-lamports per unit)
+```
+
+With the values of the devnet runs (limit 200,000 units, price 5,000 micro-lamports, base fee 5,000 lamports) each try costs 6,000 lamports, so three rungs cost at most 18,000 lamports. The app also budgets the session key's own `refund` transaction (5,250 lamports) and the transfer that returns its unused fees (5,000 lamports), which is why the buy screen above shows 0.00002825 SOL for Tight mode. These compute values are temporary; they will be chosen from a measurement on mainnet, which has not been done yet. The program caps the fee budget an order can hand to the session key at 0.002 SOL.
+
+The approval itself is a separate fee: the wallet, not Rung, sets the compute budget of the `open_order` transaction.
+
+### Wallets
+
+The wallet signs one transaction per buy, the order. Every try after that is signed by the one-time session key. Observed on an Android 15 emulator on devnet, Nov 23, 2026:
+
+| wallet | sheets per buy | what the wallet added to the order | order fee |
+|---|---|---|---|
+| Solflare | one (after the first connect) | `SetComputeUnitLimit(200000)`, `SetComputeUnitPrice(100000)` | 25,000 lamports |
+| Phantom | two: its Connect sheet, then Confirm | `SetComputeUnitPrice(375000)`, `SetComputeUnitLimit(200000)` | 80,000 lamports |
+| Solana Mobile mock wallet | one | nothing | 5,000 lamports |
+
+Neither wallet added any other instruction, and the added ones did not break the order. The fee of the order transaction is set by the wallet, which is why the app shows it as a separate line; the fees of the tries are set by the app.
+
+Phantom asks to connect again before every buy because it declines the saved authorization of an app whose identity it has not verified. The app asks the wallet to sign and sends the signed order itself: with the wallet sending, Phantom's transaction never reached devnet and Solflare kept the app in the background while the order's time ran out. An approval that takes longer than about a minute fails with "Approval took too long" and nothing is sent.
+
+## Numbers
+
+### A. Our own measurement (scripts in this repository)
+
+| number | sample | caveat |
+|---|---|---|
+| Manual-like buys of $5–500: median typed slippage 20.0%, needed 1.10%; 67.7% typed more than 5× | 4,955 successful buys, three windows | Quote assumed 3 slots before the buy; successful buys only; WSOL-based pools excluded |
+| 26.8% of manual-like buys had no protection | 2,862 buys with stable price | Only buys whose instruction could be decoded and whose price stayed stable |
+| On established tokens a single 1% try fills 97.4% | 52,373 buys, 1,211 pools (manual-like $5–500: 95.1%, 5,399) | Simulation; most buys are bots |
+| Mode fill ranges (mode table) | three windows; launch 27,403, established 52,373, most-traded 47,448, transition 6,306 buys | Simulation (landing delay 3 slots; 2 and 4 slots as sensitivity); priority-fee race not modelled; 4–5 transition pools per window |
+| 14.9% of buys with ≥20% slippage filled more than 5% above the seen price (average 30.5%); on a typical buy the difference ≈ 0 | 27,878 wide, 20,891 tight buys | Truncation effect; result depends on conditioning |
+| Buys that appear to come through a trading app: 19.0% at exactly 20%, 30.1% unprotected | 9,602 buys with stable price | App names not verified on-chain; the signal is structural |
+| Failed slippage try: median $0.00041 across all; manual-like median $0.016, p90 $0.56; priority fee is charged, Jito tip is not | 135,217 failed (manual-like 362); 35 transactions as direct evidence | Manual-like group small; depends on fee settings. The priority-fee / Jito-tip evidence (35 transactions) is in the method notes, not in the result tables |
+| Team's own buys during event week: not yet (mainnet) | mainnet, event week | Small sample; tokens chosen by the team (to be filled from real data) |
+
+*Devnet test buys, not part of this table:* the [web page](https://rung-drab.vercel.app/) counts the program's devnet transactions. It is a small sample of the team's own test buys and includes runs where we pushed the price on purpose.
+
+The numbers about typed and needed slippage come from our own measurement of three 13-minute windows of mainnet blocks. The scripts are in [`measure/`](measure/README.md), with the tables they produced on Nov 22, 2026 in [`measure/results/`](measure/results/), and the method (in Turkish) in [`measure/docs/rapor-ikinci-olcum.md`](measure/docs/rapor-ikinci-olcum.md). [`measure/README.md`](measure/README.md#numbers--script) maps every row above to the script and output that produced it. They use public RPC endpoints only; the raw blocks are not in the repository and are downloaded again by the scripts (about 20 to 25 minutes per window). After being cleaned up for this repository the scripts were verified on a small slice against the original ones, not re-run end to end.
+
+### B. Other people's measurements
+
+| number | source | caveat |
+|---|---|---|
+| 6,850,144 sandwiches, 2,154,994 wallets, $29.7M gross; 96% on pump.fun curves and PumpSwap (Oct 30, 2025 – Oct 7, 2026) | Bitquery, Oct 12, 2026 | Single source; gross; address ≠ person |
+| Daily sandwiches ≈ 3,400 → ≈ 51,900 | Bitquery | Not normalised by volume |
+| Victims in 10,000 Jupiter swaps: 8 at 1–3% slippage, 44 at 3–10%, 148 at 20–50% | Bitquery | Jupiter swaps only; not reproduced in our sample |
+| Sandwiches over three years: Solana 28.0M, Ethereum 30,607, Base 1,889 | arXiv 2609.28115 (preprint) | Not peer-reviewed; same method as Bitquery |
+
+### C. Settings screens
+
+<!-- TRANSLATION: pending Buğra's review -->
+The buy slippage of Axiom and Photon comes set to 20% (our reading of Nov 22, 2026; Axiom's sell tab and Photon's S2/S3 and other tabs were not read).
+
+## Why Solana
+
+<!-- TRANSLATION: pending Buğra's review -->
+The problem, the users and the money are here. Both properties that make the ladder practical are here too: the result of a try is known in under a second, and a try that misses is cheap (its base is $0.0004). It could be written on another chain as well; it is used here.
+
+Supporting number: over three years, sandwiches in the "protected" flow numbered 28.0M on Solana, 30,607 on Ethereum and 1,889 on Base (arXiv 2609.28115, a preprint; it shares Bitquery's method, so it is not a second, independent measurement).
+
+## Security and limits
+
+**unaudited, use small amounts.** The program was reviewed once by an independent read-only pass (a separate agent that could only read the code: access control, PDAs and account ownership, overflow, every way SOL can leave the vault). That is a review, not an audit. It reported no critical or high finding. Fixed after it, each with a test written first: an upper limit on the SOL a buy may take from the vault, a consistency band between the two quotes the client supplies, a rent-exemption check on the fee budget, and the highest cap lowered to 30%. Deferred on purpose: reclaiming the rent of pump's volume account, rejecting at `open_order` curves that cannot fill (non-SOL pairs, cashback coins), and pinning the remaining pump accounts in the program.
+
+| what happens | what follows |
+|---|---|
+| The phone turns off, the app crashes, the session key is lost | Once the order expires, `refund` returns the SOL to you. Anyone may call it; the app calls it when it opens again. SOL and the order's rent can only go to your wallet |
+| The session key is stolen | The thief can only call `try_rung` for this order, only when a rung is due and only up to your cap. Tokens still go to you; the key cannot withdraw from the vault and cannot loosen the rules. It can, however, trigger the buy at a bad price up to your cap, for example by pushing the price and then trying the top rung. It can spend at most the fee budget on the key |
+| You change your mind | `cancel` with your own wallet (a second approval); the SOL comes back at once |
+| The wallet changes the approval transaction | It is one transaction; the wallets we tried only added compute-budget instructions, which made the approval more expensive (see Wallets). The wallet cannot touch the fees of the tries |
+| A bug in the program | The SOL in the vault is at risk. Limits: at most 0.5 SOL per order, one open order per user, tests, a small program |
+| Upgrade authority | Held by the team. On devnet it is a test key. Whether to lock it later is not decided |
+| Fee budget on the session key | What is left goes back to you when the order ends. If the phone dies first it can be lost; the program limits it to 0.002 SOL per order |
+| pump's volume account | On the first buy that fills, pump opens a volume account for the vault (≈ 0.00135 SOL rent, once per user, paid from the order's rent reserve). Rung does not reclaim it yet |
+| Your token account | Created from the order's rent reserve if you do not have one. It belongs to you, so its deposit stays with you |
+
+**Limits.**
+
+- unaudited, use small amounts.
+- At most 0.5 SOL per order (`MAX_ORDER_LAMPORTS` in [`constants.rs`](programs/rung/src/constants.rs)); at least 0.001 SOL. The highest cap any order can set is 30%. Raising the per-order limit is a team decision.
+- Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
+- Android emulator; not tested on a real device or Seeker.
+- Devnet only; mainnet: not yet. Bonding curves only; PumpSwap pools: not yet.
+
+## Architecture and program addresses
+
+| | address |
+|---|---|
+| Rung program (**devnet**) | [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet) |
+| Rung program (mainnet) | not yet |
+| pump.fun program it calls | `6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P` (fixed in the program; any other buy program is rejected) |
+
+**Instructions.** `open_order` (your wallet: writes the order, funds the vault, funds the session key), `try_rung(rung_index)` (session key only: one rung, at most one buy per order), `refund` (session key at any time, anyone after expiry: everything back to the user, order closed), `cancel` (user only: ends an open order).
+
+**Events.** `OrderOpened`, `OrderFilled` (rung, tokens bought, SOL spent and both reference quotes, so the price paid against the price seen can be computed from the event alone), `OrderRefunded` (reason: expired, gave up or cancelled; SOL returned). The web counter is computed from these events.
+
+**The pump.fun call.** The program buys with pump's `buy_exact_quote_in_v3`: spend a fixed amount of SOL, receive at least a minimum number of tokens. It takes 17 accounts and needs no fee-recipient account; it does not support cashback coins (pump error 6094). The comparison with the other buy instructions is in [`docs/pump-arayuz.md`](docs/pump-arayuz.md) (Turkish notes, English quotes from pump's public docs).
 
 | path | what |
 |---|---|
@@ -19,10 +269,12 @@ Work in progress for the Dev3pack Global Hackathon (Solana). Nothing in this rep
 | `programs/rung/tests/` | Scenario and security tests (Rust, LiteSVM) |
 | `test-programs/mock-pump/` | Test double that imitates the interface of pump's `buy_exact_quote_in_v3`. Not pump's code, never deployed |
 | `client/` | TypeScript client (web3.js v1 only): addresses, instruction builders, quote, fee budget, the sender that tries the rungs. Checked byte for byte against the Rust program |
-| `web/` | Next.js web page, deployed on Vercel |
+| `app/` | Android app (React Native + Expo custom development build); see [`app/README.md`](app/README.md) |
+| `web/` | Next.js web page with the public counter, deployed on Vercel |
 | `measure/` | The scripts behind the measured numbers (public RPC only, raw data not in the repository), their results of Nov 22, 2026 and the method notes |
-| `scripts/` | Helper scripts (`set-rpc-url.sh` stores the RPC URL in the git-ignored `.env.local`) |
+| `scripts/` | Helper scripts: `devnet-ladder.ts` (the ladder from the command line, devnet only), `fetch-pump-fixtures.mjs` (read-only mainnet snapshot for tests), `set-rpc-url.sh` (stores the RPC URL in the git-ignored `.env.local`) |
 | `docs/pump-arayuz.md` | Extract of pump's public IDL and docs that the buy call is written from (Turkish notes, English quotes) |
+| `docs/shots/` | Screenshots of real devnet buys from the emulator |
 | `docs/is-listesi.md` | Work list (Turkish), kept in step with the code |
 
 ## Setup
@@ -39,15 +291,15 @@ The program is developed inside WSL2 (Ubuntu 24.04) with the repository on the W
 | Node.js | 24.10.0 |
 | Yarn | 1.22.22 |
 | Next.js (`web/`) | 16.4.6 |
-| Expo SDK | not chosen yet |
+| Expo SDK (`app/`) | 52 (React Native 0.76.9, web3.js 1.99.0); details in [`app/README.md`](app/README.md#stack) |
 
-The Android side runs on Windows, not in WSL: the Android SDK, the emulator and `adb` live there. Expo and Gradle will run from a second clone of this repository on the Windows file system, at a path that contains only ASCII characters; the program is built from the WSL clone. This split is the plan, not a verified setup: the app does not exist yet. What is verified: the emulator boots to Android 15 with the Play Store present.
+The Android side runs on Windows, not in WSL: the Android SDK, the emulator and `adb` live there. Expo and Gradle run from a second clone of this repository on the Windows file system, at a path that contains only ASCII characters; the program is built from the WSL clone. Building the app needs JDK 17; the build steps and the Windows path workarounds are in [`app/README.md`](app/README.md).
 
 | Android tool | version |
 |---|---|
 | Android Emulator | 37.2.12 |
 | Emulator system image | Android 15 (API 35), Google Play, x86_64 |
-| JDK | 21 |
+| JDK | 21 (SDK tools); 17 (app build) |
 
 Emulator, created once with `avdmanager` and started without Android Studio:
 
@@ -58,13 +310,19 @@ emulator -avd rung-play35
 
 `avdmanager` leaves `PlayStore.enabled=no` in the AVD's `config.ini`; set it to `yes` by hand. If the Windows user name contains non-ASCII characters, point `TEMP`, `ANDROID_AVD_HOME` and `ANDROID_EMULATOR_HOME` at ASCII-only folders first, otherwise the Java-based SDK tools fail with "Unable to establish loopback connection".
 
+Environment variables (names only; no values are in the repository): `RPC_URL` (local scripts, read from the git-ignored `.env.local` written by `scripts/set-rpc-url.sh`; on Vercel a server-side variable of the web page). The app uses the public devnet endpoint and holds no keys.
+
 ## Tests
 
 ```bash
 anchor test        # builds the program and the test double, then runs `cargo test`
 ```
 
-The tests load the built program into LiteSVM and load the test double at pump's address. 129 tests: unit tests of the rung arithmetic, the ladder scenarios (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, and security tests (wrong signer, substituted accounts, a fake buy program, a buy program that delivers too few tokens, pre-funded accounts, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
+The tests load the built program into LiteSVM and load the test double at pump's address. 137 Rust tests: unit tests of the rung arithmetic, the ladder scenarios (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, the two references, events, the fixes after the security review, and security tests (wrong signer, substituted accounts, a fake buy program, a buy program that delivers too few tokens, pre-funded accounts, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
+
+```bash
+cd client && npm install && npm test     # 43 client tests, including byte-for-byte vectors from the Rust program
+```
 
 ### Against the real pump program
 
@@ -82,51 +340,44 @@ The script picks a recent `buy_exact_quote_in_v3` transaction, saves the account
 
 What this does not show: behaviour on mainnet itself. LiteSVM runs with its own copies of the token programs and with every feature enabled; only a real transaction settles it.
 
+### Web page
+
 ```bash
 cd web
 npm install
 npm run build
 ```
 
-## Wallets
+### Measurement scripts
 
-The wallet signs one transaction per buy, the order. Every try after that is signed by the one-time session key. Observed on an Android 15 emulator on devnet, Nov 23, 2026:
+Re-running them is described in [`measure/README.md`](measure/README.md#run-order). A full window takes 20–25 minutes and thousands of requests to public RPC endpoints; do not re-run all windows unless you need to.
 
-| wallet | sheets per buy | what the wallet added to the order | order fee |
-|---|---|---|---|
-| Solflare | one (after the first connect) | `SetComputeUnitLimit(200000)`, `SetComputeUnitPrice(100000)` | 25,000 lamports |
-| Phantom | two: its Connect sheet, then Confirm | `SetComputeUnitPrice(375000)`, `SetComputeUnitLimit(200000)` | 80,000 lamports |
-| Solana Mobile mock wallet | one | nothing | 5,000 lamports |
+## Before / during the event
 
-Neither wallet added any other instruction, and the added ones did not break the order. The fee of the order transaction is set by the wallet, which is why the app shows it as a separate line; the fees of the tries are set by the app.
+The event runs Nov 27–29, 2026. Everything in this repository so far was done **before** the event. When the event starts, the commit on the main branch at that moment will be tagged `etkinlik-oncesi` (tag not created yet); everything after that tag is work done during the event.
 
-Phantom asks to connect again before every buy because it declines the saved authorization of an app whose identity it has not verified. The app asks the wallet to sign and sends the signed order itself: with the wallet sending, Phantom's transaction never reached devnet and Solflare kept the app in the background while the order's time ran out. An approval that takes longer than about a minute fails with "Approval took too long" and nothing is sent.
+**Done during the event:** to be filled during the event.
 
-## Measurement
+## Roadmap and business model
 
-The numbers about typed and needed slippage come from our own measurement of three 13-minute windows of mainnet blocks. The scripts are in [`measure/`](measure/README.md), with the tables they produced on Nov 22, 2026 in `measure/results/`. They use public RPC endpoints only; the raw blocks are not in the repository and are downloaded again by the scripts (about 20 to 25 minutes per window). After being cleaned up for this repository the scripts were verified on a small slice against the original ones, not re-run end to end.
+<!-- TRANSLATION: pending Buğra's review -->
+The program is an open building block; wallets and buying apps can connect to it. A small share is taken from buys that go through our own app and fill; no share is taken from a buy that does not fill. In the demo the share is zero. For comparison: pump.fun takes 0.45% per trade in its own app.
 
-## Devnet runs
+Today the program has no fee field and takes no share (not yet).
 
-Real transactions on devnet (test SOL, pump's devnet deployment, a live devnet curve), sent with `scripts/devnet-ladder.ts` on Nov 23, 2026. Tight mode (1% → 2% → 3%), 0.01 SOL, mint `B8fRBPHkEVfqE6FfUYsPKkyZvdjH3SxvQpYpyYRtG511`. The wallet signs one transaction (`open_order`); every try is signed by the one-time session key.
+## Why we built this
 
-In the second and third run the price was moved on purpose by a buy from our own wallet right after the order opened. That push is a test aid of the script, not part of the product.
+*To be written by the founder.*
 
-| run | what happened | paid vs. seen | fees |
-|---|---|---|---|
-| price did not move | [rung 1% filled](https://explorer.solana.com/tx/5rG3LwqhXeFhrws96mwfUV57uoJy3SypETcBcymZoMotRhiPgswsowYL6JSrajkezuxMBVRXGwhybE2xn8ghJjnm?cluster=devnet) | +0.00% | 0.000016 SOL |
-| price pushed +1.5% | [rung 1% failed](https://explorer.solana.com/tx/3qyr6rUPTvSjsKZfmU2j8v4QZsecooCRWytbTpvzML6Tm67zrfSpLf9mDKtThGxsWTSgchcGmtNbBz2wQYTT6qiF?cluster=devnet) with pump's error 6042, [rung 2% filled](https://explorer.solana.com/tx/3gZ8WhEJkWruaDSDrzyA3xT7xMBHo2gro89aStjz6FqxE3Ski6fwwnWGHh1jZPcVQCALJzK14q1fofr7P6uX3ftr?cluster=devnet) four slots later | +1.49% | 0.000022 SOL |
-| price pushed +4.5%, above the 3% cap | rungs [1%](https://explorer.solana.com/tx/35SeeE5X7q9J3QFkLquzBiWCZR3BbpX7ypYurbv6sJiJRZj8yRxGgHCpA9yYTNKkV9jJioQ7yYdDDF9YRc2z7wGg?cluster=devnet), [2%](https://explorer.solana.com/tx/26P3nKWRRRHNVL5A2rwtPDC6i5wMnhbZXg6BL15GMdEB5D14hLv5mtf4SWcW5Kq2xSyfBaoc2Rkbv1iaJG29o6Wy?cluster=devnet) and [3%](https://explorer.solana.com/tx/3FbWyrKHhjQJsdGeF5RthSBYTTYd8c45mwPbxpDicFiaLiX5eg6TytVweCd7HuWPq9ccymeu8hHZE9Trxg2QwH1C?cluster=devnet) all failed, then the [refund](https://explorer.solana.com/tx/2Q2XYpHszQS6P62587rnmjNdmSzJKAWcZDdv2Pgg8o1FFhWfrTFDncor7R4LkN8EoVtZnJhMKfGZ4HupZ9Vy75xQ?cluster=devnet): not bought, the order amount and the rent reserve came back in full | not bought | 0.00003325 SOL |
+## Sources
 
-Measured on devnet in these runs: a `try_rung` that buys used about 123,000 compute units, one that fails on slippage about 94,000, the refund about 9,000. With a compute-unit limit of 200,000 and a price of 5,000 micro-lamports each try cost 6,000 lamports whether it bought or not.
-
-To repeat (devnet only; the script refuses any other cluster):
-
-```bash
-cd client && npm install && cd ..
-client/node_modules/.bin/tsx scripts/devnet-ladder.ts --find-mint
-client/node_modules/.bin/tsx scripts/devnet-ladder.ts --mint <MINT> --amount 0.01 --mode tight --dry-run
-```
+- Bitquery, Solana sandwich attacks: https://bitquery.io/investigations/solana-sandwich-attacks
+- CryptoSlate on Bitquery's estimate: https://cryptoslate.com/solana-sandwich-bots-took-29-7-million-before-costs-bitquery-estimates/
+- TokenPost: https://www.tokenpost.com/news/technology/24728
+- Jupiter, slippage: https://developers.jup.ag/docs/swap/advanced/slippage
+- OKX DEX FAQs: https://web3.okx.com/help/okx-dex-faqs
+- pump.fun public docs and IDL: https://github.com/pump-fun/pump-public-docs
+- pump.fun fees: https://pump.fun/docs/fees
 
 ## License
 
