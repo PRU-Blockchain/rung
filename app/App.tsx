@@ -4,136 +4,135 @@ import "./src/polyfills";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator, LogBox, View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-// The repo's TypeScript client, resolved from ../client/src by metro.config.js.
-import { MODES, RUNG_PROGRAM_ID } from "../client/src";
+import { PublicKey } from "../client/src";
 
-import { CLUSTER } from "./src/config";
+import { BuyError, openBuy } from "./src/flow/buy";
+import { Receipt } from "./src/flow/history";
+import { Running, findUnfinished } from "./src/flow/ladder";
+import { loadMarket } from "./src/flow/market";
+import { Plan, makePlan, rungsForMode } from "./src/flow/plan";
+import { BuyScreen } from "./src/screens/BuyScreen";
+import { HistoryScreen } from "./src/screens/HistoryScreen";
+import { LadderScreen } from "./src/screens/LadderScreen";
+import { NotBoughtScreen } from "./src/screens/NotBoughtScreen";
+import { ReceiptScreen } from "./src/screens/ReceiptScreen";
 import { useAuthorization } from "./src/utils/useAuthorization";
 import { useMobileWallet } from "./src/utils/useMobileWallet";
-import { runSelfCheck } from "./src/utils/selfCheck";
 
 const queryClient = new QueryClient();
 
-// The four preset modes from the client, plus "custom" (a type-only mode in
-// client/src/constants.ts whose rungs come from the user).
-const MODE_NAMES = [...Object.keys(MODES), "custom"];
+// web3.js logs every rate-limited retry of the public devnet RPC as an error;
+// in development builds that covers the screen. They still reach Metro's log.
+LogBox.ignoreLogs(["Server responded with 429"]);
 
-function shorten(address: string): string {
-  return `${address.slice(0, 4)}...${address.slice(-4)}`;
-}
+type Screen =
+  | { name: "start" }
+  | { name: "buy" }
+  | { name: "ladder"; running: Running }
+  | { name: "receipt"; r: Receipt }
+  | { name: "not-bought"; r: Receipt }
+  | { name: "history"; back: Screen };
 
-function Home() {
+const message = (e: unknown) => (e instanceof BuyError ? e.message : `Something went wrong: ${(e as Error)?.message ?? e}`);
+
+function Main() {
   const { selectedAccount } = useAuthorization();
-  const { connect, disconnect } = useMobileWallet();
+  const { connect, disconnect, signAndSendTransaction } = useMobileWallet();
+  const [screen, setScreen] = useState<Screen>({ name: "start" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selfCheck, setSelfCheck] = useState("running");
 
+  // An order left by an earlier run is finished first (or refunded).
   useEffect(() => {
-    runSelfCheck()
-      .then(setSelfCheck)
-      .catch((e) => setSelfCheck(`failed (${(e as Error).message})`));
+    findUnfinished()
+      .then((running) => setScreen(running ? { name: "ladder", running } : { name: "buy" }))
+      .catch(() => setScreen({ name: "buy" }));
   }, []);
 
-  const run = (action: () => Promise<unknown>) => async () => {
+  const buy = async (getPlan: () => Promise<Plan>) => {
     setBusy(true);
     setError(null);
     try {
-      await action();
+      const user: PublicKey = selectedAccount?.publicKey ?? (await connect()).publicKey;
+      const plan = await getPlan();
+      const opened = await openBuy(plan, user, signAndSendTransaction);
+      setScreen({ name: "ladder", running: opened });
     } catch (e) {
-      setError((e as Error).message ?? String(e));
+      setError(message(e));
     } finally {
       setBusy(false);
     }
   };
 
-  return (
-    <SafeAreaView style={styles.screen}>
-      <Text style={styles.title}>Rung</Text>
-      <Text style={styles.network}>{CLUSTER}</Text>
+  const retry = (r: Receipt) =>
+    buy(async () => {
+      const market = await loadMarket(new PublicKey(r.mint));
+      return makePlan(market, "launch", rungsForMode("launch"), BigInt(r.amount));
+    });
 
-      <View style={styles.wallet}>
-        {selectedAccount ? (
-          <>
-            <Text style={styles.address} testID="wallet-address">
-              {shorten(selectedAccount.publicKey.toBase58())}
-            </Text>
-            <Pressable
-              style={[styles.button, styles.secondary]}
-              disabled={busy}
-              onPress={run(disconnect)}
-            >
-              <Text style={styles.secondaryText}>Disconnect</Text>
-            </Pressable>
-          </>
-        ) : (
-          <Pressable
-            style={styles.button}
-            disabled={busy}
-            onPress={run(connect)}
-          >
-            <Text style={styles.buttonText}>Connect wallet</Text>
-          </Pressable>
-        )}
-        {busy && <ActivityIndicator style={styles.spinner} />}
-        {error && <Text style={styles.error}>{error}</Text>}
-      </View>
+  const go = (next: Screen) => {
+    setError(null);
+    setScreen(next);
+  };
 
-      <View style={styles.footer}>
-        <Text style={styles.small}>Self-check: {selfCheck}</Text>
-        <Text style={styles.small}>Program: {RUNG_PROGRAM_ID.toBase58()}</Text>
-        <Text style={styles.small}>Modes: {MODE_NAMES.join(", ")}</Text>
-      </View>
-      <StatusBar style="dark" />
-    </SafeAreaView>
-  );
+  switch (screen.name) {
+    case "start":
+      return (
+        <View style={{ flex: 1, justifyContent: "center", backgroundColor: "#ffffff" }}>
+          <ActivityIndicator />
+        </View>
+      );
+    case "buy":
+      return (
+        <BuyScreen
+          user={selectedAccount?.publicKey ?? null}
+          busy={busy}
+          error={error}
+          onBuy={(plan) => buy(async () => plan)}
+          onHistory={() => go({ name: "history", back: screen })}
+          onDisconnect={() => disconnect().catch(() => undefined)}
+        />
+      );
+    case "ladder":
+      return (
+        <LadderScreen
+          running={screen.running}
+          onDone={(r, err) => {
+            if (!r) {
+              setScreen({ name: "buy" });
+              setError(err ?? "The order stopped.");
+            } else go(r.outcome === "filled" ? { name: "receipt", r } : { name: "not-bought", r });
+          }}
+        />
+      );
+    case "receipt":
+      return <ReceiptScreen r={screen.r} onNew={() => go({ name: "buy" })} onHistory={() => go({ name: "history", back: screen })} />;
+    case "not-bought":
+      return (
+        <NotBoughtScreen
+          r={screen.r}
+          busy={busy}
+          error={error}
+          onRetry={() => retry(screen.r)}
+          onNew={() => go({ name: "buy" })}
+          onHistory={() => go({ name: "history", back: screen })}
+        />
+      );
+    case "history":
+      return <HistoryScreen onBack={() => go(screen.back)} />;
+  }
 }
 
 export default function App() {
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
-        <Home />
+        <Main />
+        <StatusBar style="dark" />
       </QueryClientProvider>
     </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: "#ffffff", padding: 24 },
-  title: { fontSize: 32, fontWeight: "700", color: "#111111", marginTop: 24 },
-  network: {
-    alignSelf: "flex-start",
-    marginTop: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    backgroundColor: "#eeeeee",
-    color: "#333333",
-    fontSize: 13,
-  },
-  wallet: { flex: 1, justifyContent: "center", alignItems: "center" },
-  address: { fontSize: 20, fontFamily: "monospace", color: "#111111", marginBottom: 16 },
-  button: {
-    backgroundColor: "#111111",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  buttonText: { color: "#ffffff", fontSize: 16, fontWeight: "600" },
-  secondary: { backgroundColor: "#ffffff", borderWidth: 1, borderColor: "#111111" },
-  secondaryText: { color: "#111111", fontSize: 16, fontWeight: "600" },
-  spinner: { marginTop: 16 },
-  error: { marginTop: 16, color: "#b00020", textAlign: "center" },
-  footer: { gap: 4 },
-  small: { fontSize: 12, color: "#555555" },
-});

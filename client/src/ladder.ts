@@ -124,7 +124,11 @@ export async function sendAndConfirm(
     await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, "confirmed");
   } catch (e) {
     if (e instanceof TransactionExpiredBlockheightExceededError) return { signature, landed: false, logs: [] };
-    throw e;
+    // web3.js 1.x can reject with the transaction's own status error, a plain
+    // object such as `{ InstructionError: [2, { Custom: 6042 }] }`, when the
+    // transaction landed and failed in a program. That is a result: read it
+    // below like any other. Only real exceptions are rethrown.
+    if (e instanceof Error) throw e;
   }
   for (let i = 0; i < 20; i++) {
     const got = await connection.getTransaction(signature, {

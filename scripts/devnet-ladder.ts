@@ -5,6 +5,9 @@
 //       [--keypair ~/.config/solana/rung-devnet.json] [--rpc <url>] [--dry-run]
 //       [--push-after-open <SOL> | --push-pct <PERCENT>]   TEST AID: the wallet buys on pump
 //         right after open_order, so the price the rungs meet is higher than the one quoted
+//   npx tsx scripts/devnet-ladder.ts --push-only --mint <MINT> --push-pct 4.5 [--wait-order <USER>]
+//       TEST AID: only the push buy, e.g. while the app runs its own order; with --wait-order
+//       it fires as soon as that user's next order opens
 //   npx tsx scripts/devnet-ladder.ts --find-mint [--limit 25]
 //   npx tsx scripts/devnet-ladder.ts --status | --refund | --cancel
 //   npx tsx scripts/devnet-ladder.ts --mint <MINT> --amount 0.01 --simulate-buy --payer <PUBKEY>
@@ -487,7 +490,8 @@ async function pushPrice(connection: Connection, flags: Flags, user: Keypair, pl
     }),
   ];
   const landed = await sendAndConfirm(connection, ixs, user);
-  const balanceAfter = BigInt(await connection.getBalance(user.publicKey, "confirmed"));
+  // A rate-limited balance read must not hide that the push landed.
+  const balanceAfter = BigInt(await connection.getBalance(user.publicKey, "confirmed").catch(() => Number(balanceBefore)));
   const ok = landed.landed && !landed.err;
   console.log(`TEST AID: push buy ${landed.signature} slot ${landed.slot ?? "?"} fee ${landed.fee ?? "?"} CU ${landed.computeUnits ?? "?"} ${ok ? "ok" : `FAILED ${JSON.stringify(landed.err ?? "not landed")}`}`);
   const after = await read();
@@ -505,6 +509,61 @@ async function pushPrice(connection: Connection, flags: Flags, user: Keypair, pl
     ok,
     walletCost: balanceBefore - balanceAfter,
   };
+}
+
+/**
+ * TEST AID: only pushes the price, for testing another wallet's order (the app).
+ * With `--wait-order <USER>` it first waits until that user's order opens
+ * (polled at `processed`), then buys at once, so the push lands between
+ * `open_order` and the rungs. Without it, it pushes now.
+ */
+async function pushOnly(connection: Connection, flags: Flags, mint: PublicKey) {
+  if (!str(flags, "push-pct") && !str(flags, "push-after-open")) throw new Error("--push-only needs --push-pct or --push-after-open");
+  const user = loadKeypair(str(flags, "keypair") ?? DEFAULT_KEYPAIR);
+  const amount = parseSol(str(flags, "amount") ?? "0.01");
+  const market = await loadMarket(connection, mint);
+  const plan = { market, amount, quote: quoteOrder(amount, market.curve, market.feeConfig, market.supply) } as Plan;
+  const waitFor = str(flags, "wait-order");
+  if (waitFor) {
+    const owner = new PublicKey(waitFor);
+    const pda = orderPda(owner);
+    const startOf = async () => {
+      const info = await connection.getAccountInfo(pda, "processed");
+      if (!info) return undefined;
+      const o = decodeOrder(info.data);
+      return o.status === "Open" ? o.startSlot : undefined;
+    };
+    const known = await startOf();
+    const timeoutMs = Number(int(flags, "wait-seconds", 180n)) * 1000;
+    console.log(`TEST AID: waiting up to ${timeoutMs / 1000}s for a new open order of ${owner.toBase58()}${known !== undefined ? ` (an open order from slot ${known} is ignored)` : ""}`);
+    // One websocket subscription instead of polling: the public devnet RPC
+    // limits requests per IP, and the app under test shares that IP.
+    await new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        void connection.removeAccountChangeListener(id);
+        reject(new Error("no new order opened in time; nothing pushed"));
+      }, timeoutMs);
+      const id = connection.onAccountChange(
+        pda,
+        (info) => {
+          let o: Order;
+          try {
+            o = decodeOrder(info.data);
+          } catch {
+            return; // closed (refunded): no order to push against
+          }
+          if (o.status === "Open" && o.startSlot !== known) {
+            console.log(`TEST AID: order opened at slot ${o.startSlot}; pushing now`);
+            clearTimeout(timer);
+            void connection.removeAccountChangeListener(id);
+            resolve();
+          }
+        },
+        "processed",
+      );
+    });
+  }
+  await pushPrice(connection, flags, user, plan);
 }
 
 function printReceipt(r: {
@@ -807,7 +866,8 @@ async function main() {
   const mintText = str(flags, "mint");
   if (!mintText) throw new Error("--mint <MINT> is required");
   const mint = new PublicKey(mintText);
-  if (flags["simulate-buy"]) await simulateBuy(connection, flags, mint);
+  if (flags["push-only"]) await pushOnly(connection, flags, mint);
+  else if (flags["simulate-buy"]) await simulateBuy(connection, flags, mint);
   else await run(connection, flags, mint);
 }
 

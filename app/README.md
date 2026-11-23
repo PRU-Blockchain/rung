@@ -1,14 +1,23 @@
-# Rung Android app (skeleton)
+# Rung Android app
 
-React Native + Expo **custom development build** (not Expo Go) that connects to an
-Android wallet through Mobile Wallet Adapter (MWA). Based on
+React Native + Expo **custom development build** (not Expo Go) that buys a
+pump.fun token through Rung on **devnet**, with one wallet approval through
+Mobile Wallet Adapter (MWA). Started from
 [solana-mobile-expo-template](https://github.com/solana-mobile/solana-mobile-expo-template)
-v3.0.0 (commit `04cdd54`), trimmed to a single screen.
+v3.0.0 (commit `04cdd54`).
 
-The screen shows the `Rung` title, the network label (`devnet`), a
-"Connect wallet" button (MWA `authorize`), the connected address and "Disconnect"
-(MWA `deauthorize`), a startup self-check line and constants imported from
-`../client/src`.
+Screens (`src/screens/`, one file each): buy, ladder (live), receipt, not
+bought (with retry), history. Logic (`src/flow/`): market and quote, plan and
+fees, opening the order (one `signAndSendTransactions`), running the ladder
+(`client`'s `runLadder`), resume after a restart, history. `App.tsx` is a
+small state machine that picks the screen.
+
+- The order's session key is generated per buy, kept only in
+  `expo-secure-store`, never logged, and deleted once the order is closed and
+  the key is empty. On start, an unfinished order is resumed: still open, the
+  ladder goes on (after expiry it refunds); already ended, the app reads the
+  result from the chain, returns what the key holds and writes the receipt.
+- History is in AsyncStorage and opens without a network.
 
 ## Stack
 
@@ -23,13 +32,14 @@ The screen shows the `Rung` title, the network label (`devnet`), a
 
 ## Layout
 
-- `App.tsx`: the single screen. Imports `./src/polyfills` first.
+- `App.tsx`: screen state machine. Imports `./src/polyfills` first.
 - `src/polyfills.ts`: `react-native-get-random-values` and a global `Buffer`.
 - `src/utils/useAuthorization.tsx`, `src/utils/useMobileWallet.tsx`: MWA
-  authorize / deauthorize, adapted from the template. Transactions are meant
-  to go through `signAndSendTransactions` (helper present, unused for now).
-- `src/utils/selfCheck.ts`: generates a `Keypair`, round-trips it through
-  `expo-secure-store`, deletes it and shows `Self-check: ok`. Nothing is logged.
+  authorize / deauthorize / `signAndSendTransactions`, adapted from the template.
+- `src/flow/`: `market.ts`, `plan.ts`, `buy.ts`, `ladder.ts`, `session.ts`,
+  `history.ts`, `format.ts`, `connection.ts`.
+- `src/screens/`: `BuyScreen`, `LadderScreen`, `ReceiptScreen`,
+  `NotBoughtScreen`, `HistoryScreen`, shared `ui.tsx`.
 - `src/config.ts`: devnet endpoint (`https://api.devnet.solana.com`). No keys.
 - `metro.config.js`: adds `../client` to `watchFolders` and resolves the
   client's package imports (`@solana/web3.js`) from this app's `node_modules`,
@@ -92,7 +102,33 @@ after adding a native module or changing `app.json`.
 
 Android package: `com.prublockchain.rung`.
 
+## Testing a price move (devnet, TEST AID)
+
+To see a rung slip or a buy not happen, move the price right after the app's
+order opens, from a second devnet wallet:
+
+```bash
+npx tsx scripts/devnet-ladder.ts --push-only --mint <MINT> --push-pct 4.5 \
+  --wait-order <APP_WALLET_ADDRESS> --keypair <devnet keypair file>
+```
+
+It subscribes to the app wallet's order account and buys on pump as soon as a
+new order opens. About 4.5% gives "not bought" in Tight mode; about 1.5% makes
+the first rung slip and the second fill. Small devnet curves run out of tokens
+quickly (the curve completes and every rung fails with pump error 6005).
+
 ## Known issues
+
+- The public devnet RPC (`api.devnet.solana.com`) rate-limits per IP
+  (`429 Connection rate limits exceeded`). web3.js retries with backoff; the
+  retries are hidden from the dev-build LogBox but stay in Metro's log. A run
+  that still breaks off is refunded by the session key; nothing is retried twice.
+- web3.js 1.x `confirmTransaction` sometimes rejects with the transaction's own
+  error object (e.g. a slippage `{ InstructionError: [2, { Custom: 6042 }] }`)
+  instead of resolving. `client`'s `sendAndConfirm` treats that as an exception,
+  which stopped the ladder after the first slipped rung. `src/flow/connection.ts`
+  turns it back into a normal result; the proper fix belongs in
+  `client/src/ladder.ts`.
 
 - `JAVA_TOOL_OPTIONS` breaks the native build: it fails at
   `:expo-modules-core:configureCMakeDebug[x86_64]` with
