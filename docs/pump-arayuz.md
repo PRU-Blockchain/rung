@@ -2,7 +2,7 @@
 
 - **Kaynak:** https://github.com/pump-fun/pump-public-docs, commit `bc35796152027d2744ca02066d305438e34b67e7`
   (2026-11-20T21:34:02Z, "docs: protocol fee recipient rotation, 8 new fee recipients for pump and PumpSwap, cut off November 25").
-- **Çıkarılma tarihi:** 2026-11-23. Ham dosyalar: `C:\Android\tmp\pump-docs-guncel\` (yalnız veri).
+- **Çıkarılma tarihi:** 2026-11-23.
 - **Uyarı:** Bu dosya 2026-11-23'te kaynaktan çıkarıldı. **Kod yazmadan önce güncel IDL ile yeniden karşılaştır.**
 - Kural: adres, sıra, tohum, kod, sürüm kaynakta yazdığı gibidir. Kaynakta olmayan şey "kaynakta yok" diye işaretli.
   "Kaynak dışı" etiketli satırlar genel Solana bilgisidir, pump belgesi değildir.
