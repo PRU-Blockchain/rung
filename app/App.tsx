@@ -9,7 +9,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { PublicKey } from "../client/src";
 
-import { BuyError, openBuy } from "./src/flow/buy";
+import { BuyError, inForeground, openBuy } from "./src/flow/buy";
 import { Receipt } from "./src/flow/history";
 import { Running, findUnfinished } from "./src/flow/ladder";
 import { loadMarket } from "./src/flow/market";
@@ -59,7 +59,14 @@ function Main() {
       // Network work happens while Rung is in front (its requests failed from
       // the background); the wallet then opens once, to authorize and sign.
       // Without any cached account the first buy connects first.
-      const user: PublicKey = selectedAccount?.publicKey ?? (await connect()).publicKey;
+      let user: PublicKey;
+      if (selectedAccount) user = selectedAccount.publicKey;
+      else {
+        user = (await connect()).publicKey;
+        // The wallet answers before Rung is in front again; reading the chain
+        // right away failed with "Network request failed" (seen with Phantom).
+        await inForeground();
+      }
       const plan = await getPlan();
       const opened = await openBuy(plan, user, signOpen);
       setScreen({ name: "ladder", running: opened });

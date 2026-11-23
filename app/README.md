@@ -8,7 +8,8 @@ v3.0.0 (commit `04cdd54`).
 
 Screens (`src/screens/`, one file each): buy, ladder (live), receipt, not
 bought (with retry), history. Logic (`src/flow/`): market and quote, plan and
-fees, opening the order (one `signAndSendTransactions`), running the ladder
+fees, opening the order (the wallet signs with `signTransactions`, the app
+sends; see "Wallet notes" below), running the ladder
 (`client`'s `runLadder`), resume after a restart, history. `App.tsx` is a
 small state machine that picks the screen.
 
@@ -35,7 +36,8 @@ small state machine that picks the screen.
 - `App.tsx`: screen state machine. Imports `./src/polyfills` first.
 - `src/polyfills.ts`: `react-native-get-random-values` and a global `Buffer`.
 - `src/utils/useAuthorization.tsx`, `src/utils/useMobileWallet.tsx`: MWA
-  authorize / deauthorize / `signAndSendTransactions`, adapted from the template.
+  authorize / deauthorize / `signTransactions` (fallback
+  `signAndSendTransactions`), adapted from the template.
 - `src/flow/`: `market.ts`, `plan.ts`, `buy.ts`, `ladder.ts`, `session.ts`,
   `history.ts`, `format.ts`, `connection.ts`.
 - `src/screens/`: `BuyScreen`, `LadderScreen`, `ReceiptScreen`,
@@ -117,7 +119,68 @@ new order opens. About 4.5% gives "not bought" in Tight mode; about 1.5% makes
 the first rung slip and the second fill. Small devnet curves run out of tokens
 quickly (the curve completes and every rung fails with pump error 6005).
 
-## Known issues
+## Known issues / wallet notes
+
+Observed on the `rung-play35` emulator (Android 15 image) on 2026-11-23, devnet,
+Tight mode, 0.01 SOL, token `27wsVth5k9sUpxR9JGQoWbi1EDP4yRU7twNGW6mhqRSK`.
+Only these two wallet installs were tried; other versions may behave differently.
+
+**Why sign-then-send.** The wallet only signs (MWA `signTransactions`) and the
+app sends the signed bytes itself once it is back in front (`src/flow/buy.ts`).
+In earlier runs Phantom's own `signAndSendTransactions` never reached devnet,
+and Solflare kept Rung in the background (JS paused) until its success screen
+was closed, so orders expired before any rung was tried. Both wallets report
+`features: ["solana:signTransactions"]`, so the `signAndSendTransactions`
+fallback was not used in these runs.
+
+| | Phantom (`app.phantom`, Testnet Mode, Solana Devnet) | Solflare (`com.solflare.mobile`) |
+|---|---|---|
+| Wallet sheets, first buy (not connected) | 3: Connect, Connect again, Confirm (two Android app choosers) | 2: Connect, then the transaction sheet (two choosers) |
+| Wallet sheets, later buys | 2: Connect + Confirm, every time | 1: the transaction sheet |
+| Cached auth token | refused: `authorize(auth_token)` answers `-1 authorization request failed`; Phantom's log says `Declining sol_mwa_reauthorize: dApp identity is not verified (mwaIdentityVerified !== true)` and revokes the record, so the app authorizes again (a new Connect sheet) | accepted silently |
+| Identity warning | red "This app's identity could not be verified. It may be impersonating another app." on Connect; yellow "This domain is new" on Confirm | "Unknown site ... Only sign transactions on sites you trust"; the "I trust this site" switch must be turned on for every buy, then "slide to approve" |
+| Approval sheet shows | -0.017178 SOL, Network "Solana", Network Fee 0.00008 SOL ([screenshot](../docs/shots/wallet-phantom-approval.png)) | -0.02 SOL (with a USD value), Network fee 0.000025 SOL |
+| Instructions the wallet added | `SetComputeUnitPrice(375000)` + `SetComputeUnitLimit(200000)` put **before** `open_order`; no Lighthouse | `SetComputeUnitLimit(200000)` + `SetComputeUnitPrice(100000)` put **after** `open_order`; no Lighthouse |
+| Fee of the open (on chain) | 80,000 lamports, v0, fee payer = user | 25,000 lamports, v0, fee payer = user |
+| Back to Rung | automatic after Confirm | automatic after the slide |
+| Two buys back to back | both filled; Phantom did not crash | both filled |
+
+The app's fee text ("+ approval fee set by your wallet") is there because the
+wallet, not Rung, picks the compute-unit price: 0.00008 SOL with Phantom,
+0.000025 SOL with Solflare for the same transaction.
+
+Run results (devnet signatures):
+
+- Phantom, buy 1: open `51Qbk6QbmCsmW1AkbSQXmrxePVzKfRrcmtrRSEcmcZRuFYvZz6Vc42LVEd1zEDDnZLDgGEWJZUpa57MGUuKiiziA`,
+  filled on try 1% `hY9SxGm84tUoNbucQVLRfonGHM5NdfJK1E9E1o9pGr14xo4vxvVog4QtM7XAZ1SzAFBu3LHKJSEGp9xTdKJXnpB`
+  ([receipt](../docs/shots/app-10-receipt-phantom.png)).
+- Phantom, buy 2: open `56sYPppjoFT2Chk1QoBTQPh2RgbAh3SP1pf76ZwnrRSQVauEfeTkDWK9nL6MHL1BwuyXjjXgo9AmmM6Ddv15XUXz`, filled on try 1%.
+- Solflare, buys 1 and 2: opens `3T858wb1mkDoEhU3HYRhCbeVfG9o2b32rr3r66qTRx5hPUU8t4NQGrhivbKjZTAfmRhpp6xewMmmopLw2aw41i7q`
+  and `3TozcWbMZDVpCaBebvgjjFSrVEZALjxAXrSSjFprFrGmxPBenAvstZdFTxKMKSnE8MQ43TecSHoonTHVzmqfyKuK`, both filled on try 1%.
+- Solflare with a +4.5% price push (TEST AID) right after the open
+  (`2jvjVjdVqx4yTVNST3ffV4PKepLHEquckBb7RwfquTApmV63eUUZjzrVf975iYGWiAstnvV7pQy5upjFcwnK19p9`):
+  tries 1%, 2%, 3% failed with 6042, refund sent, screen "Price went above your
+  cap. Not bought. Your SOL is back." (price +4.43%). "Retry with Launch mode"
+  opened a new single-approval order
+  (`4zKAUh1BVArMrm33jWkNMoaGuZYxE8Lfdmkn8oGJTQGyWo7xxCF7pCsQNY9JTbxDWpfMpoHXCdz2zF3cSPgxFYfA`)
+  that filled on try 10%.
+
+Problems seen:
+
+- **Phantom asks to Connect on every buy** (see the table). The cause in
+  Phantom's log is the unverified app identity, not the token. Verifying it
+  presumably needs Digital Asset Links between `rung-drab.vercel.app` and this
+  Android app's signing certificate; not tried.
+- **"Approval took too long" (`Blockhash not found`)**: the blockhash is read
+  before the wallet opens, and a signed-only transaction cannot be refreshed by
+  the wallet. When chooser + Connect + reading the sheet took over about a
+  minute, the send failed simulation with `Blockhash not found` (once with
+  Phantom, once with Solflare). The five buys approved within about 15 to 20
+  seconds of tapping Buy all landed. Nothing is sent in that case; the user taps Buy again.
+- **First buy, "Network request failed"**: when no account was cached the buy
+  connected first and then read the chain while Rung was still in the
+  background (Phantom). `App.tsx` now waits for Rung to be in front after
+  connecting.
 
 - The public devnet RPC (`api.devnet.solana.com`) rate-limits per IP
   (`429 Connection rate limits exceeded`). web3.js retries with backoff; the

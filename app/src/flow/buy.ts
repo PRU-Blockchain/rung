@@ -88,7 +88,7 @@ function describeSigned(tx: VersionedTransaction, builtCount: number): string {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** Resolves once Rung is in front again (requests from the background failed). */
-function inForeground(): Promise<void> {
+export function inForeground(): Promise<void> {
   if (AppState.currentState === "active") return Promise.resolve();
   return new Promise((resolve) => {
     const sub = AppState.addEventListener("change", (s) => {
