@@ -35,6 +35,23 @@ The program is developed inside WSL2 (Ubuntu 24.04) with the repository on the W
 | Next.js (`web/`) | 16.4.6 |
 | Expo SDK | not chosen yet |
 
+The Android side runs on Windows, not in WSL: the Android SDK, the emulator and `adb` live there. Expo and Gradle will run from a second clone of this repository on the Windows file system, at a path that contains only ASCII characters; the program is built from the WSL clone. This split is the plan, not a verified setup: the app does not exist yet. What is verified: the emulator boots to Android 15 with the Play Store present.
+
+| Android tool | version |
+|---|---|
+| Android Emulator | 37.2.12 |
+| Emulator system image | Android 15 (API 35), Google Play, x86_64 |
+| JDK | 21 |
+
+Emulator, created once with `avdmanager` and started without Android Studio:
+
+```
+avdmanager create avd -n rung-play35 -k "system-images;android-35;google_apis_playstore;x86_64" -d pixel_7
+emulator -avd rung-play35
+```
+
+`avdmanager` leaves `PlayStore.enabled=no` in the AVD's `config.ini`; set it to `yes` by hand. If the Windows user name contains non-ASCII characters, point `TEMP`, `ANDROID_AVD_HOME` and `ANDROID_EMULATOR_HOME` at ASCII-only folders first, otherwise the Java-based SDK tools fail with "Unable to establish loopback connection".
+
 ## Tests
 
 ```bash
