@@ -1,0 +1,60 @@
+# --- Secrets: never commit ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.keystore
+*.jks
+*.p12
+id.json
+*-keypair.json
+*keypair*.json
+keys/
+secrets/
+
+# --- Rust / Anchor ---
+target/
+.anchor/
+test-ledger/
+.surfpool/
+**/*.rs.bk
+
+# --- Node ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-store/
+dist/
+.turbo/
+
+# --- Expo / React Native / Android ---
+.expo/
+app/android/
+app/ios/
+*.apk
+*.aab
+*.hprof
+local.properties
+.gradle/
+
+# --- Web ---
+.next/
+out/
+.vercel/
+
+# --- Measurement raw data (re-created by the scripts; tens of thousands of files) ---
+measure/blk_*/
+measure/cache/
+measure/data/
+measure/rows_*.json
+measure/pool_age*.json
+measure/tmp/
+
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
