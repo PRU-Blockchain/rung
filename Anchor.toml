@@ -16,6 +16,6 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-test = "cargo build-sbf --manifest-path test-programs/mock-pump/Cargo.toml && cargo test"
+test = "cargo build-sbf --manifest-path test-programs/mock-pump/Cargo.toml && cargo build-sbf --manifest-path test-programs/mock-pump-amm/Cargo.toml && cargo test"
 
 [hooks]

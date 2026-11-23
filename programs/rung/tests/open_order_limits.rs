@@ -202,9 +202,10 @@ fn zero_raw_tokens_are_rejected() {
 // --- venue ----------------------------------------------------------------------
 
 #[test]
-fn pumpswap_venue_is_rejected_for_now() {
+fn pumpswap_order_pointing_at_a_curve_account_is_rejected() {
+    // The venue account here is the token's bonding curve, not its pool.
     let (mut env, spec) = spec_with(|s| s.venue = Venue::PumpSwap);
-    assert_rejected(&mut env, &spec, RungError::VenueNotSupported);
+    assert_rejected(&mut env, &spec, RungError::InvalidVenueAccount);
 }
 
 #[track_caller]

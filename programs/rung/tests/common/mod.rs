@@ -24,6 +24,8 @@ use solana_signer::Signer;
 use solana_transaction::Transaction;
 use solana_transaction_error::TransactionError;
 
+pub mod amm;
+
 // ---------------------------------------------------------------------------
 // Addresses
 // ---------------------------------------------------------------------------

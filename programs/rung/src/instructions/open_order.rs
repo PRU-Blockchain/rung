@@ -9,7 +9,13 @@ use crate::{
     error::RungError,
     events::OrderOpened,
     state::{Order, OrderStatus, Venue},
-    venue::{parse_curve_reserves, raw_quote, BONDING_CURVE_SEED, PUMP_PROGRAM_ID},
+    pump_swap::{
+        canonical_pool, parse_pool, pool_reserves, PUMP_SWAP_PROGRAM_ID, SPL_TOKEN_PROGRAM_ID,
+        WSOL_MINT,
+    },
+    venue::{
+        parse_curve_reserves, raw_quote, CurveReserves, BONDING_CURVE_SEED, PUMP_PROGRAM_ID,
+    },
 };
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Debug)]
@@ -62,11 +68,95 @@ pub struct OpenOrder<'info> {
     #[account(mut, seeds = [VAULT_SEED, user.key().as_ref()], bump)]
     pub vault: SystemAccount<'info>,
 
-    /// CHECK: the venue's price account (the bonding curve of `mint`). Its
-    /// address and owner are verified in the handler before it is read.
+    /// CHECK: the venue's price account: the bonding curve of `mint`, or its
+    /// canonical PumpSwap pool. Its address and owner are verified in the
+    /// handler before it is read.
     pub venue_state: UncheckedAccount<'info>,
 
     pub system_program: Program<'info, System>,
+    // Remaining accounts, PumpSwap only: the pool's base and quote token
+    // accounts, in that order.
+}
+
+/// Reserves of the bonding curve of `mint`. The account must be pump's curve
+/// for exactly this mint, and the curve must still be selling.
+fn curve_start_reserves(venue_state: &UncheckedAccount, mint: &Pubkey) -> Result<CurveReserves> {
+    let (curve_address, _) =
+        Pubkey::find_program_address(&[BONDING_CURVE_SEED, mint.as_ref()], &PUMP_PROGRAM_ID);
+    require_keys_eq!(
+        venue_state.key(),
+        curve_address,
+        RungError::InvalidVenueAccount
+    );
+    require_keys_eq!(
+        *venue_state.owner,
+        PUMP_PROGRAM_ID,
+        RungError::InvalidVenueAccount
+    );
+    let reserves = parse_curve_reserves(&venue_state.try_borrow_data()?)?;
+    require!(!reserves.complete, RungError::CurveComplete);
+    Ok(reserves)
+}
+
+/// Reserves of the canonical PumpSwap pool of `mint`. The two remaining
+/// accounts are the pool's token accounts, in the order base, quote; they
+/// must be the ones written in the pool.
+fn pool_start_reserves(
+    venue_state: &UncheckedAccount,
+    reserve_accounts: &[AccountInfo],
+    mint: &Pubkey,
+    base_token_program: &Pubkey,
+) -> Result<CurveReserves> {
+    require_keys_eq!(
+        venue_state.key(),
+        canonical_pool(mint),
+        RungError::InvalidVenueAccount
+    );
+    require_keys_eq!(
+        *venue_state.owner,
+        PUMP_SWAP_PROGRAM_ID,
+        RungError::InvalidVenueAccount
+    );
+    let pool = parse_pool(&venue_state.try_borrow_data()?)?;
+    require_keys_eq!(pool.base_mint, *mint, RungError::InvalidVenueAccount);
+    require_keys_eq!(pool.quote_mint, WSOL_MINT, RungError::InvalidVenueAccount);
+
+    require!(reserve_accounts.len() == 2, RungError::InvalidVenueAccount);
+    let (base_account, quote_account) = (&reserve_accounts[0], &reserve_accounts[1]);
+    require_keys_eq!(
+        base_account.key(),
+        pool.pool_base_token_account,
+        RungError::InvalidVenueAccount
+    );
+    require_keys_eq!(
+        quote_account.key(),
+        pool.pool_quote_token_account,
+        RungError::InvalidVenueAccount
+    );
+    require_keys_eq!(
+        *base_account.owner,
+        *base_token_program,
+        RungError::InvalidVenueAccount
+    );
+    require_keys_eq!(
+        *quote_account.owner,
+        SPL_TOKEN_PROGRAM_ID,
+        RungError::InvalidVenueAccount
+    );
+    pool_reserves(
+        &pool,
+        token_balance(base_account)?,
+        token_balance(quote_account)?,
+    )
+}
+
+/// Balance of a token account: bytes 64..72 in both token programs.
+fn token_balance(token_account: &AccountInfo) -> Result<u64> {
+    let data = token_account.try_borrow_data()?;
+    require!(data.len() >= 72, RungError::InvalidVenueAccount);
+    let mut bytes = [0u8; 8];
+    bytes.copy_from_slice(&data[64..72]);
+    Ok(u64::from_le_bytes(bytes))
 }
 
 pub fn handle_open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result<()> {
@@ -133,7 +223,6 @@ pub fn handle_open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result
             RungError::FeeBudgetBelowRent
         );
     }
-    require!(args.venue == Venue::Curve, RungError::VenueNotSupported);
 
     // One open order per user: the vault never holds the SOL of two orders.
     require!(
@@ -143,20 +232,15 @@ pub fn handle_open_order(ctx: Context<OpenOrder>, args: OpenOrderArgs) -> Result
 
     // --- Reference 2: read the price from the venue now. ---
     let mint = ctx.accounts.mint.key();
-    let (curve_address, _) =
-        Pubkey::find_program_address(&[BONDING_CURVE_SEED, mint.as_ref()], &PUMP_PROGRAM_ID);
-    require_keys_eq!(
-        ctx.accounts.venue_state.key(),
-        curve_address,
-        RungError::InvalidVenueAccount
-    );
-    require_keys_eq!(
-        *ctx.accounts.venue_state.owner,
-        PUMP_PROGRAM_ID,
-        RungError::InvalidVenueAccount
-    );
-    let reserves = parse_curve_reserves(&ctx.accounts.venue_state.try_borrow_data()?)?;
-    require!(!reserves.complete, RungError::CurveComplete);
+    let reserves = match args.venue {
+        Venue::Curve => curve_start_reserves(&ctx.accounts.venue_state, &mint)?,
+        Venue::PumpSwap => pool_start_reserves(
+            &ctx.accounts.venue_state,
+            ctx.remaining_accounts,
+            &mint,
+            ctx.accounts.mint.to_account_info().owner,
+        )?,
+    };
 
     // Scale the quote the user saw by how the fee-free quote changed between
     // the reserves the app saw and the reserves the program reads now.

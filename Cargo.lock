@@ -1813,6 +1813,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "mock-pump-amm"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+]
+
+[[package]]
 name = "num"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2307,6 +2315,7 @@ dependencies = [
  "base64 0.22.1",
  "litesvm",
  "mock-pump",
+ "mock-pump-amm",
  "serde_json",
  "solana-account",
  "solana-keypair",

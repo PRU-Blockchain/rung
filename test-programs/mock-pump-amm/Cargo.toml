@@ -1,0 +1,31 @@
+# TEST DOUBLE: never deployed. Loaded by Rung's LiteSVM tests at PumpSwap's address.
+# Kept outside `programs/` on purpose so the Anchor CLI does not treat it as a
+# program of this workspace. Build: `cargo build-sbf --manifest-path test-programs/mock-pump-amm/Cargo.toml`.
+[package]
+name = "mock-pump-amm"
+version = "0.1.0"
+description = "Test double that imitates the interface of PumpSwap's buy_exact_quote_in_v2. Not pump's code."
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "mock_pump_amm"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+anchor-debug = []
+custom-heap = []
+custom-panic = []
+
+[dependencies]
+anchor-lang = "1.1.2"
+anchor-spl = "1.1.2"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(target_os, values("solana"))'] }

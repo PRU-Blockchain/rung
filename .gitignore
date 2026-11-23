@@ -21,6 +21,8 @@ test-ledger/
 **/*.rs.bk
 # pump's dumped program and mainnet account snapshots (re-created by scripts/fetch-pump-fixtures.mjs)
 programs/rung/tests/fixtures/pump/
+# PumpSwap's dumped program and mainnet pool snapshot (re-created by scripts/fetch-pumpswap-fixtures.mjs)
+programs/rung/tests/fixtures/pumpswap/
 
 # --- Node ---
 node_modules/

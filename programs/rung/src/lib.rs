@@ -14,6 +14,7 @@ pub mod error;
 pub mod events;
 pub mod instructions;
 pub mod math;
+pub mod pump_swap;
 pub mod state;
 pub mod vault;
 pub mod venue;
@@ -39,7 +40,10 @@ pub mod rung {
     /// Session key only. Tries rung `rung_index`; buys at most once per order.
     /// The venue's own accounts are passed as remaining accounts, in the order
     /// the venue's buy instruction expects them.
-    pub fn try_rung(ctx: Context<TryRung>, rung_index: u8) -> Result<()> {
+    pub fn try_rung<'info>(
+        ctx: Context<'info, TryRung<'info>>,
+        rung_index: u8,
+    ) -> Result<()> {
         instructions::try_rung::handle_try_rung(ctx, rung_index)
     }
 

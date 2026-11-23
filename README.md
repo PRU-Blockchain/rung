@@ -82,9 +82,9 @@ The app's own devnet buys (Phantom, Solflare, a not-bought run and its "Retry wi
 
 | part | state |
 |---|---|
-| On-chain order program (Anchor) | deployed on **devnet** at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet). Buys on pump.fun **bonding curves** only. Reviewed once by an independent read-only pass, not audited |
+| On-chain order program (Anchor) | deployed on **devnet** at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet). The deployed build buys on pump.fun **bonding curves** only. Reviewed once by an independent read-only pass (before pool support was added), not audited |
 | Mainnet | not yet: no mainnet deployment, no decision on it yet |
-| PumpSwap pools | not yet: the program rejects a pool order (`VenueNotSupported`) |
+| PumpSwap pools | in the program and tested locally, against a test double and against the real PumpSwap program dumped from mainnet (the vault is accepted as the buyer). Not yet: the program deployed on devnet is still the curve-only build, and the app and the client do not build pool orders |
 | Android app (`app/`) | works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. Not tested: Custom mode, a real device, Seeker, mainnet |
 | APK | not yet |
 | Web page (`web/`) | live at https://rung-drab.vercel.app/; the counter is computed from the program's devnet events |

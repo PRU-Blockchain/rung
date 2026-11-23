@@ -392,3 +392,104 @@ TRADE_V3, BUY, PUMP_SWAP_TRADE_V2, SYNTHETIC_MIGRATION, FEE_RECIPIENTS, FEE_RECI
 - FAQ: CU için "it is recommended to use a static big enough CU limit like `100_000`" (BUY.md Rust örneği 400_000 kullanıyor).
 - Kaynakta yok: `associated_user`'ın handler kontrolleri, `bonding_curve_v2` / `pool_v2` tohumları, PDA alıcı hakkında
   herhangi bir not, güncel ücret kademelerinin metni, `UserVolumeAccumulator::LEN` sayısı (yalnız "137-byte").
+## K. PumpSwap alımı için doğrulananlar
+- **Tarih/kaynak:** 2026-11-23. `pump-public-docs` `bc35796` (yukarıdakiyle aynı; GitHub'daki son commit). Deney: gerçek PumpSwap
+  ikilisi (`solana program dump`, 10.485.715 bayt) + mainnet hesap kopyası, LiteSVM içinde (`programs/rung/tests/real_pumpswap.rs`;
+  fixture `scripts/fetch-pumpswap-fixtures.mjs`). Kaynak işlem
+  `48MSMXM7p8aYBXomNtDL1mpY51bZCtRsYt942FiCoCa4jvXauCao3LqEcXjEuuafKXe1SksGP3eo5x84Kd5j2cuF` (slot 473074709, `buy_exact_quote_in_v2`),
+  mint `76fFhcA142kf9gdg11ahYTmEiZnPXokxJkcF1axupump` (Token-2022), hesap kopyası slot 473075789. "Deney" satırları belge değil,
+  o ikilinin o anki davranışıdır.
+### K1. Kanonik havuz türetimi
+- `pool_authority = PDA(["pool-authority", mint], 6EF8rr…F6P)`: pump IDL `migrate` #10 ve `migrate_v2` #11 `pool_authority`
+  tohumları (`program` alanı yok → pump'ın kendi programı altında).
+- `pool = PDA(["pool", [0,0], pool_authority, base_mint, quote_mint], pAMMBa…XEA)`: `migrate` #9 / `migrate_v2` #10 tohumları
+  (`[0,0]` = index 0, u16 LE; `program` = `pump_amm`). `migrate`'te `quote_mint` = `wsol_mint` (`So111…112`).
+  PUMP_SWAP_README: "pools created using Pump program `migrate` instruction use a `CANONONICAL_POOL_INDEX == 0`".
+  FEE_PROGRAM_README: `isPumpPool(baseMint, poolCreator) = pumpPoolAuthorityPda(baseMint) == pool.creator` (`coin_creator` değil).
+- Havuzun token hesapları (`migrate_v2` #17/#18): `pool_base_token_account = ATA(pool, base_token_program, base_mint)`,
+  `pool_quote_token_account = ATA(pool, quote_token_program, quote_mint)`; ikisi de `Pool` hesabında yazılı.
+- **Kanıt (mainnet, getAccountInfo):** mint `76fF…pump` → `pool_authority` `EBTqQ1g8NSPXorW6HcerzQABkdRmqrXXwMBLgSq3VRiX` →
+  türetilen havuz `C4E4jTqFXTsCYD2UvRTXmSDDjrMuLZtwrnxNJo9XYUJr` = işlemdeki `pool`; sahibi `pAMMBa…XEA`, discriminator `Pool`,
+  `creator` = `EBTq…VRiX`, `index` = 0, `quote_mint` = WSOL, uzunluk 301 bayt (güncel düzen 287 bayt; fazlası `extend_account`).
+  Aynı türetim `tests/mock_pump_amm.rs` `canonical_pool_derivation_matches_the_mainnet_pool` içinde sabit değerlerle sınanır.
+- Diğer PDA'lar (deneyde fixture ile eşleşti): `global_config` `["global_config"]` (pAMM) = `ADyA8h…JKqw`; `fee_config`
+  `["fee_config", pAMM id]` (Pump Fees) = `5PHirr…Tjx`; `event_authority` `["__event_authority"]` (pAMM) =
+  `GS4CU59F31iL7aR2Q8zVS8DRrcRnXX1yjQ66TqNVQnaR`; `user_volume_accumulator` `["user_volume_accumulator", user]` (pAMM).
+### K2. `buy_exact_quote_in_v2`: argümanlar ve 17 hesap (Rung tasarımında kim veriyor)
+Argümanlar yalnız `spendable_quote_in: u64`, `min_base_amount_out: u64` (IDL; `track_volume` **yok**). Veri 24 bayt; mainnet
+işleminin verisi de 24 bayt (`c2ab1c46684d5b2f` + 2×u64). Bayraklar IDL'den.
+
+| # | Hesap | Bayrak | Rung'da |
+|---|---|---|---|
+| 0 | `pool` | W | program sabitler: `canonical_pool(order.mint)` |
+| 1 | `user` | W S | program sabitler: kasa PDA'sı (`invoke_signed`) |
+| 2 | `global_config` | - | oturum anahtarı verir; PumpSwap doğrular |
+| 3 | `base_mint` | - | program sabitler: `order.mint` (IDL `relations: pool`) |
+| 4 | `quote_mint` | - | program sabitler: WSOL (IDL `relations: pool`) |
+| 5 | `user_base_token_account` | W | program sabitler: `ATA(kasa, token_program, mint)` = `vault_token_account` |
+| 6 | `user_quote_token_account` | W | program sabitler: `ATA(kasa, SPL Token, WSOL)`; program açar, doldurur, kapatır |
+| 7 | `pool_base_token_account` | W | oturum anahtarı verir; PumpSwap `Pool` ile karşılaştırır (`relations`) |
+| 8 | `pool_quote_token_account` | W | oturum anahtarı verir; aynı |
+| 9 | `base_token_program` | - | program sabitler: `token_program` hesabı |
+| 10 | `quote_token_program` | - | oturum anahtarı verir (WSOL için SPL Token) |
+| 11 | `system_program` | - | IDL'de sabit adres |
+| 12 | `user_volume_accumulator` | W | oturum anahtarı verir; PumpSwap tohumla doğrular (`user` = kasa) |
+| 13 | `fee_config` | - | oturum anahtarı verir; IDL'de sabit tohum |
+| 14 | `buyback_fee_recipient` | W | oturum anahtarı verir; 8 listeli cüzdandan birinin WSOL hesabı |
+| 15 | `event_authority` | - | oturum anahtarı verir; tohumla doğrulanır |
+| 16 | `program` | - | program sabitler: `pAMMBa…XEA` (`WrongBuyProgram`) |
+### K3. Deney sonuçları (gerçek PumpSwap ikilisi)
+- **SOL, WSOL olarak istenir:** düz cüzdan WSOL ATA'sını açıp `amount` aktardı, `sync_native` ile sardı, sonra aldı: WSOL hesabı
+  tam `spendable_quote_in` kadar azaldı (`amount = 0`, yalnız kirası kaldı). Olaydaki `quote_amount_in` = harcanan (T1).
+- **`user_volume_accumulator`:** alımda yoksa açılır, sahibi PumpSwap, **137 bayt**, kirası **`user`'dan** (T1: 1.346.200 lamport,
+  mainnet kirasıyla). Rung'da `user` = kasa → kasa öder.
+- **`pool` kira takviyesi:** güncel uzunluktaki havuzda ödeme yok. Havuz 261 bayta kesilince alım onu 287 bayta büyüttü, farkı
+  (132.080 lamport) `user` ödedi (T9). Bugünkü mainnet havuzu 301 bayt; kasa için yalnız eski havuzlarda ek gider.
+- **`buyback_fee_recipient`:** listeli bir cüzdanın var olmayan WSOL ATA'sı → **6027** `AccountTypeNotSupported`; listede olmayan
+  cüzdanın WSOL hesabı → **6053** `BuybackFeeRecipientNotAuthorized` (T8). "Must exist" ve "8 listeden biri" doğru.
+- **ATA zorunluluğu:** PumpSwap, alıcının ATA olmayan (sahibi alıcı olan) WSOL hesabını da, ATA olmayan base hesabını da kabul
+  etti (T7). [5]/[6]'nın ATA olması **PumpSwap'ın değil Rung'un** kuralı (adresi sabitlemek için).
+- **Kayma hatası:** `min_base_amount_out` = kotasyon + 1 → **6040** (`0x1798`, `BuySlippageBelowMinBaseAmountOut`), WSOL yerinde
+  kalır; = kotasyon → geçer, tam o kadar token (T5).
+- **İşlem boyutu:** CU limiti + `try_rung` (10 sabit + 17 hesap, Token-2022 mint) legacy işlem **917 bayt / 24 anahtar**
+  (sınır 1232; T4 ölçer). Adres tablosu (ALT) gerekmez. Düz cüzdanın ATA + sarma + alım işlemi 108.349 CU.
+- **Rung kasasını `user` olarak kabul ediyor mu:** **henüz doğrulanmadı** (T2; Rung'un PumpSwap gövdesi yazılınca).
+### K4. Ücretler (AMM `fee_config`)
+- Kanonik havuzda oranlar `fee_config.fee_tiers`'tan, piyasa değerine göre (`calculateFeeTier`); piyasa değeri
+  `effective_quote_reserves * mint_supply / base_reserve` (FEE_PROGRAM_README `poolMarketCap`; deneyde etkin rezervle tuttu).
+  Kanonik olmayan havuz → `flat_fees` (bu kopyada lp 25 / protocol 5 / creator 0).
+- Bu kopyadaki kademeler (lp/protocol/creator bps): `< 420 SOL` 2/93/30 (=125); `≥ 420 SOL` 20/5/95 (=120); sonra creator payı
+  kademe kademe 90…5'e iner (`≥ 98.240 SOL` 20/5/5 = 30). 25 kademe; `stable_fee_tiers` ayrı (kullanımı kaynakta yok).
+- **Gerçek alımda tutan:** piyasa değeri 1.098,55 SOL → kademe 20/5/95 = **toplam 120 bps**; `BuyEvent` bps'leri bire bir bu.
+  `buyback_fee = protocol_fee × GlobalConfig.buyback_basis_points (5000) / 10.000` → protokol ücretinin **içinden**, ek değil.
+  0,1 SOL'lük alımda: lp 197.629 + protocol 49.408 + creator 938.736 = 1.185.773 lamport; `cashback` 0.
+### K5. Kotasyon formülü (deneyle bire bir)
+Etkin rezervler: `base = pool_base_token_account.amount`, `quote = pool_quote_token_account.amount + Pool.virtual_quote_reserves`
+(i128; bu havuzda **+17.584.390.927**, pozitif). Adımlar pump A1'in aynısı, üç ücretle:
+1. `net = floor(s * 10_000 / (10_000 + lp + protocol + creator))`
+2. `fees = ceil(net*lp/10_000) + ceil(net*protocol/10_000) + ceil(net*creator/10_000)`; `net + fees > s` ise `net -= net + fees - s`
+3. `out = floor((net - 1) * base / (quote + net - 1))`
+
+Deneyde `out = 85.649.916.388` (fark 0); olayda `user_quote_amount_in = net = 98.814.227`,
+`quote_amount_in_with_lp_fee = net + lp_fee`. **Rung'un `raw_quote` ile farkı:** ücretsiz sabit-çarpım
+`amount*base/(quote+amount)` = 86.677.037.219 → gerçek alım **118,5 bps** daha az (ücret 120 bps + `net-1`). Rung yalnız iki
+anın oranını kullandığı için (eğrideki gibi) ücret sadeleşir. Test dublesi tek ücret (120 bps) kullanır: gerçeğe 1 ppm içinde.
+### K6. Mayhem ve cashback
+- Belge çelişkili: PUMP_SWAP_TRADE_V2 "Mayhem pools work too", IDL hata 6080 "v2 trades do not support mayhem-mode pools".
+- **Deney (T6, kopya havuzun bayrağı çevrilerek):** `is_mayhem_mode = true` → v2 alım **geçti** (6080 atılmadı;
+  `buyback_fee_basis_points` 0 oldu). `is_cashback_coin = true` → **6079** `CashbackCoinNotSupported`. Uyarı: yalnız bayrak
+  çevrildi; gerçek bir mayhem havuzunun başka farkları olabilir. Taranan 3 v2 alımın hiçbiri mayhem/cashback havuzunda değildi.
+- Cashback havuzunda `try_rung` hiçbir zaman dolamaz (her deneme 6079).
+### K7. Kira ödeyen hesaplar ve tutarlar (mainnet kirası, kopya anı: 165 bayt = 1.488.440 lamport)
+
+| Hesap | Kim açar | Kim öder | Tutar | Sonunda |
+|---|---|---|---|---|
+| kullanıcının base ATA'sı | Rung | kasa | SPL 165 B: 1.488.440 · Token-2022 170 B: 1.513.840 | kalır (kullanıcının) |
+| kasanın base ATA'sı | Rung | kasa | aynı | Rung kapatır, kasaya döner |
+| kasanın WSOL ATA'sı | Rung | kasa | 1.488.440 | Rung kapatır, kasaya döner |
+| `user_volume_accumulator` (kasanın) | PumpSwap | `user` = kasa | 137 B: 1.346.200 | kalır (PumpSwap'ta) |
+| `pool` takviyesi | PumpSwap | `user` = kasa | yalnız kısa havuzda (261→287: 132.080) | havuzda |
+| `buyback_fee_recipient` | açılmaz | - | - | var olmalı |
+
+Zirvede kasadan çıkan kira (Token-2022): 1.513.840×2 + 1.488.440 + 1.346.200 = 5.862.320 lamport; ikisi geri döner. LiteSVM'in
+varsayılan kirası farklıdır (165 B = 2.039.280); dubleli testler o sayılarla çalışır.
