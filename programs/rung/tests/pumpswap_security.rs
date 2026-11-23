@@ -519,3 +519,31 @@ fn zero_rent_reserve_fails_the_try_and_keeps_the_order_open() {
     assert_eq!(env.state(), before.session_paid(SIG_FEE));
     assert_eq!(env.order(&env.user.pubkey()).unwrap().status, OrderStatus::Open);
 }
+
+// --- Pool types the buy cannot serve (added after the second review) ----------
+
+#[test]
+fn open_order_rejects_a_cashback_pool() {
+    // The v2 buy of PumpSwap fails on cashback pools (its error 6079), so an
+    // order on one could never fill: refuse it before any SOL moves.
+    let mut env = AmmEnv::new();
+    let address = env.pool.address;
+    let mut spec = env.pool_spec();
+    spec.is_cashback_coin = true;
+    env.write_pool(&address, &spec);
+    let remaining = env.reserve_accounts();
+    assert_open_rejected(&mut env, &address, &remaining, rung_code(RungError::VenueNotSupported));
+}
+
+#[test]
+fn open_order_accepts_a_mayhem_pool() {
+    // The real v2 buy went through with this flag set, so it is not refused.
+    let mut env = AmmEnv::new();
+    let address = env.pool.address;
+    let mut spec = env.pool_spec();
+    spec.is_mayhem_mode = true;
+    env.write_pool(&address, &spec);
+    env.open_default();
+    let user = env.user.pubkey();
+    assert_eq!(env.order(&user).unwrap().status, OrderStatus::Open);
+}

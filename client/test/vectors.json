@@ -908,7 +908,7 @@
         "Program 11111111111111111111111111111111 invoke [2]",
         "Program 11111111111111111111111111111111 success",
         "Program data: Av7FGCmm4TjpLrYFT+m8aCobzzt1n2WrOKTPvYHE0fM0LkzJze2LC/pINBR/bmkMNpPv9hM2BGQDzYrioU8xs8QHNYVpI5VlKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioBAOH1BQAAAAACZAAsAQAAAAAAAEj6OhI2AAAASPo6EjYAAADoAwAAAAAAAAQAAAAAAAAATAQAAAAAAAA=",
-        "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio consumed 29455 of 200000 compute units",
+        "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio consumed 29479 of 200000 compute units",
         "Program Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio success"
       ],
       "name": "open_order_pumpswap"

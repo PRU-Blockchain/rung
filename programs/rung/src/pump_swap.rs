@@ -80,6 +80,10 @@ pub struct PoolState {
     pub quote_mint: Pubkey,
     pub pool_base_token_account: Pubkey,
     pub pool_quote_token_account: Pubkey,
+    /// PumpSwap's `buy_exact_quote_in_v2` refuses cashback pools, so an order
+    /// on one could never fill. False on pools written before the field
+    /// existed.
+    pub is_cashback_coin: bool,
     /// Added to the quote token balance to get the reserve the price is
     /// computed from. Can be negative. Zero on pools written before the field
     /// existed.
@@ -98,7 +102,8 @@ pub fn parse_pool(data: &[u8]) -> Result<PoolState> {
     const QUOTE_MINT: usize = BASE_MINT + 32;
     const POOL_BASE_TOKEN_ACCOUNT: usize = QUOTE_MINT + 32 + 32;
     const POOL_QUOTE_TOKEN_ACCOUNT: usize = POOL_BASE_TOKEN_ACCOUNT + 32;
-    const VIRTUAL_QUOTE_RESERVES: usize = POOL_QUOTE_TOKEN_ACCOUNT + 32 + 8 + 32 + 1 + 1;
+    const IS_CASHBACK_COIN: usize = POOL_QUOTE_TOKEN_ACCOUNT + 32 + 8 + 32 + 1;
+    const VIRTUAL_QUOTE_RESERVES: usize = IS_CASHBACK_COIN + 1;
 
     require!(
         data.len() >= POOL_QUOTE_TOKEN_ACCOUNT + 32 && data[..8] == POOL_DISCRIMINATOR,
@@ -121,6 +126,7 @@ pub fn parse_pool(data: &[u8]) -> Result<PoolState> {
         quote_mint: read_key(QUOTE_MINT),
         pool_base_token_account: read_key(POOL_BASE_TOKEN_ACCOUNT),
         pool_quote_token_account: read_key(POOL_QUOTE_TOKEN_ACCOUNT),
+        is_cashback_coin: data.len() > IS_CASHBACK_COIN && data[IS_CASHBACK_COIN] != 0,
         virtual_quote_reserves,
     })
 }

@@ -57,7 +57,7 @@ pub enum RungError {
     InvalidVenueAccount,
     #[msg("Arithmetic overflow")]
     MathOverflow,
-    #[msg("This venue is not supported yet")]
+    #[msg("This kind of pool is not supported")]
     VenueNotSupported,
     #[msg("The bonding curve is complete; the token trades in a pool now")]
     CurveComplete,

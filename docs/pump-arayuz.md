@@ -431,7 +431,7 @@ işleminin verisi de 24 bayt (`c2ab1c46684d5b2f` + 2×u64). Bayraklar IDL'den.
 | 7 | `pool_base_token_account` | W | oturum anahtarı verir; PumpSwap `Pool` ile karşılaştırır (`relations`) |
 | 8 | `pool_quote_token_account` | W | oturum anahtarı verir; aynı |
 | 9 | `base_token_program` | - | program sabitler: `token_program` hesabı |
-| 10 | `quote_token_program` | - | oturum anahtarı verir (WSOL için SPL Token) |
+| 10 | `quote_token_program` | - | Rung sabitler: SPL Token (kasanın imzasıyla çağrıldığı için başka program kabul edilmez) |
 | 11 | `system_program` | - | IDL'de sabit adres |
 | 12 | `user_volume_accumulator` | W | oturum anahtarı verir; PumpSwap tohumla doğrular (`user` = kasa) |
 | 13 | `fee_config` | - | oturum anahtarı verir; IDL'de sabit tohum |

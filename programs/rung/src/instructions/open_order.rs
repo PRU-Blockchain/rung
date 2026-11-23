@@ -120,6 +120,8 @@ fn pool_start_reserves(
     let pool = parse_pool(&venue_state.try_borrow_data()?)?;
     require_keys_eq!(pool.base_mint, *mint, RungError::InvalidVenueAccount);
     require_keys_eq!(pool.quote_mint, WSOL_MINT, RungError::InvalidVenueAccount);
+    // An order on a cashback pool could never fill: refuse it before any SOL moves.
+    require!(!pool.is_cashback_coin, RungError::VenueNotSupported);
 
     require!(reserve_accounts.len() == 2, RungError::InvalidVenueAccount);
     let (base_account, quote_account) = (&reserve_accounts[0], &reserve_accounts[1]);
