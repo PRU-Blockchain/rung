@@ -2,7 +2,7 @@ import { Connection } from "@solana/web3.js";
 
 import { RPC_ENDPOINT } from "../config";
 
-/** One devnet connection for the whole app (public endpoint, no key). */
+/** One connection for the whole app, to the network of this build (public endpoint, no key). */
 export const connection = new Connection(RPC_ENDPOINT, "confirmed");
 
 // web3.js 1.x `confirmTransaction` rejects with the transaction's own error

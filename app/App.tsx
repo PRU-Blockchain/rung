@@ -24,7 +24,7 @@ import { useMobileWallet } from "./src/utils/useMobileWallet";
 
 const queryClient = new QueryClient();
 
-// web3.js logs every rate-limited retry of the public devnet RPC as an error;
+// web3.js logs every rate-limited retry of the public RPC as an error;
 // in development builds that covers the screen. They still reach Metro's log.
 LogBox.ignoreLogs(["Server responded with 429"]);
 

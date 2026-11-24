@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 
-import { CLUSTER } from "../config";
+import { NETWORK } from "../config";
 import { explorerTx } from "../flow/format";
 
 export const colors = {
@@ -22,7 +22,7 @@ export function Header({ right }: { right?: ReactNode }) {
     <View style={s.header}>
       <View>
         <Text style={s.title}>Rung</Text>
-        <Text style={s.network}>{CLUSTER}</Text>
+        <Text style={s.network}>{NETWORK.label}</Text>
       </View>
       {right}
     </View>

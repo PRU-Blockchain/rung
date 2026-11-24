@@ -1,3 +1,5 @@
+import { NETWORK } from "../config";
+import { explorerTxUrl } from "../network";
 // Display helpers. Amounts stay bigint until the last step.
 
 const LAMPORTS = 1_000_000_000n;
@@ -43,7 +45,7 @@ export const pctText = (pct: number) => `${Number(pct.toFixed(2))}%`;
 
 export const shortAddress = (address: string) => `${address.slice(0, 4)}...${address.slice(-4)}`;
 
-export const explorerTx = (signature: string) => `https://explorer.solana.com/tx/${signature}?cluster=devnet`;
+export const explorerTx = (signature: string) => explorerTxUrl(NETWORK, signature);
 
 /** "0.01" -> 10_000_000n; null if it is not a SOL amount with at most 9 decimals. */
 export function parseSol(text: string): bigint | null {
