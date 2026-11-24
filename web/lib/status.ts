@@ -13,7 +13,8 @@ export const STATUS = {
   /** Public endpoint used when the server-side `RPC_URL` is not set. */
   publicRpc: "https://api.devnet.solana.com",
   /** Short line under the intro. */
-  networkLine: "The program runs on devnet (test SOL). It is not on mainnet yet.",
+  networkLine:
+    "The program is deployed on devnet and on mainnet. This page and the app read devnet (test SOL); no buy has been made on mainnet yet.",
   audit: "unaudited, use small amounts", // verbatim
   devices: "Android emulator; not tested on a real device or Seeker", // verbatim
   /** `null` until an APK is published. */

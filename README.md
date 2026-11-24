@@ -7,7 +7,7 @@ On Solana, set slippage too wide and a sandwich bot takes the gap; set it too ti
 - On established tokens, 97% of buys fill on the first 1% try.
 
 **Live web page:** https://rung-drab.vercel.app/ (its counter reads devnet)<br>
-**Program address (devnet):** [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet) · mainnet: not yet<br>
+**Program address (devnet):** [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet) · **mainnet:** [same address](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio), deployed Nov 24, 2026, no buy there yet<br>
 **Demo video:** not yet
 
 <p>
@@ -43,7 +43,7 @@ At launch, Tight fills 80–81% of buys; the rest are buys where the price ran a
 
 ## How to try
 
-Everything below runs on **devnet** (test SOL). Rung is not on mainnet yet.
+Everything below runs on **devnet** (test SOL). The program is also deployed on mainnet (Nov 24, 2026), but nothing below uses it yet: no buy has been made there, and the app and the web page still talk to devnet.
 
 | way | state |
 |---|---|
@@ -62,7 +62,7 @@ client/node_modules/.bin/tsx scripts/ladder.ts --mint <MINT> --amount 0.01 --mod
 
 Drop `--dry-run` to send real devnet transactions. The script signs with a devnet keypair file (default `~/.config/solana/rung-devnet.json`, or `--keypair <file>`) that you fund with devnet SOL yourself.
 
-The script refuses a mainnet RPC unless `--mainnet` is given, and refuses `--mainnet` on anything that is not mainnet. With `--mainnet` the SOL is real, so the rules are tighter: `--keypair` has no default, an order is at most 0.01 SOL, the test aids that move the price are refused, and without `--yes-real-sol` the script prints the plan and sends nothing. The rules are in [`scripts/network.ts`](scripts/network.ts) with their tests in [`client/test/network.test.ts`](client/test/network.test.ts). Not yet: a run on mainnet; the program is not deployed there.
+The script refuses a mainnet RPC unless `--mainnet` is given, and refuses `--mainnet` on anything that is not mainnet. With `--mainnet` the SOL is real, so the rules are tighter: `--keypair` has no default, an order is at most 0.01 SOL, the test aids that move the price are refused, and without `--yes-real-sol` the script prints the plan and sends nothing. The rules are in [`scripts/network.ts`](scripts/network.ts) with their tests in [`client/test/network.test.ts`](client/test/network.test.ts). Not yet: a run on mainnet.
 
 ### Devnet runs
 
@@ -87,7 +87,7 @@ The app's own devnet buys (Phantom, Solflare, a not-bought run and its "Retry wi
 | part | state |
 |---|---|
 | On-chain order program (Anchor) | deployed on **devnet** at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet). Buys on pump.fun bonding curves and on PumpSwap pools. Reviewed twice by independent read-only passes, not audited |
-| Mainnet | not yet: no mainnet deployment, no decision on it yet |
+| Mainnet | the program is deployed at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio) since Nov 24, 2026 (same address and same build as on devnet). Not yet: any buy on mainnet; the app and the web page still use devnet |
 | PumpSwap pools | in the program, the client, the command-line script and the Android app. Tested locally against a test double and the real PumpSwap program dumped from mainnet, on a local fork of mainnet, and with real buys on a devnet pool through the script and through the app (runs in [`app/README.md`](app/README.md#pumpswap-pools)). Not yet: a buy on mainnet |
 | Android app (`app/`) | works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. Not tested: Custom mode, a real device, Seeker, mainnet |
 | APK | not yet |
@@ -240,7 +240,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 | You change your mind | `cancel` with your own wallet (a second approval); the SOL comes back at once |
 | The wallet changes the approval transaction | It is one transaction; the wallets we tried only added compute-budget instructions, which made the approval more expensive (see Wallets). The wallet cannot touch the fees of the tries |
 | A bug in the program | The SOL in the vault is at risk. Limits: at most 0.5 SOL per order, one open order per user, tests, a small program |
-| Upgrade authority | Held by the team. On devnet it is a test key. Whether to lock it later is not decided |
+| Upgrade authority | Held by the team: it is the wallet that deployed the program. **THE UPGRADE AUTHORITY MUST NEVER BE LOCKED** (never set to none, never `--final`): the program's deposit of about 1.55 SOL can come back only through this authority, by closing the program, and locking it would leave the deposit in the program forever. Team decision of Nov 24, 2026. What it means for you: the team can change the program, so you trust the team as well as the code. On devnet the authority is a test key |
 | Fee budget on the session key | What is left goes back to you when the order ends. If the phone dies first it can be lost; the program limits it to 0.002 SOL per order |
 | pump's volume account | On the first buy that fills, pump opens a volume account for the vault (≈ 0.00135 SOL rent, once per user, paid from the order's rent reserve). Rung does not reclaim it yet |
 | Your token account | Created from the order's rent reserve if you do not have one. It belongs to you, so its deposit stays with you |
@@ -251,7 +251,8 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 - At most 0.5 SOL per order (`MAX_ORDER_LAMPORTS` in [`constants.rs`](programs/rung/src/constants.rs)); at least 0.001 SOL. The highest cap any order can set is 30%. Raising the per-order limit is a team decision.
 - Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
 - Android emulator; not tested on a real device or Seeker.
-- Devnet only; mainnet: not yet.
+- The program is upgradeable and stays that way: **THE UPGRADE AUTHORITY MUST NEVER BE LOCKED** (see the table above).
+- The program is on mainnet, but nothing has been bought there yet; the app, the web page and every run described here are on devnet.
 - Buys on pump.fun bonding curves and on a token's own (canonical) PumpSwap pool paired with SOL. Other pools and cashback pools: no.
 
 ## Architecture and program addresses
@@ -259,7 +260,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 | | address |
 |---|---|
 | Rung program (**devnet**) | [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet) |
-| Rung program (mainnet) | not yet |
+| Rung program (**mainnet**) | [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio), deployed Nov 24, 2026 in slot 473332524 ([transaction](https://explorer.solana.com/tx/2ijAe9BY54L7mTBn6PMXa9srqSLwFYwSqG1GPkP7YSNzyZW5Mqt96Wc2hRkoZEEnUTiqJ4DeMipLLMU16SFDQiLP)). Read back from mainnet and compared: byte for byte the build with sha256 `f29024e97072e82642f5bf0fc5b197b6fb0fd2e03f4c91b473b5827d35738acc`, the same build as on devnet. Upgrade authority: the team's deploy wallet `9yWQH6bDLpwWNmD6UeQvWshfrRmufv8EHf6zWety9dCL`. **THE UPGRADE AUTHORITY MUST NEVER BE LOCKED** (see Security and limits) |
 | pump.fun program it calls | `6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P` (fixed in the program; any other buy program is rejected) |
 | PumpSwap program it calls | `pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA` (fixed in the program, same rule) |
 
@@ -400,7 +401,9 @@ On Nov 24, 2026, against a local fork of mainnet (no real SOL):
 - a buy through the freshly deployed program then filled from a live PumpSwap pool on the 1% rung (185,204 compute units for the try).
 - closing the program (`solana program close`, signed by the upgrade authority) returned 1.55332684 SOL to the wallet. Of the 2 SOL the wallet started with, 1.99763188 SOL were back after deploy and close: the 0.00083312 SOL of the program account stay there and the fees are spent. The closed address then refused a new deploy, as the CLI warns. Closing while an order is open would strand that order's SOL in its vault, so it is only an option when no order is open.
 
-What this does not show: mainnet itself. The program is not deployed there.
+**THE UPGRADE AUTHORITY MUST NEVER BE LOCKED.** Do not run `solana program set-upgrade-authority ... --final`, and do not deploy with `--final`: after that nobody can close the program, and its deposit stays in it forever. `scripts/deploy-program.test.sh` fails if any script in this repository contains such a command.
+
+**On mainnet.** With the team's approval the same script then deployed the program to mainnet on Nov 24, 2026: the build above, to the address above, verified byte for byte after the deploy. It took 1.555817994 SOL from the deploy wallet: 1.55415996 SOL of deposit and the rest in fees. No buy has been made on mainnet yet.
 
 ### Web page
 

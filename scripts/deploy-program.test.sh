@@ -83,6 +83,39 @@ RPC_URL_FOR_CASE="$dead_rpc" expect_refusal "the wallet as the buffer key" "the 
 RPC_URL_FOR_CASE="$dead_rpc" expect_refusal "an RPC that does not answer" "could not read the genesis hash" \
   --network mainnet "${good[@]}" --check
 
+# --- THE UPGRADE AUTHORITY MUST NEVER BE LOCKED ---------------------------------------------------
+# Locking it (a "final" deploy, or an authority change) would leave the program's
+# deposit in the program forever. No script or config here may hold such a command.
+
+lock_pattern='--fin''al|set-upgrade-autho''rity|--new-upgrade-autho''rity'
+lock_commands_in() { grep -rnE -- "$lock_pattern" "$@" 2>/dev/null || true; }
+
+check() {
+  local name="$1" ok="$2" detail="${3-}"
+  if [[ "$ok" == "yes" ]]; then
+    pass=$((pass + 1))
+    echo "ok   $name"
+  else
+    fail=$((fail + 1))
+    echo "FAIL $name"
+    [[ -n "$detail" ]] && echo "$detail" | sed 's/^/     | /'
+  fi
+}
+
+# The detector itself: it must see each kind of locking command.
+printf 'solana program deploy x.so --fin%s\n' "al" >"$tmp/bad1.sh"
+printf 'solana program set-upgrade-autho%s ID --fin%s\n' "rity" "al" >"$tmp/bad2.sh"
+printf 'solana program set-upgrade-autho%s ID --new-upgrade-autho%s OTHER\n' "rity" "rity" >"$tmp/bad3.sh"
+found="$(lock_commands_in "$tmp/bad1.sh" "$tmp/bad2.sh" "$tmp/bad3.sh" | cut -d: -f1 | sort -u | wc -l)"
+check "the detector sees a locking command" "$([[ "$found" -eq 3 ]] && echo yes || echo no)" "saw $found of 3"
+
+found="$(lock_commands_in "$repo_root/scripts" "$repo_root/Anchor.toml" "$repo_root/client/package.json" "$repo_root/client/src" \
+  "$repo_root/web/package.json" "$repo_root/app/package.json")"
+check "no script or config here can lock the upgrade authority" "$([[ -z "$found" ]] && echo yes || echo no)" "$found"
+
+warned="$(grep -c 'THE UPGRADE AUTHORITY MUST NEVER BE LOCKED' "$script" || true)"
+check "the deploy script says so, in its header and in what it prints" "$([[ "$warned" -ge 2 ]] && echo yes || echo no)" "found $warned of 2"
+
 echo
 echo "$pass passed, $fail failed"
 [[ $fail -eq 0 ]]
