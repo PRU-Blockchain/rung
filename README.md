@@ -101,6 +101,15 @@ A buy in Launch mode (10% → 20% → 30%), minutes later, on another curve in i
 
 Each failed try cost 6,000 lamports; one order, one buy. Both buys were sold back six slots later ([first](https://explorer.solana.com/tx/3btwwah5aZS4RwhBFPPgaoMorbEegSfFREBjMMGhFVqJG2LYgCsz8rfi5NnNeqjufU4DJaMbizM4eqzEzWhDvCD1), [second](https://explorer.solana.com/tx/2SKoRtdjb1VUiuNavXDew2u6T1ygdkc7Wd937AjEsd8XHTagURxhrYt2yVLgqMgLsMyc9wDtMqv4EG6haSc9m62W)).
 
+**The first try next to the order.** In the runs above the first try landed a median of 9 slots after the order, because the sender waited for the order's confirmation first. Since then `try_rung(0)` is sent together with the order and lands right behind it. Four more buys the same evening, same ladder, 0.01 SOL each:
+
+| what happened | first try after the order | paid vs. seen |
+|---|---|---|
+| [1% rung filled](https://explorer.solana.com/tx/2x1SqT4VoctJ5Ac2MqZEWYQx4JHAMSaiaqc6tyDPfZkFZJFioAZYhGCWTRxidvQWtzET78H324HWfMPVTEyA53ZK) | 4 slots | +0.28% |
+| [1% rung](https://explorer.solana.com/tx/2z3MWGwFJGNQ88jc9RYGqZvgeh7zFF9FtDh6sCEJTKMkyU2Rv86ThmcsByDmGUF5ZLzbDeMaZZajX4gzvTUb7De2) failed, [2% rung filled](https://explorer.solana.com/tx/2woUHhAG6Tjm2V3AKC52EcbcWLzMuEkJHRT76fxxiqJXEbT1s4Z6RZnSEEjUgrnys57zmxgQcwDLDVz6duZUeb8x) | 3 slots | +0.93% |
+| [1% rung](https://explorer.solana.com/tx/LAy4CNeEtcLMSnojo9Uxk4isH6MVqxbVnYaxBczHRtXrEj8vsZrLPAk9mS3uSjT5M2kBCAwFYMQ8HCnfce3uuRi) failed, [2% rung filled](https://explorer.solana.com/tx/MXzfo3PgaEmqEekJAkn9TzN4CgZEKtXsMSWr9tttio4t9UdwayA18spqscKo5sgxksTNwBdz6tZ6HkeZrm1avS4) | 10 slots | +0.47% |
+| [1% rung filled](https://explorer.solana.com/tx/4rRRUBxpmeiFSRZ6kzfBZSw9xVk1bsryNxxf9rVQaZmxcVZgFs1gWQLqvexuTphhi49eLyx4S4mjfv1JuTv5j1Gs) | 4 slots | −6.14% (the price had dropped before the order landed) |
+
 ### Devnet runs
 
 Real transactions on devnet (test SOL, pump's devnet deployment, a live devnet curve), sent with the script (`scripts/ladder.ts`, then named `devnet-ladder.ts`) on Nov 23, 2026. Tight mode (1% → 2% → 3%), 0.01 SOL, mint `B8fRBPHkEVfqE6FfUYsPKkyZvdjH3SxvQpYpyYRtG511`. The wallet signs one transaction (`open_order`); every try is signed by the one-time session key.
@@ -288,7 +297,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 - At most 0.5 SOL per order (`MAX_ORDER_LAMPORTS` in [`constants.rs`](programs/rung/src/constants.rs)); at least 0.001 SOL. The highest cap any order can set is 30%. Raising the per-order limit is a team decision.
 - Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
 - Android emulator; not tested on a real device or Seeker.
-- On mainnet: seven buys and two not-bought runs so far, all through the script. Not yet on mainnet: the app.
+- On mainnet: eleven buys and two not-bought runs so far, all through the script. Not yet on mainnet: the app.
 - Buys on pump.fun bonding curves and on a token's own (canonical) PumpSwap pool paired with SOL. Other pools and cashback pools: no.
 
 ## Architecture and program addresses

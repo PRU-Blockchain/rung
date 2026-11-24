@@ -192,7 +192,7 @@ export interface EarlyTry {
  * first try lands in the first block after the order exists instead of
  * seconds later. Until the order lands the session key holds no SOL, so a copy
  * that arrives too early cannot land and costs nothing; the same signed bytes
- * are therefore sent again every `resendMs` for a while.
+ * are therefore sent again every `resendMs` for a while. On mainnet (Nov 24, 2026, re-sent every 400 ms) the try landed 3, 4, 4 and 10 slots after the order; sent only after the order's confirmation it had been a median of 9.
  *
  * Give it the blockhash the order transaction uses. It stays a transaction of
  * its own, signed only by the session key: the price the rung is measured
@@ -211,9 +211,9 @@ export async function sendFirstTryEarly(p: {
   lastValidBlockHeight: number;
   cuLimit?: number;
   cuPrice?: bigint;
-  /** Pause between re-sends (default 400 ms, about one slot). */
+  /** Pause between re-sends (default 200 ms, about half a slot). */
   resendMs?: number;
-  /** How many times the same bytes are sent again (default 15). */
+  /** How many times the same bytes are sent again (default 30, about six seconds). */
   resends?: number;
 }): Promise<EarlyTry> {
   const session = p.sessionKeypair;
@@ -243,8 +243,8 @@ export async function sendFirstTryEarly(p: {
   const signature = await send();
 
   let stopped = false;
-  const resends = p.resends ?? 15;
-  const resendMs = p.resendMs ?? 400;
+  const resends = p.resends ?? 30;
+  const resendMs = p.resendMs ?? 200;
   void (async () => {
     for (let i = 0; i < resends && !stopped; i++) {
       await sleep(resendMs);
