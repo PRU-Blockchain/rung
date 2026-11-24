@@ -34,6 +34,7 @@ import {
 
 import { AppState } from "react-native";
 
+import { TOO_SLOW, sendFailureText } from "../sendFailure";
 import { connection } from "./connection";
 import { LIFETIME_SLOTS, Plan, WINDOW_SLOTS } from "./plan";
 import { PendingOrder, endSession, saveSessionKey, savePending } from "./session";
@@ -64,7 +65,7 @@ export interface Opened {
 /** A buy that did not open, worded for the screen. */
 export class BuyError extends Error {}
 
-export const TOO_SLOW = "Approval took too long. Nothing was sent. Try again.";
+export { TOO_SLOW };
 
 function walletErrorText(e: unknown): string {
   const code = (e as { code?: unknown })?.code;
@@ -228,8 +229,9 @@ export async function openBuy(plan: Plan, user: PublicKey, signOpen: SignOpen): 
       const text = String((e as Error)?.message ?? e);
       console.log(`RUNG send failed: ${text}`);
       await endSession();
-      if (/blockhash not found|expired/i.test(text)) throw new BuyError(TOO_SLOW);
-      throw new BuyError(`The buy could not be sent: ${text}`);
+      // The RPC does not always name an expired blockhash; ask the chain.
+      const height = await connection.getBlockHeight("confirmed").catch(() => 0);
+      throw new BuyError(sendFailureText(text, height > value.lastValidBlockHeight));
     }
   } else {
     signature = result.signature;
