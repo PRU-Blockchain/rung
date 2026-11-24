@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Mode, PublicKey, orderPda } from "../../../client/src";
 
 import { connection } from "../flow/connection";
+import { walletIsShort } from "../funds";
 import { bpsText, parseSol, priceText, shortAddress, sol, tokens } from "../flow/format";
 import { Market, MarketError, curveAgeSeconds, loadMarket, parseMint, priceKeys, venueText, withPrice } from "../flow/market";
 import {
@@ -124,6 +125,13 @@ export function BuyScreen(props: {
     };
   }, [market?.mint.toBase58(), props.user?.toBase58()]);
 
+  // A wallet that was disconnected or swapped takes its balance and its order
+  // record with it: what is on the screen must belong to the wallet named on it.
+  useEffect(() => {
+    setBalance(null);
+    setOrderExists(false);
+  }, [props.user?.toBase58()]);
+
   // A buy that failed (e.g. "Approval took too long") is reported at the
   // bottom of the screen. Coming back from the wallet or the launcher, Android
   // reopened the keyboard on the address field and it covered that line:
@@ -169,7 +177,7 @@ export function BuyScreen(props: {
     amountProblem ??
     planError ??
     (!plan ? "Getting a quote…" : null) ??
-    (balance !== null && cost && balance < cost.total + 100_000n ? "Not enough SOL in the wallet for this buy." : null);
+    (walletIsShort(!!props.user, balance, cost?.total ?? null) ? "Not enough SOL in the wallet for this buy." : null);
 
   return (
     <SafeAreaView style={s.screen}>
