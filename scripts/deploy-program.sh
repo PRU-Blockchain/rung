@@ -15,11 +15,9 @@
 #   - --deploy without --confirm <PROGRAM ID>;
 #   - a program that exists with another upgrade authority, or with too little room.
 #
-# THE UPGRADE AUTHORITY MUST NEVER BE LOCKED. This script never makes a deploy
-# final and never changes the authority, and nothing else in this repository
-# may (scripts/deploy-program.test.sh checks). The program's deposit comes back
-# only when the upgrade authority closes the program; with the authority locked
-# the deposit would stay in the program forever. Team decision, Nov 24, 2026.
+# This script never makes a deploy final and never changes the upgrade
+# authority; whether to lock the authority later is the team's decision, made
+# by hand (scripts/deploy-program.test.sh checks that no script here does it).
 #
 # The wallet pays and becomes the upgrade authority. Key files are passed to
 # the solana CLI by path; this script never prints or copies their contents.
@@ -212,7 +210,6 @@ if [[ "$balance" -lt "$need" ]]; then
   echo "Short by         about $(sol $((need - balance)))"
 fi
 echo "Upgrade authority after the deploy: the wallet, $wallet_address"
-echo "THE UPGRADE AUTHORITY MUST NEVER BE LOCKED: the deposit can come back only through it."
 
 if [[ $do_check -eq 1 ]]; then
   echo "--check: nothing was sent."

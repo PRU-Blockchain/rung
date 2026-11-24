@@ -83,9 +83,9 @@ RPC_URL_FOR_CASE="$dead_rpc" expect_refusal "the wallet as the buffer key" "the 
 RPC_URL_FOR_CASE="$dead_rpc" expect_refusal "an RPC that does not answer" "could not read the genesis hash" \
   --network mainnet "${good[@]}" --check
 
-# --- THE UPGRADE AUTHORITY MUST NEVER BE LOCKED ---------------------------------------------------
-# Locking it (a "final" deploy, or an authority change) would leave the program's
-# deposit in the program forever. No script or config here may hold such a command.
+# --- the upgrade authority is never locked or moved by a script -----------------------------------
+# Locking it (a "final" deploy) or moving it is a decision the team makes by hand.
+# No script or config here may hold such a command.
 
 lock_pattern='--fin''al|set-upgrade-autho''rity|--new-upgrade-autho''rity'
 lock_commands_in() { grep -rnE -- "$lock_pattern" "$@" 2>/dev/null || true; }
@@ -112,9 +112,6 @@ check "the detector sees a locking command" "$([[ "$found" -eq 3 ]] && echo yes 
 found="$(lock_commands_in "$repo_root/scripts" "$repo_root/Anchor.toml" "$repo_root/client/package.json" "$repo_root/client/src" \
   "$repo_root/web/package.json" "$repo_root/app/package.json")"
 check "no script or config here can lock the upgrade authority" "$([[ -z "$found" ]] && echo yes || echo no)" "$found"
-
-warned="$(grep -c 'THE UPGRADE AUTHORITY MUST NEVER BE LOCKED' "$script" || true)"
-check "the deploy script says so, in its header and in what it prints" "$([[ "$warned" -ge 2 ]] && echo yes || echo no)" "found $warned of 2"
 
 echo
 echo "$pass passed, $fail failed"

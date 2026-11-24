@@ -240,7 +240,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 | You change your mind | `cancel` with your own wallet (a second approval); the SOL comes back at once |
 | The wallet changes the approval transaction | It is one transaction; the wallets we tried only added compute-budget instructions, which made the approval more expensive (see Wallets). The wallet cannot touch the fees of the tries |
 | A bug in the program | The SOL in the vault is at risk. Limits: at most 0.5 SOL per order, one open order per user, tests, a small program |
-| Upgrade authority | Held by the team: it is the wallet that deployed the program. **THE UPGRADE AUTHORITY MUST NEVER BE LOCKED** (never set to none, never `--final`): the program's deposit of about 1.55 SOL can come back only through this authority, by closing the program, and locking it would leave the deposit in the program forever. Team decision of Nov 24, 2026. What it means for you: the team can change the program, so you trust the team as well as the code. On devnet the authority is a test key |
+| Upgrade authority | Held by the team (the wallet that deployed the program). On devnet it is a test key |
 | Fee budget on the session key | What is left goes back to you when the order ends. If the phone dies first it can be lost; the program limits it to 0.002 SOL per order |
 | pump's volume account | On the first buy that fills, pump opens a volume account for the vault (≈ 0.00135 SOL rent, once per user, paid from the order's rent reserve). Rung does not reclaim it yet |
 | Your token account | Created from the order's rent reserve if you do not have one. It belongs to you, so its deposit stays with you |
@@ -251,7 +251,6 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 - At most 0.5 SOL per order (`MAX_ORDER_LAMPORTS` in [`constants.rs`](programs/rung/src/constants.rs)); at least 0.001 SOL. The highest cap any order can set is 30%. Raising the per-order limit is a team decision.
 - Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
 - Android emulator; not tested on a real device or Seeker.
-- The program is upgradeable and stays that way: **THE UPGRADE AUTHORITY MUST NEVER BE LOCKED** (see the table above).
 - The program is on mainnet, but nothing has been bought there yet; the app, the web page and every run described here are on devnet.
 - Buys on pump.fun bonding curves and on a token's own (canonical) PumpSwap pool paired with SOL. Other pools and cashback pools: no.
 
@@ -260,7 +259,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 | | address |
 |---|---|
 | Rung program (**devnet**) | [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet) |
-| Rung program (**mainnet**) | [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio), deployed Nov 24, 2026 in slot 473332524 ([transaction](https://explorer.solana.com/tx/2ijAe9BY54L7mTBn6PMXa9srqSLwFYwSqG1GPkP7YSNzyZW5Mqt96Wc2hRkoZEEnUTiqJ4DeMipLLMU16SFDQiLP)). Read back from mainnet and compared: byte for byte the build with sha256 `f29024e97072e82642f5bf0fc5b197b6fb0fd2e03f4c91b473b5827d35738acc`, the same build as on devnet. Upgrade authority: the team's deploy wallet `9yWQH6bDLpwWNmD6UeQvWshfrRmufv8EHf6zWety9dCL`. **THE UPGRADE AUTHORITY MUST NEVER BE LOCKED** (see Security and limits) |
+| Rung program (**mainnet**) | [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio), deployed Nov 24, 2026 in slot 473332524 ([transaction](https://explorer.solana.com/tx/2ijAe9BY54L7mTBn6PMXa9srqSLwFYwSqG1GPkP7YSNzyZW5Mqt96Wc2hRkoZEEnUTiqJ4DeMipLLMU16SFDQiLP)). Read back from mainnet and compared: byte for byte the build with sha256 `f29024e97072e82642f5bf0fc5b197b6fb0fd2e03f4c91b473b5827d35738acc`, the same build as on devnet. Upgrade authority: the team's deploy wallet `9yWQH6bDLpwWNmD6UeQvWshfrRmufv8EHf6zWety9dCL` |
 | pump.fun program it calls | `6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P` (fixed in the program; any other buy program is rejected) |
 | PumpSwap program it calls | `pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA` (fixed in the program, same rule) |
 
@@ -399,9 +398,6 @@ On Nov 24, 2026, against a local fork of mainnet (no real SOL):
 - the program read back from the fork was byte for byte the build with sha256 `f29024e97072e82642f5bf0fc5b197b6fb0fd2e03f4c91b473b5827d35738acc`, which is also the build running on devnet (read back from devnet and compared the same way);
 - the deploy took 1.55569 fork SOL in total: a deposit of 1.55416 SOL, which comes back only if the program is closed (a closed program address cannot be used again), and the rest in fees;
 - a buy through the freshly deployed program then filled from a live PumpSwap pool on the 1% rung (185,204 compute units for the try).
-- closing the program (`solana program close`, signed by the upgrade authority) returned 1.55332684 SOL to the wallet. Of the 2 SOL the wallet started with, 1.99763188 SOL were back after deploy and close: the 0.00083312 SOL of the program account stay there and the fees are spent. The closed address then refused a new deploy, as the CLI warns. Closing while an order is open would strand that order's SOL in its vault, so it is only an option when no order is open.
-
-**THE UPGRADE AUTHORITY MUST NEVER BE LOCKED.** Do not run `solana program set-upgrade-authority ... --final`, and do not deploy with `--final`: after that nobody can close the program, and its deposit stays in it forever. `scripts/deploy-program.test.sh` fails if any script in this repository contains such a command.
 
 **On mainnet.** With the team's approval the same script then deployed the program to mainnet on Nov 24, 2026: the build above, to the address above, verified byte for byte after the deploy. It took 1.555817994 SOL from the deploy wallet: 1.55415996 SOL of deposit and the rest in fees. No buy has been made on mainnet yet.
 
