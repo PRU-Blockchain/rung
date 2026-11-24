@@ -7,7 +7,7 @@ On Solana, set slippage too wide and a sandwich bot takes the gap; set it too ti
 - On established tokens, 97% of buys fill on the first 1% try.
 
 **Live web page:** https://rung-drab.vercel.app/ (its counter reads devnet)<br>
-**Program address (devnet):** [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet) · **mainnet:** [same address](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio), deployed Nov 24, 2026, no buy there yet<br>
+**Program address (devnet):** [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet) · **mainnet:** [same address](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio), deployed Nov 24, 2026; first buy the same day<br>
 **Demo video:** not yet
 
 <p>
@@ -43,7 +43,7 @@ At launch, Tight fills 80–81% of buys; the rest are buys where the price ran a
 
 ## How to try
 
-Everything below runs on **devnet** (test SOL). The program is also deployed on mainnet (Nov 24, 2026), but nothing below uses it yet: no buy has been made there, and the app and the web page still talk to devnet.
+The app and the web page run on **devnet** (test SOL). The program is deployed on mainnet as well (Nov 24, 2026), and the command-line script has bought there: see [Mainnet run](#mainnet-run).
 
 | way | state |
 |---|---|
@@ -62,9 +62,21 @@ client/node_modules/.bin/tsx scripts/ladder.ts --mint <MINT> --amount 0.01 --mod
 
 Drop `--dry-run` to send real devnet transactions. The script signs with a devnet keypair file (default `~/.config/solana/rung-devnet.json`, or `--keypair <file>`) that you fund with devnet SOL yourself.
 
-The script refuses a mainnet RPC unless `--mainnet` is given, and refuses `--mainnet` on anything that is not mainnet. With `--mainnet` the SOL is real, so the rules are tighter: `--keypair` has no default, an order is at most 0.01 SOL, the test aids that move the price are refused, and without `--yes-real-sol` the script prints the plan and sends nothing. The rules are in [`scripts/network.ts`](scripts/network.ts) with their tests in [`client/test/network.test.ts`](client/test/network.test.ts). Not yet: a run on mainnet.
+The script refuses a mainnet RPC unless `--mainnet` is given, and refuses `--mainnet` on anything that is not mainnet. With `--mainnet` the SOL is real, so the rules are tighter: `--keypair` has no default, an order is at most 0.01 SOL, the test aids that move the price are refused, and without `--yes-real-sol` the script prints the plan and sends nothing. The rules are in [`scripts/network.ts`](scripts/network.ts) with their tests in [`client/test/network.test.ts`](client/test/network.test.ts). The first mainnet run is below.
 
 Rung only buys. To take a test buy back, `--sell-all --mint <MINT>` sells the wallet's whole balance of the token on its PumpSwap pool from the plain wallet and closes the emptied token account.
+
+### Mainnet run
+
+The first buy on mainnet, Nov 24, 2026, sent with the same script (`scripts/mainnet.sh`): Tight mode (1% → 2% → 3%), 0.01 SOL, mint `Ai66LHZG9MCzg1WKdawwqduVAXpNDUuV8M3uyq5ppump` on its own PumpSwap pool (about 8,988 SOL in the pool). The wallet signed one transaction, the order; the try and the sweep were signed by the one-time session key.
+
+| step | what happened | fee |
+|---|---|---|
+| [order](https://explorer.solana.com/tx/4J9FJo5UPbdD8t1UQ4E9gouEDDmXmzfPiseawLXPKv1GjG5k48mypXTXyAG2rTX1fYhyPpP5ziwEUYx4Fy6sYEzu) | `open_order` in slot 473337656; quote 41.147423 tokens | 0.000005 SOL |
+| [rung 1%](https://explorer.solana.com/tx/2ZNEtvVpsiTVdcpgxoiBXBnTeknSoo1VhMwCmjhw4vHd4w7cCfP75BuQw74yf2buTXfhBKcXY7qQwYJyWj4kNt5U) | filled six slots later: 41.147423 tokens for 0.01 SOL, the quoted amount exactly (paid +0.00% vs. seen); 195,038 compute units | 0.0000063 SOL |
+| [sweep](https://explorer.solana.com/tx/4mvpngmiHyqJDCUykdTzGh3GydBAU7VTzeLWzknZFd7PgGwqPoahTeY67fdowz8cjHrbTk5r6YNmzyYmLc4SAEa) | what was left on the session key went back to the wallet | 0.000005 SOL |
+
+Rung's fees for this buy: 0.0000163 SOL. The tokens were then [sold back](https://explorer.solana.com/tx/97KiD1BwqNmtP2MTjhT2ctA7aNpg5sm7Zzt8UKui6mDhiqKgKTVSoD4DsZ5LpfmRQgikpaLkevRdeEHAd7uCYLh) from the same wallet with a plain PumpSwap sell (`--sell-all`), and the order account was [closed](https://explorer.solana.com/tx/5RyYStquEhKbqYZDzCcWz6EmyEnXbNvk4cyn3oXoisaJZVfY5gzuS5faR3bjsPrLcYSXMYwptnK2BBoGf5hKsnyN) after the order's lifetime. Over the whole round trip the wallet ended 0.001432328 SOL lower: 0.0013462 SOL is the rent of the volume account PumpSwap opens once for the wallet's vault, and the rest is PumpSwap's 0.30% fee on the buy and on the sell plus five transaction fees.
 
 ### Devnet runs
 
@@ -89,8 +101,8 @@ The app's own devnet buys (Phantom, Solflare, a not-bought run and its "Retry wi
 | part | state |
 |---|---|
 | On-chain order program (Anchor) | deployed on **devnet** at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet). Buys on pump.fun bonding curves and on PumpSwap pools. Reviewed twice by independent read-only passes, not audited |
-| Mainnet | the program is deployed at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio) since Nov 24, 2026 (same address and same build as on devnet). Not yet: any buy on mainnet; the app and the web page still use devnet |
-| PumpSwap pools | in the program, the client, the command-line script and the Android app. Tested locally against a test double and the real PumpSwap program dumped from mainnet, on a local fork of mainnet, and with real buys on a devnet pool through the script and through the app (runs in [`app/README.md`](app/README.md#pumpswap-pools)). Not yet: a buy on mainnet |
+| Mainnet | the program is deployed at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio) since Nov 24, 2026 (same address and same build as on devnet). First buy the same day, through the script, from a PumpSwap pool: [rung 1% filled](https://explorer.solana.com/tx/2ZNEtvVpsiTVdcpgxoiBXBnTeknSoo1VhMwCmjhw4vHd4w7cCfP75BuQw74yf2buTXfhBKcXY7qQwYJyWj4kNt5U). The app and the web page still use devnet |
+| PumpSwap pools | in the program, the client, the command-line script and the Android app. Tested locally against a test double and the real PumpSwap program dumped from mainnet, on a local fork of mainnet, and with real buys on a devnet pool through the script and through the app (runs in [`app/README.md`](app/README.md#pumpswap-pools)), and with a real buy on a mainnet pool through the script ([Mainnet run](#mainnet-run)) |
 | Android app (`app/`) | works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. Not tested: Custom mode, a real device, Seeker, mainnet |
 | APK | not yet |
 | Web page (`web/`) | live at https://rung-drab.vercel.app/; the counter is computed from the program's devnet events |
@@ -253,7 +265,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 - At most 0.5 SOL per order (`MAX_ORDER_LAMPORTS` in [`constants.rs`](programs/rung/src/constants.rs)); at least 0.001 SOL. The highest cap any order can set is 30%. Raising the per-order limit is a team decision.
 - Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
 - Android emulator; not tested on a real device or Seeker.
-- The program is on mainnet, but nothing has been bought there yet; the app, the web page and every run described here are on devnet.
+- On mainnet: one buy so far, through the script, from a PumpSwap pool. Not yet on mainnet: a buy from a bonding curve, a not-bought run, the app.
 - Buys on pump.fun bonding curves and on a token's own (canonical) PumpSwap pool paired with SOL. Other pools and cashback pools: no.
 
 ## Architecture and program addresses
@@ -401,7 +413,7 @@ On Nov 24, 2026, against a local fork of mainnet (no real SOL):
 - the deploy took 1.55569 fork SOL in total: a deposit of 1.55416 SOL, which comes back only if the program is closed (a closed program address cannot be used again), and the rest in fees;
 - a buy through the freshly deployed program then filled from a live PumpSwap pool on the 1% rung (185,204 compute units for the try).
 
-**On mainnet.** With the team's approval the same script then deployed the program to mainnet on Nov 24, 2026: the build above, to the address above, verified byte for byte after the deploy. It took 1.555817994 SOL from the deploy wallet: 1.55415996 SOL of deposit and the rest in fees. No buy has been made on mainnet yet.
+**On mainnet.** With the team's approval the same script then deployed the program to mainnet on Nov 24, 2026: the build above, to the address above, verified byte for byte after the deploy. It took 1.555817994 SOL from the deploy wallet: 1.55415996 SOL of deposit and the rest in fees.
 
 ### Web page
 
