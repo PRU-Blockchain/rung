@@ -13,6 +13,8 @@
 //   npx tsx scripts/ladder.ts --find-mint [--limit 25]
 //   npx tsx scripts/ladder.ts --find-pool [--limit 25]   canonical SOL pools from recent PumpSwap transactions
 //   npx tsx scripts/ladder.ts --status | --refund | --cancel
+//       [--then-sell-all]   after a buy that filled: sell it back at once (as --sell-all does), wait for the
+//         order's lifetime to end and close the order account. For test buys whose SOL should come back.
 //   npx tsx scripts/ladder.ts --sell-all --mint <MINT> [--slippage-bps 100] [--keypair ...]
 //       sells the wallet's whole balance of the token where it trades (curve or PumpSwap pool) and closes the emptied
 //       token account, so the SOL of a test buy and that account's rent come back. Rung itself never sells.
@@ -459,7 +461,13 @@ function printPlan(p: Plan, user?: PublicKey, userBalance?: bigint, orderExists?
 
 // --- run --------------------------------------------------------------------------
 
-async function run(connection: Connection, flags: Flags, mint: PublicKey) {
+/** What `run` did, for `--then-sell-all`. Nothing when no order was opened. */
+interface RunOutcome {
+  filled: boolean;
+  lastSlot: bigint;
+}
+
+async function run(connection: Connection, flags: Flags, mint: PublicKey): Promise<RunOutcome | undefined> {
   const keypairPath = str(flags, "keypair") ?? DEFAULT_KEYPAIR;
   const dryRun = flags["dry-run"] !== undefined;
   if (!dryRun) guardMainnet(flags);
@@ -576,6 +584,40 @@ async function run(connection: Connection, flags: Flags, mint: PublicKey) {
       accumulator: !accInfo && after[2] ? BigInt(after[2].lamports) : 0n,
     },
   });
+  return { filled: !!result.filled, lastSlot: order.lastSlot };
+}
+
+/**
+ * `--then-sell-all`: the rest of a test round trip. Sells what the order
+ * bought, then closes the order account once the order's lifetime is over,
+ * so its rent comes back too. An order that did not buy was already refunded
+ * and closed by the ladder.
+ */
+async function sellAndClose(connection: Connection, flags: Flags, mint: PublicKey, done: RunOutcome) {
+  if (!done.filled) {
+    console.log("\n--then-sell-all: nothing was bought, so there is nothing to sell or close.");
+    return;
+  }
+  console.log("\n--then-sell-all: selling what the order bought.");
+  let sellError: unknown;
+  try {
+    await sellAll(connection, flags, mint);
+  } catch (e) {
+    sellError = e;
+    console.log(`  the sell did not go through: ${e instanceof Error ? e.message : String(e)}`);
+    console.log("  the tokens are still in the wallet; run --sell-all again.");
+  }
+  console.log(`\nwaiting for the order's lifetime to end (slot ${done.lastSlot}) to close the order account`);
+  for (;;) {
+    const slot = BigInt(await connection.getSlot("confirmed"));
+    if (slot > done.lastSlot) break;
+    await pause(Number((done.lastSlot - slot) * 400n) + 800);
+  }
+  const user = loadKeypair(str(flags, "keypair") ?? DEFAULT_KEYPAIR);
+  await refundOrCancel(connection, user, "refund");
+  const balance = BigInt(await connection.getBalance(user.publicKey, "confirmed"));
+  console.log(`wallet now ${sol(balance)}`);
+  if (sellError) throw new Error("the order account is closed, but the sell did not go through (see above).");
 }
 
 // --- TEST AID: move the price after the order opened -----------------------------------
@@ -1282,7 +1324,10 @@ async function main() {
   if (flags["sell-all"]) await sellAll(connection, flags, mint);
   else if (flags["push-only"]) await pushOnly(connection, flags, mint);
   else if (flags["simulate-buy"]) await simulateBuy(connection, flags, mint);
-  else await run(connection, flags, mint);
+  else {
+    const done = await run(connection, flags, mint);
+    if (done && flags["then-sell-all"] !== undefined) await sellAndClose(connection, flags, mint, done);
+  }
 }
 
 // Exit explicitly: the RPC connection keeps a websocket open after
