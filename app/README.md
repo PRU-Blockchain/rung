@@ -107,6 +107,16 @@ after adding a native module or changing `app.json`.
 
 Android package: `com.prublockchain.rung`.
 
+## Network
+
+The network is fixed when the app's JavaScript is bundled. Without a setting it is devnet. For mainnet:
+
+```powershell
+$env:EXPO_PUBLIC_CLUSTER = "mainnet-beta"; npx expo start --dev-client --clear
+```
+
+That switches the RPC endpoint (the public one of that network; no key goes into the app), the chain the wallet is asked for (`solana:mainnet`), the explorer links and the label under the title. Any other value stops the app. The rule is in [`src/network.ts`](src/network.ts), tested in `client/test/app-network.test.ts`. A wallet that was connected on devnet has to be disconnected and connected again, and the wallet app itself has to be on mainnet.
+
 ## Testing a price move (devnet, TEST AID)
 
 To see a rung slip or a buy not happen, move the price right after the app's
