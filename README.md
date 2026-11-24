@@ -110,6 +110,8 @@ Each failed try cost 6,000 lamports; one order, one buy. Both buys were sold bac
 | [1% rung](https://explorer.solana.com/tx/LAy4CNeEtcLMSnojo9Uxk4isH6MVqxbVnYaxBczHRtXrEj8vsZrLPAk9mS3uSjT5M2kBCAwFYMQ8HCnfce3uuRi) failed, [2% rung filled](https://explorer.solana.com/tx/MXzfo3PgaEmqEekJAkn9TzN4CgZEKtXsMSWr9tttio4t9UdwayA18spqscKo5sgxksTNwBdz6tZ6HkeZrm1avS4) | 10 slots | +0.47% |
 | [1% rung filled](https://explorer.solana.com/tx/4rRRUBxpmeiFSRZ6kzfBZSw9xVk1bsryNxxf9rVQaZmxcVZgFs1gWQLqvexuTphhi49eLyx4S4mjfv1JuTv5j1Gs) | 4 slots | −6.14% (the price had dropped before the order landed) |
 
+**From the app.** The same evening the first mainnet buy went through the Android app, with Phantom as the wallet (CATE pool, Tight, 0.01 SOL): [one approval](https://explorer.solana.com/tx/5X1dpRNNF5zp4DhVW7WqmmvBLFV8YYQ6z3KH1jph94bkG8751KmTWbTVt2Z1JRGfbXK9ooYXk9LiJSEddfmT7L4e), the [1% rung filled](https://explorer.solana.com/tx/2hws1mQkKJsekvwNYgvRko3KGfukHqfukW5MJ5NeooSZNcW7123ANjpquQiKHiW8d3duBYQmR85D5qox1BYgqd64) at the price seen (40.795274 tokens), and the [unused fees came back](https://explorer.solana.com/tx/2ydWR4dKPf5wyNgERXXVQQAiPaRMLAakLu8BTvpi7ra3fAwGJPjNksoZP23shVEDK6pQLQuHUCgBf842ikD8gtRi). [Receipt screen](docs/shots/app-19-mainnet-bought.png).
+
 ### Devnet runs
 
 Real transactions on devnet (test SOL, pump's devnet deployment, a live devnet curve), sent with the script (`scripts/ladder.ts`, then named `devnet-ladder.ts`) on Nov 23, 2026. Tight mode (1% → 2% → 3%), 0.01 SOL, mint `B8fRBPHkEVfqE6FfUYsPKkyZvdjH3SxvQpYpyYRtG511`. The wallet signs one transaction (`open_order`); every try is signed by the one-time session key.
@@ -135,7 +137,7 @@ The app's own devnet buys (Phantom, Solflare, a not-bought run and its "Retry wi
 | On-chain order program (Anchor) | deployed on **devnet** at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet). Buys on pump.fun bonding curves and on PumpSwap pools. Reviewed twice by independent read-only passes, not audited |
 | Mainnet | the program is deployed at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio) since Nov 24, 2026 (same address and same build as on devnet). Two buys the same day, through the script: from a PumpSwap pool ([rung 1% filled](https://explorer.solana.com/tx/2ZNEtvVpsiTVdcpgxoiBXBnTeknSoo1VhMwCmjhw4vHd4w7cCfP75BuQw74yf2buTXfhBKcXY7qQwYJyWj4kNt5U)) and from a bonding curve ([rung 1% filled](https://explorer.solana.com/tx/GY6Y2LdzeJj1Zch3XFuTuXvvPVKroEGFAR2ZFqjEcsaCpCRuqHs8JAMuE1Fr2Tigrk1PQht6DH6L4KVgRRWwzQM)). The app and the web page still use devnet |
 | PumpSwap pools | in the program, the client, the command-line script and the Android app. Tested locally against a test double and the real PumpSwap program dumped from mainnet, on a local fork of mainnet, and with real buys on a devnet pool through the script and through the app (runs in [`app/README.md`](app/README.md#pumpswap-pools)), and with a real buy on a mainnet pool through the script ([Mainnet runs](#mainnet-runs)) |
-| Android app (`app/`) | works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. Built for mainnet (`EXPO_PUBLIC_CLUSTER=mainnet-beta`) it starts and reads a live pool ([screen](docs/shots/app-18-mainnet-plan.png)); no buy through the app on mainnet yet. Not tested: Custom mode, a real device, Seeker |
+| Android app (`app/`) | works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. Built for mainnet (`EXPO_PUBLIC_CLUSTER=mainnet-beta`) it reads a live pool ([screen](docs/shots/app-18-mainnet-plan.png)) and has bought on mainnet with Phantom ([receipt](docs/shots/app-19-mainnet-bought.png)): one buy so far. Not tested: Custom mode, a real device, Seeker |
 | APK | not yet |
 | Web page (`web/`) | live at https://rung-drab.vercel.app/; the counter is computed from the program's devnet events |
 | Measurement scripts (`measure/`) | in the repository; verified on a small slice, not re-run end to end |
@@ -297,7 +299,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 - At most 0.5 SOL per order (`MAX_ORDER_LAMPORTS` in [`constants.rs`](programs/rung/src/constants.rs)); at least 0.001 SOL. The highest cap any order can set is 30%. Raising the per-order limit is a team decision.
 - Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
 - Android emulator; not tested on a real device or Seeker.
-- On mainnet: eleven buys and two not-bought runs so far, all through the script. Not yet on mainnet: the app.
+- On mainnet: twelve buys and two not-bought runs so far: eleven through the script, one through the app.
 - Buys on pump.fun bonding curves and on a token's own (canonical) PumpSwap pool paired with SOL. Other pools and cashback pools: no.
 
 ## Architecture and program addresses
@@ -374,7 +376,7 @@ anchor test        # builds the program and the test double, then runs `cargo te
 The tests load the built program into LiteSVM and load two test doubles, one at pump's address and one at PumpSwap's. 226 Rust tests: unit tests of the rung arithmetic, the ladder scenarios on both venues (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, the two references, events, the fixes after the two reviews, and security tests (wrong signer, substituted accounts, a pool that is not the token's own, a fake buy program, a buy program that delivers too few tokens, takes too much SOL or misuses the vault's signature, pre-funded accounts, a try that runs out of compute units, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
 
 ```bash
-cd client && npm install && npm test     # 116 client tests, including byte-for-byte vectors from the Rust program
+cd client && npm install && npm test     # 123 client tests, including byte-for-byte vectors from the Rust program
 ```
 
 ### Against the real pump program

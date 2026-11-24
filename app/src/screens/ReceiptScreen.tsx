@@ -1,9 +1,10 @@
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { bpsText, pctText, priceText, shortAddress, sol, tokens } from "../flow/format";
+import { bpsText, priceText, shortAddress, sol, tokens } from "../flow/format";
 import { Receipt, accumulatorLabel } from "../flow/history";
 import { paidAboveSeenPct } from "../flow/ladder";
+import { signedPctText } from "../percent";
 import { Button, Header, Row, TxLinkText, s } from "./ui";
 
 /** The links of a receipt, approval first. */
@@ -31,7 +32,7 @@ export function ReceiptScreen({ r, onNew, onHistory }: { r: Receipt; onNew: () =
         <View style={s.box}>
           <Row label="Price you saw" value={priceText(amount, seen, r.decimals)} />
           <Row label="Price you paid" value={priceText(spent, bought, r.decimals)} />
-          <Row label="Difference" value={`${diff >= 0 ? "+" : "-"}${pctText(Math.abs(diff))}`} />
+          <Row label="Difference" value={signedPctText(diff)} />
           <Row label="Rung that filled" value={`try ${bpsText(r.filledRungBps ?? 0)}`} />
           <Row label="Tokens bought" value={tokens(bought, r.decimals)} />
           <Row label="SOL spent on the buy" value={sol(spent)} />
