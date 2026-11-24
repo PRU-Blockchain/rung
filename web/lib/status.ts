@@ -14,7 +14,7 @@ export const STATUS = {
   publicRpc: "https://api.devnet.solana.com",
   /** Short line under the intro. */
   networkLine:
-    "The program is deployed on devnet and on mainnet. This page and the app read devnet (test SOL); the first mainnet buy was made on Nov 24, 2026, through the command-line script.",
+    "The program is deployed on devnet and on mainnet. This page and the app read devnet (test SOL); the first two mainnet buys were made on Nov 24, 2026, through the command-line script.",
   audit: "unaudited, use small amounts", // verbatim
   devices: "Android emulator; not tested on a real device or Seeker", // verbatim
   /** `null` until an APK is published. */
