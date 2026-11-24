@@ -10,8 +10,15 @@ import { test } from "node:test";
 import { Keypair } from "@solana/web3.js";
 
 import {
+  PUMP_IX,
+  PUMP_PROGRAM_ID,
   PUMP_SWAP_IX,
   PUMP_SWAP_PROGRAM_ID,
+  pumpBuyAccounts,
+  pumpCloseVolumeAccumulatorIx,
+  pumpEventAuthorityPda,
+  pumpSellV3Ix,
+  userVolumeAccumulatorPda,
   TOKEN_2022_PROGRAM_ID,
   ammEventAuthorityPda,
   ammUserVolumeAccumulatorPda,
@@ -92,6 +99,62 @@ test("close_user_volume_accumulator: user (signer), its accumulator, event autho
       [PUMP_SWAP_PROGRAM_ID.toBase58(), false, false],
     ],
   );
+});
+
+// --- the same for a token that still trades on its pump.fun curve ---------------------------
+// pump's `sell_v3` takes the 17 accounts of `buy_exact_quote_in_v3` (idl/pump.json, read 2026-11-24).
+
+const buybackRecipient = key();
+
+test("the curve sell discriminator is Anchor's for sell_v3", () => {
+  assert.deepEqual([...PUMP_IX.sellV3], anchorDiscriminator("sell_v3"));
+  assert.deepEqual([...PUMP_IX.sellV3], [28, 146, 222, 119, 38, 196, 105, 213]);
+  // The same instruction name on both programs gives the same bytes; the program id tells them apart.
+  assert.deepEqual([...PUMP_IX.closeUserVolumeAccumulator], [...PUMP_SWAP_IX.closeUserVolumeAccumulator]);
+});
+
+test("pump sell_v3: discriminator, then tokens in and minimum lamports out as u64 LE", () => {
+  const ix = pumpSellV3Ix({ seller, mint, tokenProgram: TOKEN_2022_PROGRAM_ID, buybackRecipient, tokensIn: 123_456_789n, minLamportsOut: 9_800_000n });
+  assert.ok(ix.programId.equals(PUMP_PROGRAM_ID));
+  assert.equal(ix.data.length, 24);
+  assert.deepEqual([...ix.data.subarray(0, 8)], [...PUMP_IX.sellV3]);
+  assert.equal(ix.data.readBigUInt64LE(8), 123_456_789n);
+  assert.equal(ix.data.readBigUInt64LE(16), 9_800_000n);
+});
+
+test("pump sell_v3 takes the 17 accounts of the v3 buy, with the seller as the signing user", () => {
+  const ix = pumpSellV3Ix({ seller, mint, tokenProgram: TOKEN_2022_PROGRAM_ID, buybackRecipient, tokensIn: 1n, minLamportsOut: 1n });
+  const buy = pumpBuyAccounts({ buyer: seller, mint, tokenProgram: TOKEN_2022_PROGRAM_ID, buybackRecipient, buyerSigns: true });
+  assert.equal(ix.keys.length, 17);
+  assert.deepEqual(
+    ix.keys.map((k) => [k.pubkey.toBase58(), k.isSigner, k.isWritable]),
+    buy.map((k) => [k.pubkey.toBase58(), k.isSigner, k.isWritable]),
+  );
+  assert.ok(ix.keys[8].pubkey.equals(seller) && ix.keys[8].isSigner);
+  assert.equal(ix.keys.filter((k) => k.isSigner).length, 1);
+});
+
+test("a curve sell of nothing, or for nothing, is not built", () => {
+  const base = { seller, mint, tokenProgram: TOKEN_2022_PROGRAM_ID, buybackRecipient };
+  assert.throws(() => pumpSellV3Ix({ ...base, tokensIn: 0n, minLamportsOut: 1n }), /nothing to sell/);
+  assert.throws(() => pumpSellV3Ix({ ...base, tokensIn: 1n, minLamportsOut: 0n }), /minimum/);
+});
+
+test("pump close_user_volume_accumulator: user (signer), its pump accumulator, event authority, program", () => {
+  const ix = pumpCloseVolumeAccumulatorIx(seller);
+  assert.ok(ix.programId.equals(PUMP_PROGRAM_ID));
+  assert.deepEqual([...ix.data], [...PUMP_IX.closeUserVolumeAccumulator]);
+  assert.deepEqual(
+    ix.keys.map((k) => [k.pubkey.toBase58(), k.isSigner, k.isWritable]),
+    [
+      [seller.toBase58(), true, true],
+      [userVolumeAccumulatorPda(seller).toBase58(), false, true],
+      [pumpEventAuthorityPda().toBase58(), false, false],
+      [PUMP_PROGRAM_ID.toBase58(), false, false],
+    ],
+  );
+  // Not the PumpSwap account of the same wallet.
+  assert.ok(!userVolumeAccumulatorPda(seller).equals(ammUserVolumeAccumulatorPda(seller)));
 });
 
 // --- the estimate printed before a sell (the minimum itself comes from a simulation) ---

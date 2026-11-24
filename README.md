@@ -64,7 +64,7 @@ Drop `--dry-run` to send real devnet transactions. The script signs with a devne
 
 The script refuses a mainnet RPC unless `--mainnet` is given, and refuses `--mainnet` on anything that is not mainnet. With `--mainnet` the SOL is real, so the rules are tighter: `--keypair` has no default, an order is at most 0.01 SOL, the test aids that move the price are refused, and without `--yes-real-sol` the script prints the plan and sends nothing. The rules are in [`scripts/network.ts`](scripts/network.ts) with their tests in [`client/test/network.test.ts`](client/test/network.test.ts). The first mainnet run is below.
 
-Rung only buys. To take a test buy back, `--sell-all --mint <MINT>` sells the wallet's whole balance of the token on its PumpSwap pool from the plain wallet and closes the emptied token account.
+Rung only buys. To take a test buy back, `--sell-all --mint <MINT>` sells the wallet's whole balance of the token where it trades (its curve or its PumpSwap pool) from the plain wallet and closes the emptied token account.
 
 ### Mainnet run
 
@@ -342,7 +342,7 @@ anchor test        # builds the program and the test double, then runs `cargo te
 The tests load the built program into LiteSVM and load two test doubles, one at pump's address and one at PumpSwap's. 226 Rust tests: unit tests of the rung arithmetic, the ladder scenarios on both venues (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, the two references, events, the fixes after the two reviews, and security tests (wrong signer, substituted accounts, a pool that is not the token's own, a fake buy program, a buy program that delivers too few tokens, takes too much SOL or misuses the vault's signature, pre-funded accounts, a try that runs out of compute units, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
 
 ```bash
-cd client && npm install && npm test     # 91 client tests, including byte-for-byte vectors from the Rust program
+cd client && npm install && npm test     # 96 client tests, including byte-for-byte vectors from the Rust program
 ```
 
 ### Against the real pump program

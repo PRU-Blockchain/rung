@@ -169,6 +169,38 @@ export function pumpBuyExactQuoteInV3Ix(p: {
   );
 }
 
+/**
+ * A direct pump sell on a SOL-paired curve from a plain wallet: give
+ * `tokensIn`, receive at least `minLamportsOut`. `sell_v3` takes the same 17
+ * accounts as the v3 buy. Rung never sells; the script uses this to sell a
+ * test buy.
+ */
+export function pumpSellV3Ix(p: {
+  seller: PublicKey;
+  mint: PublicKey;
+  tokenProgram: PublicKey;
+  buybackRecipient: PublicKey;
+  tokensIn: bigint;
+  minLamportsOut: bigint;
+}): TransactionInstruction {
+  if (p.tokensIn <= 0n) throw new RangeError("nothing to sell");
+  if (p.minLamportsOut <= 0n) throw new RangeError("a sell needs a minimum above zero");
+  return ix(
+    PUMP_PROGRAM_ID,
+    pumpBuyAccounts({ buyer: p.seller, mint: p.mint, tokenProgram: p.tokenProgram, buybackRecipient: p.buybackRecipient, buyerSigns: true }),
+    concat(Uint8Array.from(PUMP_IX.sellV3), u64(p.tokensIn), u64(p.minLamportsOut)),
+  );
+}
+
+/** Closes pump's volume account of `user`; its rent goes back to `user`. */
+export function pumpCloseVolumeAccumulatorIx(user: PublicKey): TransactionInstruction {
+  return ix(
+    PUMP_PROGRAM_ID,
+    [w(user, true), w(userVolumeAccumulatorPda(user)), r(pumpEventAuthorityPda()), r(PUMP_PROGRAM_ID)],
+    Uint8Array.from(PUMP_IX.closeUserVolumeAccumulator),
+  );
+}
+
 // --- PumpSwap buy_exact_quote_in_v2 accounts (docs/pump-arayuz.md B2, K2) ------------
 
 /**

@@ -92,6 +92,9 @@ export const PUMP_IX = {
   buyV2: [184, 23, 238, 97, 103, 197, 211, 61],
   buyExactSolIn: [56, 252, 116, 8, 158, 223, 205, 95],
   buy: [102, 6, 61, 18, 1, 218, 235, 234],
+  // Not called by the Rung program: used by the script to sell from a plain wallet.
+  sellV3: [28, 146, 222, 119, 38, 196, 105, 213],
+  closeUserVolumeAccumulator: [249, 69, 164, 218, 150, 103, 84, 138],
 } as const;
 
 export const BONDING_CURVE_DISCRIMINATOR = [23, 183, 248, 55, 96, 216, 172, 96] as const;

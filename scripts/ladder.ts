@@ -14,7 +14,7 @@
 //   npx tsx scripts/ladder.ts --find-pool [--limit 25]   canonical SOL pools from recent PumpSwap transactions
 //   npx tsx scripts/ladder.ts --status | --refund | --cancel
 //   npx tsx scripts/ladder.ts --sell-all --mint <MINT> [--slippage-bps 100] [--keypair ...]
-//       sells the wallet's whole balance of the token on its PumpSwap pool and closes the emptied
+//       sells the wallet's whole balance of the token where it trades (curve or PumpSwap pool) and closes the emptied
 //       token account, so the SOL of a test buy and that account's rent come back. Rung itself never sells.
 //   npx tsx scripts/ladder.ts --mint <MINT> --amount 0.01 --simulate-buy --payer <PUBKEY> [--venue ...]
 //   ... --local-fork --rpc http://127.0.0.1:8899 ...   TEST AID: a local fork of mainnet (e.g. `surfpool start`)
@@ -91,6 +91,8 @@ import {
   pumpFeeConfigPda,
   pumpGlobalPda,
   pumpSwapBuyExactQuoteInV2Ix,
+  pumpCloseVolumeAccumulatorIx,
+  pumpSellV3Ix,
   pumpSwapCloseVolumeAccumulatorIx,
   pumpSwapSellV2Ix,
   quoteOrder,
@@ -857,6 +859,86 @@ async function refundOrCancel(connection: Connection, user: Keypair, kind: "refu
  * opened for the sell. The minimum it accepts is what a
  * simulation of the same sell returned just before, less `--slippage-bps`.
  */
+/**
+ * The curve half of `--sell-all`: pump's `sell_v3` pays SOL straight to the
+ * wallet, so the simulation is read from the wallet's own balance.
+ */
+async function sellAllOnCurve(connection: Connection, flags: Flags, user: Keypair, m: CurveMarket, slippageBps: bigint) {
+  const u = user.publicKey;
+  const mint = m.mint;
+  const ata = associatedTokenAddress(u, mint, m.tokenProgram);
+  const accumulator = userVolumeAccumulatorPda(u);
+  const [ataInfo, accBefore, walletInfo] = await connection.getMultipleAccountsInfo([ata, accumulator, u], "confirmed");
+  const tokens = ataInfo ? tokenAccountAmount(ataInfo.data) : 0n;
+  if (tokens === 0n || !walletInfo) throw new Error("this wallet holds none of this token; nothing was sent.");
+
+  const sell = (minLamportsOut: bigint) =>
+    pumpSellV3Ix({ seller: u, mint, tokenProgram: m.tokenProgram, buybackRecipient: m.buybackRecipient, tokensIn: tokens, minLamportsOut });
+  // pump opens a volume account for a seller that has none; close it again so its rent comes back.
+  const closeVolume = accBefore ? [] : [pumpCloseVolumeAccumulatorIx(u)];
+
+  const { blockhash } = await connection.getLatestBlockhash("confirmed");
+  const probe = new VersionedTransaction(
+    new TransactionMessage({ payerKey: u, recentBlockhash: blockhash, instructions: [computeUnitLimitIx(250_000), sell(1n), ...closeVolume] }).compileToV0Message(),
+  );
+  const sim = (
+    await connection.simulateTransaction(probe, {
+      sigVerify: false,
+      replaceRecentBlockhash: true,
+      commitment: "confirmed",
+      accounts: { encoding: "base64", addresses: [u.toBase58()] },
+    })
+  ).value;
+  if (sim.err) {
+    for (const line of (sim.logs ?? []).filter((l) => /failed|Error/.test(l)).slice(-6)) console.log(`    | ${line}`);
+    throw new Error(`the sell does not go through in simulation (${JSON.stringify(sim.err)}); nothing was sent.`);
+  }
+  const post = sim.accounts?.[0];
+  if (!post) throw new Error("the simulation did not return the wallet; nothing was sent.");
+  // The wallet's change in the simulation; if the simulation charged the fee, this is 5,000 lamports low, which only makes the minimum safer.
+  const simulated = BigInt(post.lamports) - BigInt(walletInfo.lamports);
+  if (simulated <= 0n) throw new Error("the sell would pay nothing in simulation; nothing was sent.");
+  const minLamportsOut = (simulated * (10_000n - slippageBps)) / 10_000n;
+
+  const q = quoteMarket(m, MIN_ORDER_LAMPORTS);
+  console.log(`Sell (${networkName()})`);
+  console.log(`  mint            ${mint.toBase58()} (${tokenProgramName(m.tokenProgram)})`);
+  console.log(`  venue           pump.fun bonding curve; fees ${q.feeText}`);
+  console.log(`  tokens to sell  ${units(tokens, m.decimals)} (the wallet's whole balance)`);
+  console.log(`  pays now        ${sol(simulated)} in simulation`);
+  console.log(`  minimum         ${sol(minLamportsOut)} (${slippageBps} bps below the simulation); below that the sell fails and nothing is sold`);
+  console.log(`  also back       ${sol(BigInt(ataInfo!.lamports))} rent of the token account, closed after the sell`);
+  console.log(`  wallet          ${u.toBase58()}`);
+  if (flags["dry-run"] !== undefined) {
+    console.log("--dry-run: nothing sent.");
+    return;
+  }
+  if (!mayOpenOrder(network, flags)) {
+    console.log("MAINNET, real SOL: nothing sent. Add --yes-real-sol to sell.");
+    return;
+  }
+
+  const balanceBefore = BigInt(walletInfo.lamports);
+  const ixs = [
+    computeUnitLimitIx(250_000),
+    sell(minLamportsOut),
+    closeTokenAccountIx({ account: ata, destination: u, owner: u, tokenProgram: m.tokenProgram }),
+    ...closeVolume,
+  ];
+  const landed = await sendAndConfirm(connection, ixs, user);
+  if (!landed.landed) throw new Error("the sell did not land (blockhash expired); nothing was sold");
+  console.log(`\nsell ${landed.signature} slot ${landed.slot ?? "?"} fee ${landed.fee ?? "?"} CU ${landed.computeUnits ?? "?"}\n  ${explorer(landed.signature)}`);
+  if (landed.err) {
+    throw new Error(`the sell failed and nothing was sold: ${describeFailure(classifyFailure(landed.err, landed.logs, ixs.map((i) => i.programId)))}`);
+  }
+  const balanceAfter = BigInt(await connection.getBalance(u, "confirmed"));
+  const accAfter = await connection.getAccountInfo(accumulator, "confirmed");
+  console.log(`  wallet SOL      before ${sol(balanceBefore)}, after ${sol(balanceAfter)}, change ${sol(balanceAfter - balanceBefore)}`);
+  if (!accBefore && accAfter) {
+    console.log(`  note            pump's volume account of this wallet is still open (${sol(BigInt(accAfter.lamports))} rent)`);
+  }
+}
+
 async function sellAll(connection: Connection, flags: Flags, mint: PublicKey) {
   guardMainnet(flags);
   const slippageBps = int(flags, "slippage-bps", 100n);
@@ -864,7 +946,7 @@ async function sellAll(connection: Connection, flags: Flags, mint: PublicKey) {
   const user = loadKeypair(str(flags, "keypair") ?? DEFAULT_KEYPAIR);
   const u = user.publicKey;
   const m = await loadMarket(connection, mint, str(flags, "venue"));
-  if (m.venue !== "PumpSwap") throw new Error("--sell-all sells on a PumpSwap pool; this token trades on its curve. Nothing was sent.");
+  if (m.venue === "Curve") return sellAllOnCurve(connection, flags, user, m, slippageBps);
 
   const ata = associatedTokenAddress(u, mint, m.tokenProgram);
   const wsol = wsolAta(u);
