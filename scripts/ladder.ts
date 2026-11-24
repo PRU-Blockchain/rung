@@ -13,6 +13,8 @@
 //   npx tsx scripts/ladder.ts --find-mint [--limit 25]
 //   npx tsx scripts/ladder.ts --find-pool [--limit 25]   canonical SOL pools from recent PumpSwap transactions
 //   npx tsx scripts/ladder.ts --status | --refund | --cancel
+//       [--mint busy [--busy-min-trades 30]]   instead of a mint: the busiest open curve among recent pump buys
+//         whose price is not falling (rule in scripts/pick.ts). For test buys on a token that is moving.
 //       [--then-sell-all]   after a buy that filled: sell it back at once (as --sell-all does), wait for the
 //         order's lifetime to end and close the order account. For test buys whose SOL should come back.
 //   npx tsx scripts/ladder.ts --sell-all --mint <MINT> [--slippage-bps 100] [--keypair ...]
@@ -113,6 +115,7 @@ import {
   wrapSolIxs,
   wsolAta,
 } from "../client/src/index";
+import { type CurveActivity, pickBusyCurve } from "./pick";
 import { type Network, checkMainnetRun, chooseNetwork, explorerTx, hideRpc, mayOpenOrder, rpcHost } from "./network";
 
 const DEFAULT_RPC = "https://api.devnet.solana.com";
@@ -1109,14 +1112,19 @@ async function getTx(connection: Connection, signature: string) {
 
 const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function findMints(connection: Connection, limit: number) {
+/** Mints bought in the most recent successful pump transactions, with the instruction that bought them. */
+async function recentBuys(connection: Connection, limit: number, atOnce = 1) {
   const sigs = (await connection.getSignaturesForAddress(PUMP_PROGRAM_ID, { limit })).filter((s) => !s.err);
   const counts = new Map<string, number>();
   const mints = new Map<string, string>();
   const v3Buyers = new Set<string>();
-  for (const s of sigs) {
-    const tx = await getTx(connection, s.signature);
-    await pause(250); // public devnet RPC rate limit
+  // One at a time on the public devnet RPC (rate limit); a keyed RPC can take a few at once.
+  const txs: Awaited<ReturnType<typeof getTx>>[] = [];
+  for (let i = 0; i < sigs.length; i += atOnce) {
+    txs.push(...(await Promise.all(sigs.slice(i, i + atOnce).map((s) => getTx(connection, s.signature).catch(() => null)))));
+    await pause(250);
+  }
+  for (const tx of txs) {
     if (!tx?.meta) continue;
     const keys = tx.transaction.message.getAccountKeys({ accountKeysFromLookups: tx.meta.loadedAddresses });
     const ixs: { program: PublicKey; accounts: number[]; data: Uint8Array }[] = [
@@ -1141,7 +1149,70 @@ async function findMints(connection: Connection, limit: number) {
       if (name === "buy_exact_quote_in_v3" || name === "buy_v3") v3Buyers.add(keys.get(ix.accounts[8])!.toBase58());
     }
   }
-  console.log(`scanned ${sigs.length} recent successful pump transactions on ${networkName()}`);
+  return { scanned: sigs.length, counts, mints, v3Buyers };
+}
+
+/**
+ * `--mint busy`: among the mints of recent pump buys, the busiest open curve
+ * whose price is not falling. Reads only; the rule is `pickBusyCurve`.
+ */
+async function pickBusy(connection: Connection, flags: Flags): Promise<PublicKey> {
+  const minTrades = Number(int(flags, "busy-min-trades", 30n));
+  const { scanned, mints } = await recentBuys(connection, Number(int(flags, "limit", 200n)), network === "devnet" ? 1 : 8);
+  const list = [...mints.keys()].slice(0, 30).map((m) => new PublicKey(m));
+  const curves = list.map(bondingCurvePda);
+  const read = async () =>
+    (await connection.getMultipleAccountsInfo(curves, "confirmed")).map((info) => (info ? decodeBondingCurve(info.data) : undefined));
+  const price = (c: BondingCurve) => (c.virtualQuoteReserves * 1_000_000_000_000n) / (c.virtualTokenReserves || 1n);
+  const before = await read();
+  const watchedFrom = Date.now();
+  const trades: number[] = [];
+  for (let i = 0; i < list.length; i++) {
+    const c = before[i];
+    if (!c || c.complete) {
+      trades.push(0);
+      continue;
+    }
+    const sigs = await connection.getSignaturesForAddress(curves[i], { limit: 300 });
+    const now = Math.floor(Date.now() / 1000);
+    trades.push(sigs.filter((s) => !s.err && s.blockTime && now - s.blockTime <= 60).length);
+  }
+  // Watch for at least five seconds, so the price change means something.
+  const left = 5_000 - (Date.now() - watchedFrom);
+  if (left > 0) await pause(left);
+  const after = await read();
+  const seconds = ((Date.now() - watchedFrom) / 1000).toFixed(0);
+  const reasons: string[] = [];
+  const activity: CurveActivity[] = list.map((mint, i) => {
+    const b = before[i];
+    const a = after[i];
+    const why = !a
+      ? "no curve"
+      : a.complete
+        ? "curve complete"
+        : !a.quoteMint.equals(PublicKey.default)
+          ? "not paired with SOL"
+          : a.isCashbackCoin
+            ? "cashback coin"
+            : a.isMayhemMode
+              ? "mayhem mode"
+              : "";
+    reasons.push(why);
+    const priceMoveBps = a && b ? Number(((price(a) - price(b)) * 10_000n) / (price(b) || 1n)) : 0;
+    return { mint: mint.toBase58(), usable: why === "", tradesLastMinute: trades[i], priceMoveBps };
+  });
+  console.log(`--mint busy: ${scanned} recent pump transactions scanned, ${list.length} mints watched for ${seconds} s`);
+  for (const [i, c] of activity.entries()) {
+    console.log(`  ${c.mint}  ${(c.usable ? "usable" : reasons[i]).padEnd(19)}  ${String(c.tradesLastMinute).padStart(3)} trades in the last minute  price ${c.priceMoveBps >= 0 ? "+" : ""}${(c.priceMoveBps / 100).toFixed(2)}% in ${seconds} s`);
+  }
+  const picked = pickBusyCurve(activity, minTrades);
+  console.log(`--mint busy: picked ${picked.mint}\n`);
+  return new PublicKey(picked.mint);
+}
+
+async function findMints(connection: Connection, limit: number) {
+  const { scanned, counts, mints, v3Buyers } = await recentBuys(connection, limit);
+  console.log(`scanned ${scanned} recent successful pump transactions on ${networkName()}`);
   console.log("pump instructions seen:");
   for (const [name, n] of [...counts].sort((a, b) => b[1] - a[1])) console.log(`  ${String(n).padStart(4)}  ${name}`);
   if (v3Buyers.size) console.log(`recent v3 buyers (for --simulate-buy --payer): ${[...v3Buyers].slice(0, 3).join(", ")}`);
@@ -1320,7 +1391,7 @@ async function main() {
   }
   const mintText = str(flags, "mint");
   if (!mintText) throw new Error("--mint <MINT> is required");
-  const mint = new PublicKey(mintText);
+  const mint = mintText === "busy" ? await pickBusy(connection, flags) : new PublicKey(mintText);
   if (flags["sell-all"]) await sellAll(connection, flags, mint);
   else if (flags["push-only"]) await pushOnly(connection, flags, mint);
   else if (flags["simulate-buy"]) await simulateBuy(connection, flags, mint);
