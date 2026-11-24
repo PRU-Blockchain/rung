@@ -164,6 +164,22 @@ export function poolExpectedTokens(spendable: bigint, reserves: Reserves, fees: 
   return quoteAfterFees(spendable, reserves, [fees.lpFeeBps, fees.protocolFeeBps, fees.creatorFeeBps]);
 }
 
+/**
+ * About how many lamports a PumpSwap sell of `tokensIn` returns:
+ * `tokens * quote / (base + tokens)`, less the three fees, each rounded up.
+ * An estimate to print before a sell; the minimum sent with the sell comes
+ * from a simulation, not from here.
+ */
+export function poolSellEstimate(tokensIn: bigint, reserves: Reserves, fees: Omit<PoolFees, "marketCapLamports">): bigint {
+  if (tokensIn <= 0n) throw new RangeError("nothing to sell");
+  const gross = (tokensIn * reserves.virtualQuoteReserves) / (reserves.virtualTokenReserves + tokensIn);
+  const taken = [fees.lpFeeBps, fees.protocolFeeBps, fees.creatorFeeBps].reduce(
+    (sum, bps) => sum + ceilDiv(gross * bps, BPS_DENOMINATOR),
+    0n,
+  );
+  return gross - taken;
+}
+
 export interface PoolOrderQuote extends PoolFees {
   amount: bigint;
   /** With fees. Sent as `expected_tokens_seen`. */

@@ -101,6 +101,9 @@ export const FEE_CONFIG_DISCRIMINATOR = [143, 52, 146, 187, 219, 123, 76, 155] a
 /** PumpSwap's buy (idl/pump_amm.json; same bytes as pump's, told apart by the program id). */
 export const PUMP_SWAP_IX = {
   buyExactQuoteInV2: [194, 171, 28, 70, 104, 77, 91, 47],
+  // Not called by the Rung program: used by the script to sell from a plain wallet.
+  sellV2: [93, 246, 130, 60, 231, 233, 64, 178],
+  closeUserVolumeAccumulator: [249, 69, 164, 218, 150, 103, 84, 138],
 } as const;
 export const POOL_DISCRIMINATOR = [241, 154, 109, 4, 17, 177, 109, 188] as const;
 export const AMM_GLOBAL_CONFIG_DISCRIMINATOR = [149, 8, 156, 202, 160, 252, 176, 217] as const;

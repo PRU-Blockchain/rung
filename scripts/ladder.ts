@@ -13,6 +13,9 @@
 //   npx tsx scripts/ladder.ts --find-mint [--limit 25]
 //   npx tsx scripts/ladder.ts --find-pool [--limit 25]   canonical SOL pools from recent PumpSwap transactions
 //   npx tsx scripts/ladder.ts --status | --refund | --cancel
+//   npx tsx scripts/ladder.ts --sell-all --mint <MINT> [--slippage-bps 100] [--keypair ...]
+//       sells the wallet's whole balance of the token on its PumpSwap pool and closes the emptied
+//       token account, so the SOL of a test buy and that account's rent come back. Rung itself never sells.
 //   npx tsx scripts/ladder.ts --mint <MINT> --amount 0.01 --simulate-buy --payer <PUBKEY> [--venue ...]
 //   ... --local-fork --rpc http://127.0.0.1:8899 ...   TEST AID: a local fork of mainnet (e.g. `surfpool start`)
 //       instead of devnet. Accepted only when the RPC host is this machine; nothing reaches a real network.
@@ -83,10 +86,13 @@ import {
   openOrderIx,
   orderPda,
   poolReserves,
+  poolSellEstimate,
   pumpBuyExactQuoteInV3Ix,
   pumpFeeConfigPda,
   pumpGlobalPda,
   pumpSwapBuyExactQuoteInV2Ix,
+  pumpSwapCloseVolumeAccumulatorIx,
+  pumpSwapSellV2Ix,
   quoteOrder,
   quotePoolOrder,
   rawQuote,
@@ -842,6 +848,110 @@ async function refundOrCancel(connection: Connection, user: Keypair, kind: "refu
   console.log(`${kind} ${landed.signature} fee ${landed.fee}\n  ${explorer(landed.signature)}`);
 }
 
+// --- sell what a test buy bought ---------------------------------------------------------
+
+/**
+ * `--sell-all`: one transaction from the wallet that wraps nothing, sells its
+ * whole balance of the token on the PumpSwap pool, unwraps the SOL received,
+ * closes the emptied token account and closes the volume account PumpSwap
+ * opened for the sell. The minimum it accepts is what a
+ * simulation of the same sell returned just before, less `--slippage-bps`.
+ */
+async function sellAll(connection: Connection, flags: Flags, mint: PublicKey) {
+  guardMainnet(flags);
+  const slippageBps = int(flags, "slippage-bps", 100n);
+  if (slippageBps < 1n || slippageBps > 1_000n) throw new Error("--slippage-bps must be between 1 and 1000; nothing was sent.");
+  const user = loadKeypair(str(flags, "keypair") ?? DEFAULT_KEYPAIR);
+  const u = user.publicKey;
+  const m = await loadMarket(connection, mint, str(flags, "venue"));
+  if (m.venue !== "PumpSwap") throw new Error("--sell-all sells on a PumpSwap pool; this token trades on its curve. Nothing was sent.");
+
+  const ata = associatedTokenAddress(u, mint, m.tokenProgram);
+  const wsol = wsolAta(u);
+  const accumulator = ammUserVolumeAccumulatorPda(u);
+  const [ataInfo, accBefore] = await connection.getMultipleAccountsInfo([ata, accumulator], "confirmed");
+  const tokens = ataInfo ? tokenAccountAmount(ataInfo.data) : 0n;
+  if (tokens === 0n) throw new Error("this wallet holds none of this token; nothing was sent.");
+
+  const q = quotePoolOrder(MIN_ORDER_LAMPORTS, m.pm.reserves, m.pm.feeConfig, m.supply);
+  const estimate = poolSellEstimate(tokens, m.pm.reserves, q);
+  const sell = (minLamportsOut: bigint) =>
+    pumpSwapSellV2Ix({
+      seller: u,
+      mint,
+      tokenProgram: m.tokenProgram,
+      pool: m.pm.poolAccounts,
+      buybackWsolAccount: m.buybackRecipient,
+      tokensIn: tokens,
+      minLamportsOut,
+    });
+  const openWsol = createAtaIdempotentIx({ payer: u, owner: u, mint: WSOL_MINT, tokenProgram: TOKEN_PROGRAM_ID });
+  // PumpSwap opens a volume account for a seller that has none. Close it again in the same
+  // transaction so its rent comes back; one that was there before is left alone.
+  const closeVolume = accBefore ? [] : [pumpSwapCloseVolumeAccumulatorIx(u)];
+
+  // What the sell pays right now: simulate it and read the wrapped-SOL account.
+  const { blockhash } = await connection.getLatestBlockhash("confirmed");
+  const probe = new VersionedTransaction(
+    new TransactionMessage({ payerKey: u, recentBlockhash: blockhash, instructions: [computeUnitLimitIx(250_000), openWsol, sell(1n), ...closeVolume] }).compileToV0Message(),
+  );
+  const sim = (
+    await connection.simulateTransaction(probe, {
+      sigVerify: false,
+      replaceRecentBlockhash: true,
+      commitment: "confirmed",
+      accounts: { encoding: "base64", addresses: [wsol.toBase58()] },
+    })
+  ).value;
+  if (sim.err) {
+    for (const line of (sim.logs ?? []).filter((l) => /failed|Error/.test(l)).slice(-6)) console.log(`    | ${line}`);
+    throw new Error(`the sell does not go through in simulation (${JSON.stringify(sim.err)}); nothing was sent.`);
+  }
+  const post = sim.accounts?.[0];
+  if (!post) throw new Error("the simulation did not return the wrapped-SOL account; nothing was sent.");
+  const simulated = tokenAccountAmount(base64Decode((post.data as unknown as [string, string])[0]));
+  const minLamportsOut = (simulated * (10_000n - slippageBps)) / 10_000n;
+
+  console.log(`Sell (${networkName()})`);
+  console.log(`  mint            ${mint.toBase58()} (${tokenProgramName(m.tokenProgram)})`);
+  console.log(`  pool            ${m.pm.poolAccounts.address.toBase58()}; fees lp ${q.lpFeeBps} + protocol ${q.protocolFeeBps} + creator ${q.creatorFeeBps} bps`);
+  console.log(`  tokens to sell  ${units(tokens, m.decimals)} (the wallet's whole balance)`);
+  console.log(`  pays now        ${sol(simulated)} in simulation (estimate from the reserves ${sol(estimate)})`);
+  console.log(`  minimum         ${sol(minLamportsOut)} (${slippageBps} bps below the simulation); below that the sell fails and nothing is sold`);
+  console.log(`  also back       ${sol(BigInt(ataInfo!.lamports))} rent of the token account, closed after the sell`);
+  console.log(`  wallet          ${u.toBase58()}`);
+  if (flags["dry-run"] !== undefined) {
+    console.log("--dry-run: nothing sent.");
+    return;
+  }
+  if (!mayOpenOrder(network, flags)) {
+    console.log("MAINNET, real SOL: nothing sent. Add --yes-real-sol to sell.");
+    return;
+  }
+
+  const balanceBefore = BigInt(await connection.getBalance(u, "confirmed"));
+  const ixs = [
+    computeUnitLimitIx(250_000),
+    openWsol,
+    sell(minLamportsOut),
+    closeTokenAccountIx({ account: wsol, destination: u, owner: u, tokenProgram: TOKEN_PROGRAM_ID }),
+    closeTokenAccountIx({ account: ata, destination: u, owner: u, tokenProgram: m.tokenProgram }),
+    ...closeVolume,
+  ];
+  const landed = await sendAndConfirm(connection, ixs, user);
+  if (!landed.landed) throw new Error("the sell did not land (blockhash expired); nothing was sold");
+  console.log(`\nsell ${landed.signature} slot ${landed.slot ?? "?"} fee ${landed.fee ?? "?"} CU ${landed.computeUnits ?? "?"}\n  ${explorer(landed.signature)}`);
+  if (landed.err) {
+    throw new Error(`the sell failed and nothing was sold: ${describeFailure(classifyFailure(landed.err, landed.logs, ixs.map((i) => i.programId)))}`);
+  }
+  const balanceAfter = BigInt(await connection.getBalance(u, "confirmed"));
+  const accAfter = await connection.getAccountInfo(accumulator, "confirmed");
+  console.log(`  wallet SOL      before ${sol(balanceBefore)}, after ${sol(balanceAfter)}, change ${sol(balanceAfter - balanceBefore)}`);
+  if (!accBefore && accAfter) {
+    console.log(`  note            PumpSwap's volume account of this wallet is still open (${sol(BigInt(accAfter.lamports))} rent)`);
+  }
+}
+
 // --- find a mint ------------------------------------------------------------------------
 
 const BUY_KINDS: [string, readonly number[], number][] = [
@@ -1087,7 +1197,8 @@ async function main() {
   const mintText = str(flags, "mint");
   if (!mintText) throw new Error("--mint <MINT> is required");
   const mint = new PublicKey(mintText);
-  if (flags["push-only"]) await pushOnly(connection, flags, mint);
+  if (flags["sell-all"]) await sellAll(connection, flags, mint);
+  else if (flags["push-only"]) await pushOnly(connection, flags, mint);
   else if (flags["simulate-buy"]) await simulateBuy(connection, flags, mint);
   else await run(connection, flags, mint);
 }

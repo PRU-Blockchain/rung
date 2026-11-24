@@ -227,6 +227,45 @@ export function pumpSwapBuyExactQuoteInV2Ix(p: {
   );
 }
 
+/**
+ * A direct PumpSwap sell from a plain wallet: give `tokensIn`, receive at
+ * least `minLamportsOut` of wrapped SOL. `sell_v2` takes the same 17 accounts
+ * as the v2 buy. Rung never sells; the script uses this to sell a test buy.
+ */
+export function pumpSwapSellV2Ix(p: {
+  seller: PublicKey;
+  mint: PublicKey;
+  tokenProgram: PublicKey;
+  pool: PoolAccounts;
+  buybackWsolAccount: PublicKey;
+  tokensIn: bigint;
+  minLamportsOut: bigint;
+}): TransactionInstruction {
+  if (p.tokensIn <= 0n) throw new RangeError("nothing to sell");
+  if (p.minLamportsOut <= 0n) throw new RangeError("a sell needs a minimum above zero");
+  return ix(
+    PUMP_SWAP_PROGRAM_ID,
+    pumpSwapBuyAccounts({
+      buyer: p.seller,
+      mint: p.mint,
+      tokenProgram: p.tokenProgram,
+      pool: p.pool,
+      buybackWsolAccount: p.buybackWsolAccount,
+      buyerSigns: true,
+    }),
+    concat(Uint8Array.from(PUMP_SWAP_IX.sellV2), u64(p.tokensIn), u64(p.minLamportsOut)),
+  );
+}
+
+/** Closes the PumpSwap volume account of `user`; its rent goes back to `user`. */
+export function pumpSwapCloseVolumeAccumulatorIx(user: PublicKey): TransactionInstruction {
+  return ix(
+    PUMP_SWAP_PROGRAM_ID,
+    [w(user, true), w(ammUserVolumeAccumulatorPda(user)), r(ammEventAuthorityPda()), r(PUMP_SWAP_PROGRAM_ID)],
+    Uint8Array.from(PUMP_SWAP_IX.closeUserVolumeAccumulator),
+  );
+}
+
 // --- token accounts and wrapped SOL ---------------------------------------------------
 
 /** Associated Token Program `CreateIdempotent`. */
