@@ -11,6 +11,7 @@
 
 import {
   COMPUTE_BUDGET_PROGRAM_ID,
+  EarlyTry,
   Keypair,
   MAX_LIFETIME_SLOTS,
   Order,
@@ -26,6 +27,7 @@ import {
   fetchOrder,
   openOrderIx,
   orderPda,
+  sendFirstTryEarly,
   userVolumeAccumulatorPda,
   vaultPda,
 } from "../../../client/src";
@@ -55,6 +57,8 @@ export interface Opened {
   pending: PendingOrder;
   session: Keypair;
   order: Order;
+  /** The try of rung 0 that was sent together with the order. */
+  firstTry?: EarlyTry;
 }
 
 /** A buy that did not open, worded for the screen. */
@@ -234,8 +238,30 @@ export async function openBuy(plan: Plan, user: PublicKey, signOpen: SignOpen): 
   await savePending(pending);
   console.log(`RUNG open sent: ${signature} (${result.kind === "signed" ? "by the app" : "by the wallet"})`);
 
+  // The first try goes out together with the order instead of after its
+  // confirmation, so it lands in the first block after the order exists.
+  // Until then the session key holds no SOL: an early copy cannot land or cost
+  // anything. If it cannot be sent, the ladder sends rung 0 the ordinary way.
+  const firstTry = await sendFirstTryEarly({
+    connection,
+    user,
+    mint: market.mint,
+    tokenProgram: market.tokenProgram,
+    buybackRecipient: market.buybackRecipient,
+    venue: market.venue,
+    pool,
+    sessionKeypair: session,
+    blockhash: value.blockhash,
+    lastValidBlockHeight: value.lastValidBlockHeight,
+  }).catch((e) => {
+    console.log(`RUNG early first try not sent: ${String((e as Error)?.message ?? e)}`);
+    return undefined;
+  });
+  if (firstTry) console.log(`RUNG first try sent with the order: ${firstTry.signature}`);
+
   const landed = await waitConfirmed(signature, value.lastValidBlockHeight);
   if (!landed) {
+    firstTry?.stop();
     await endSession();
     throw new BuyError(TOO_SLOW);
   }
@@ -243,6 +269,7 @@ export async function openBuy(plan: Plan, user: PublicKey, signOpen: SignOpen): 
     .getTransaction(signature, { commitment: "confirmed", maxSupportedTransactionVersion: 0 })
     .catch(() => null);
   if (got?.meta?.err) {
+    firstTry?.stop();
     await endSession();
     const failure = classifyFailure(got.meta.err, got.meta.logMessages ?? []);
     throw new BuyError(`The buy did not open: ${describeFailure(failure)}. Nothing was bought.`);
@@ -250,10 +277,14 @@ export async function openBuy(plan: Plan, user: PublicKey, signOpen: SignOpen): 
   if (got) console.log(`RUNG open on chain: fee ${got.meta?.fee}, version ${got.version}`);
 
   const order = await fetchOrder(connection, user);
-  if (!order || order.status !== "Open" || !order.sessionKey.equals(session.publicKey)) {
+  // The early first try can have bought already; the ladder then takes its result.
+  const state = order?.status;
+  const usable = state === "Open" || (state === "Filled" && firstTry !== undefined);
+  if (!order || !usable || !order.sessionKey.equals(session.publicKey)) {
+    firstTry?.stop();
     throw new BuyError("The order is not open on chain.");
   }
-  return { pending, session, order };
+  return { pending, session, order, firstTry };
 }
 
 /** Lifetimes: ours when the app sends, the program's maximum when the wallet does. */

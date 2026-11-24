@@ -10,6 +10,7 @@ import {
   associatedTokenAddress,
   DEFAULT_CU_PRICE,
   DEFAULT_REFUND_CU_LIMIT,
+  EarlyTry,
   ammUserVolumeAccumulatorPda,
   computeUnitLimitIx,
   computeUnitPriceIx,
@@ -44,6 +45,8 @@ export interface Running {
   pending: PendingOrder;
   session: Keypair;
   order?: Order;
+  /** Set on a fresh buy: the try of rung 0 sent together with the order. */
+  firstTry?: EarlyTry;
 }
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
@@ -131,6 +134,7 @@ export async function runOrder(run: Running, onEvent: (e: LadderEvent) => void):
         pool,
         sessionKeypair: run.session,
         order: run.order,
+        firstTry: run.firstTry,
         pollMs: 500,
         onEvent: persist,
       });
