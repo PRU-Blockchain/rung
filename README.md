@@ -49,22 +49,24 @@ Everything below runs on **devnet** (test SOL). Rung is not on mainnet yet.
 |---|---|
 | Install the APK | not yet: no APK is published |
 | Build the Android app from source and run it on an emulator | works on an Android 15 emulator with Phantom, Solflare or Solana Mobile's mock wallet, set to devnet. Steps in [`app/README.md`](app/README.md) |
-| Run the ladder from the command line | works: [`scripts/devnet-ladder.ts`](scripts/devnet-ladder.ts) opens an order and tries the rungs on devnet, see below |
+| Run the ladder from the command line | works: [`scripts/ladder.ts`](scripts/ladder.ts) opens an order and tries the rungs on devnet, see below |
 | No Android at hand | the [web page](https://rung-drab.vercel.app/) shows the counter of the program's devnet transactions, and the explorer links below show real devnet runs |
 
-### Command line (devnet only; the script refuses any other cluster)
+### Command line (devnet unless told otherwise)
 
 ```bash
 cd client && npm install && cd ..
-client/node_modules/.bin/tsx scripts/devnet-ladder.ts --find-mint
-client/node_modules/.bin/tsx scripts/devnet-ladder.ts --mint <MINT> --amount 0.01 --mode tight --dry-run
+client/node_modules/.bin/tsx scripts/ladder.ts --find-mint
+client/node_modules/.bin/tsx scripts/ladder.ts --mint <MINT> --amount 0.01 --mode tight --dry-run
 ```
 
 Drop `--dry-run` to send real devnet transactions. The script signs with a devnet keypair file (default `~/.config/solana/rung-devnet.json`, or `--keypair <file>`) that you fund with devnet SOL yourself.
 
+The script refuses a mainnet RPC unless `--mainnet` is given, and refuses `--mainnet` on anything that is not mainnet. With `--mainnet` the SOL is real, so the rules are tighter: `--keypair` has no default, an order is at most 0.01 SOL, the test aids that move the price are refused, and without `--yes-real-sol` the script prints the plan and sends nothing. The rules are in [`scripts/network.ts`](scripts/network.ts) with their tests in [`client/test/network.test.ts`](client/test/network.test.ts). Not yet: a run on mainnet; the program is not deployed there.
+
 ### Devnet runs
 
-Real transactions on devnet (test SOL, pump's devnet deployment, a live devnet curve), sent with `scripts/devnet-ladder.ts` on Nov 23, 2026. Tight mode (1% → 2% → 3%), 0.01 SOL, mint `B8fRBPHkEVfqE6FfUYsPKkyZvdjH3SxvQpYpyYRtG511`. The wallet signs one transaction (`open_order`); every try is signed by the one-time session key.
+Real transactions on devnet (test SOL, pump's devnet deployment, a live devnet curve), sent with the script (`scripts/ladder.ts`, then named `devnet-ladder.ts`) on Nov 23, 2026. Tight mode (1% → 2% → 3%), 0.01 SOL, mint `B8fRBPHkEVfqE6FfUYsPKkyZvdjH3SxvQpYpyYRtG511`. The wallet signs one transaction (`open_order`); every try is signed by the one-time session key.
 
 In the second and third run the price was moved on purpose by a buy from our own wallet right after the order opened. That push is a test aid of the script, not part of the product.
 
@@ -229,7 +231,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 
 ## Security and limits
 
-**unaudited, use small amounts.** The program was reviewed once by an independent read-only pass (a separate agent that could only read the code: access control, PDAs and account ownership, overflow, every way SOL can leave the vault). That is a review, not an audit. It reported no critical or high finding. Fixed after it, each with a test written first: an upper limit on the SOL a buy may take from the vault, a consistency band between the two quotes the client supplies, a rent-exemption check on the fee budget, and the highest cap lowered to 30%. Deferred on purpose: reclaiming the rent of pump's volume account, rejecting at `open_order` curves that cannot fill (non-SOL pairs, cashback coins), and pinning the remaining pump accounts in the program.
+**unaudited, use small amounts.** The program was reviewed twice by independent read-only passes (a separate agent that could only read the code: access control, PDAs and account ownership, overflow, every way SOL can leave the vault; the second pass after the PumpSwap path was added). Those are reviews, not an audit. Neither reported a critical or high finding. Fixed after it, each with a test written first: an upper limit on the SOL a buy may take from the vault, a consistency band between the two quotes the client supplies, a rent-exemption check on the fee budget, and the highest cap lowered to 30%. Deferred on purpose: reclaiming the rent of pump's volume account, rejecting at `open_order` curves that cannot fill (non-SOL pairs, cashback coins), and pinning the remaining pump accounts in the program.
 
 | what happens | what follows |
 |---|---|
@@ -249,7 +251,8 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 - At most 0.5 SOL per order (`MAX_ORDER_LAMPORTS` in [`constants.rs`](programs/rung/src/constants.rs)); at least 0.001 SOL. The highest cap any order can set is 30%. Raising the per-order limit is a team decision.
 - Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
 - Android emulator; not tested on a real device or Seeker.
-- Devnet only; mainnet: not yet. Bonding curves only; PumpSwap pools: not yet.
+- Devnet only; mainnet: not yet.
+- Buys on pump.fun bonding curves and on a token's own (canonical) PumpSwap pool paired with SOL. Other pools and cashback pools: no.
 
 ## Architecture and program addresses
 
@@ -258,6 +261,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 | Rung program (**devnet**) | [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet) |
 | Rung program (mainnet) | not yet |
 | pump.fun program it calls | `6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P` (fixed in the program; any other buy program is rejected) |
+| PumpSwap program it calls | `pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA` (fixed in the program, same rule) |
 
 **Instructions.** `open_order` (your wallet: writes the order, funds the vault, funds the session key), `try_rung(rung_index)` (session key only: one rung, at most one buy per order), `refund` (session key at any time, anyone after expiry: everything back to the user, order closed), `cancel` (user only: ends an open order).
 
@@ -270,11 +274,12 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 | `programs/rung/` | The order program: `open_order`, `try_rung`, `refund`, `cancel` |
 | `programs/rung/tests/` | Scenario and security tests (Rust, LiteSVM) |
 | `test-programs/mock-pump/` | Test double that imitates the interface of pump's `buy_exact_quote_in_v3`. Not pump's code, never deployed |
+| `test-programs/mock-pump-amm/` | Test double that imitates the interface of PumpSwap's `buy_exact_quote_in_v2`, with switches that make it cheat. Not PumpSwap's code, never deployed |
 | `client/` | TypeScript client (web3.js v1 only): addresses, instruction builders, quote, fee budget, the sender that tries the rungs. Checked byte for byte against the Rust program |
 | `app/` | Android app (React Native + Expo custom development build); see [`app/README.md`](app/README.md) |
 | `web/` | Next.js web page with the public counter, deployed on Vercel |
 | `measure/` | The scripts behind the measured numbers (public RPC only, raw data not in the repository), their results of Nov 22, 2026 and the method notes |
-| `scripts/` | Helper scripts: `devnet-ladder.ts` (the ladder from the command line, devnet only), `fetch-pump-fixtures.mjs` (read-only mainnet snapshot for tests), `set-rpc-url.sh` (stores the RPC URL in the git-ignored `.env.local`) |
+| `scripts/` | Helper scripts: `ladder.ts` (the ladder from the command line) with `network.ts` (which network it may talk to), `fetch-pump-fixtures.mjs` and `fetch-pumpswap-fixtures.mjs` (read-only mainnet snapshots for tests), `set-rpc-url.sh` (stores the RPC URL in the git-ignored `.env.local`) |
 | `docs/pump-arayuz.md` | Extract of pump's public IDL and docs that the buy call is written from (Turkish notes, English quotes) |
 | `docs/shots/` | Screenshots of real devnet buys from the emulator |
 | `docs/is-listesi.md` | Work list (Turkish), kept in step with the code |
@@ -323,7 +328,7 @@ anchor test        # builds the program and the test double, then runs `cargo te
 The tests load the built program into LiteSVM and load two test doubles, one at pump's address and one at PumpSwap's. 226 Rust tests: unit tests of the rung arithmetic, the ladder scenarios on both venues (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, the two references, events, the fixes after the two reviews, and security tests (wrong signer, substituted accounts, a pool that is not the token's own, a fake buy program, a buy program that delivers too few tokens, takes too much SOL or misuses the vault's signature, pre-funded accounts, a try that runs out of compute units, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
 
 ```bash
-cd client && npm install && npm test     # 65 client tests, including byte-for-byte vectors from the Rust program
+cd client && npm install && npm test     # 84 client tests, including byte-for-byte vectors from the Rust program
 ```
 
 ### Against the real pump program
@@ -365,7 +370,7 @@ The same limit applies: this is not mainnet.
 ```bash
 surfpool start --network mainnet --no-tui --no-deploy       # a local validator that fetches mainnet accounts as they are read
 solana program deploy -u http://127.0.0.1:8899 -k <throwaway keypair> --program-id target/deploy/rung-keypair.json target/deploy/rung.so
-npx tsx scripts/devnet-ladder.ts --local-fork --rpc http://127.0.0.1:8899 --keypair <throwaway keypair> --mint <MINT> --amount 0.01 --mode tight
+npx tsx scripts/ladder.ts --local-fork --rpc http://127.0.0.1:8899 --keypair <throwaway keypair> --mint <MINT> --amount 0.01 --mode tight
 ```
 
 `--local-fork` is accepted only when the RPC is on the same machine, so nothing can reach a real network; the wallet is a throwaway key funded by the fork's own airdrop. On Nov 24, 2026 the same client code and the same program build, run this way against mainnet's pump and PumpSwap programs and three live tokens:
@@ -377,6 +382,24 @@ npx tsx scripts/devnet-ladder.ts --local-fork --rpc http://127.0.0.1:8899 --keyp
 - deploying the program in the fork took 1.556 SOL from the wallet, nearly all of it the rent deposit of the program's accounts at mainnet's rent rate.
 
 What this does not show: mainnet itself. A fork has no other traders, no validators and no landing delay; the transactions exist only on the machine that ran them.
+
+### Deploy rehearsal
+
+```bash
+bash scripts/deploy-program.test.sh      # 17 refusals that must stop before the first RPC request
+bash scripts/deploy-program.sh --network local-fork --wallet <throwaway keypair> --sha256 <sha256 of target/deploy/rung.so> --check
+```
+
+[`scripts/deploy-program.sh`](scripts/deploy-program.sh) deploys only the build whose sha256 it is given, only to the network it is told (it checks the genesis hash, and a fork on this machine is not accepted as mainnet), and only after `--confirm <program id>`. `--check` prints the deposit, the fees and the wallet's balance and sends nothing. The buffer key is a file, so an interrupted deploy resumes with the same command.
+
+On Nov 24, 2026, against a local fork of mainnet (no real SOL):
+
+- a first deploy was interrupted after six seconds; the deposit was then in the buffer account (1.55332684 SOL), and the same command finished the deploy from there;
+- the program read back from the fork was byte for byte the build with sha256 `f29024e97072e82642f5bf0fc5b197b6fb0fd2e03f4c91b473b5827d35738acc`, which is also the build running on devnet (read back from devnet and compared the same way);
+- the deploy took 1.55569 fork SOL in total: a deposit of 1.55416 SOL, which comes back only if the program is closed (a closed program address cannot be used again), and the rest in fees;
+- a buy through the freshly deployed program then filled from a live PumpSwap pool on the 1% rung (185,204 compute units for the try).
+
+What this does not show: mainnet itself. The program is not deployed there.
 
 ### Web page
 

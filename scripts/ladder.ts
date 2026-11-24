@@ -1,20 +1,26 @@
-// Devnet-only sender for Rung: open an order, try the rungs in turn, print a receipt.
+// Sender for Rung: open an order, try the rungs in turn, print a receipt.
+// Runs on devnet unless told otherwise.
 //
-//   npx tsx scripts/devnet-ladder.ts --mint <MINT> --amount 0.01 --mode tight
+//   npx tsx scripts/ladder.ts --mint <MINT> --amount 0.01 --mode tight
 //       [--venue auto|curve|pool] (auto: the curve while it is open, then the canonical PumpSwap pool)
 //       [--rungs 100,300] [--cu-price 5000] [--cu-limit <venue default>] [--window 4] [--lifetime 150]
 //       [--keypair ~/.config/solana/rung-devnet.json] [--rpc <url>] [--dry-run]
 //       [--push-after-open <SOL> | --push-pct <PERCENT>]   TEST AID: the wallet buys on the venue
 //         right after open_order, so the price the rungs meet is higher than the one quoted
-//   npx tsx scripts/devnet-ladder.ts --push-only --mint <MINT> --push-pct 4.5 [--wait-order <USER>] [--venue ...]
+//   npx tsx scripts/ladder.ts --push-only --mint <MINT> --push-pct 4.5 [--wait-order <USER>] [--venue ...]
 //       TEST AID: only the push buy, e.g. while the app runs its own order; with --wait-order
 //       it fires as soon as that user's next order opens
-//   npx tsx scripts/devnet-ladder.ts --find-mint [--limit 25]
-//   npx tsx scripts/devnet-ladder.ts --find-pool [--limit 25]   canonical SOL pools from recent PumpSwap transactions
-//   npx tsx scripts/devnet-ladder.ts --status | --refund | --cancel
-//   npx tsx scripts/devnet-ladder.ts --mint <MINT> --amount 0.01 --simulate-buy --payer <PUBKEY> [--venue ...]
+//   npx tsx scripts/ladder.ts --find-mint [--limit 25]
+//   npx tsx scripts/ladder.ts --find-pool [--limit 25]   canonical SOL pools from recent PumpSwap transactions
+//   npx tsx scripts/ladder.ts --status | --refund | --cancel
+//   npx tsx scripts/ladder.ts --mint <MINT> --amount 0.01 --simulate-buy --payer <PUBKEY> [--venue ...]
 //   ... --local-fork --rpc http://127.0.0.1:8899 ...   TEST AID: a local fork of mainnet (e.g. `surfpool start`)
 //       instead of devnet. Accepted only when the RPC host is this machine; nothing reaches a real network.
+//   ... --mainnet --keypair <FILE> [--rpc <url>] ... --yes-real-sol   MAINNET: real SOL.
+//       The RPC is --rpc or the environment variable RPC_URL; only its host is ever printed.
+//       --keypair has no default. An order is at most 0.01 SOL. The test aids are refused.
+//       Without --yes-real-sol the script prints the plan and sends nothing.
+//       The rules are in scripts/network.ts and tested in client/test/network.test.ts.
 //
 // The keypair file is read, never printed. The session key lives only in memory.
 
@@ -97,10 +103,8 @@ import {
   wrapSolIxs,
   wsolAta,
 } from "../client/src/index";
+import { type Network, checkMainnetRun, chooseNetwork, explorerTx, hideRpc, mayOpenOrder, rpcHost } from "./network";
 
-// `solana genesis-hash -u devnet` / `-u mainnet-beta`, checked 2026-11-23.
-const DEVNET_GENESIS_HASH = "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG";
-const MAINNET_GENESIS_HASH = "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d";
 const DEFAULT_RPC = "https://api.devnet.solana.com";
 const DEFAULT_KEYPAIR = "~/.config/solana/rung-devnet.json";
 
@@ -159,10 +163,13 @@ function pricePerToken(lamports: bigint, tokens: bigint, decimals: number): stri
 }
 
 const pct = (bps: number | bigint) => `${(Number(bps) / 100).toFixed(2)}%`;
-let localFork = false;
-const networkName = () => (localFork ? "local fork" : "devnet");
-const explorer = (sig: string) =>
-  localFork ? `(local fork; not on any explorer) ${sig}` : `https://explorer.solana.com/tx/${sig}?cluster=devnet`;
+let network: Network = "devnet";
+const networkName = () => network;
+const explorer = (sig: string) => explorerTx(network, sig);
+/** On mainnet: refuse the run unless it keeps the rules of scripts/network.ts. */
+function guardMainnet(flags: Flags, amountLamports?: bigint) {
+  if (network === "mainnet") checkMainnetRun({ flags, amountLamports });
+}
 const tokenProgramName = (p: PublicKey) =>
   p.equals(TOKEN_2022_PROGRAM_ID) ? "Token-2022" : p.equals(TOKEN_PROGRAM_ID) ? "SPL Token" : p.toBase58();
 
@@ -180,25 +187,6 @@ function loadKeypair(path: string): Keypair {
     return Keypair.fromSecretKey(Uint8Array.from(bytes));
   } catch {
     throw new Error(`keypair file does not hold a valid secret key: ${path}`);
-  }
-}
-
-async function assertDevnet(connection: Connection) {
-  const hash = await connection.getGenesisHash();
-  if (hash === MAINNET_GENESIS_HASH) throw new Error("this RPC is MAINNET. This script runs on devnet only; nothing was sent.");
-  if (hash !== DEVNET_GENESIS_HASH) throw new Error(`this RPC is not devnet (genesis ${hash}); nothing was sent.`);
-}
-
-/** `--local-fork`: the RPC must be on this machine, so no transaction can reach a real network. */
-function assertLocal(rpc: string) {
-  let host: string;
-  try {
-    host = new URL(rpc).hostname;
-  } catch {
-    throw new Error("--local-fork needs --rpc <http://127.0.0.1:PORT>");
-  }
-  if (host !== "127.0.0.1" && host !== "localhost" && host !== "[::1]") {
-    throw new Error(`--local-fork accepts only an RPC on this machine, not ${host}; nothing was sent.`);
   }
 }
 
@@ -465,7 +453,8 @@ function printPlan(p: Plan, user?: PublicKey, userBalance?: bigint, orderExists?
 
 async function run(connection: Connection, flags: Flags, mint: PublicKey) {
   const keypairPath = str(flags, "keypair") ?? DEFAULT_KEYPAIR;
-  const dryRun = flags["dry-run"] === true;
+  const dryRun = flags["dry-run"] !== undefined;
+  if (!dryRun) guardMainnet(flags);
   let user: Keypair | undefined;
   try {
     user = loadKeypair(keypairPath);
@@ -491,6 +480,11 @@ async function run(connection: Connection, flags: Flags, mint: PublicKey) {
   printPlan(plan, u, userInfo ? BigInt(userInfo.lamports) : u ? 0n : undefined, !!orderInfo);
   if (dryRun) {
     console.log("--dry-run: nothing sent.");
+    return;
+  }
+  guardMainnet(flags, plan.amount);
+  if (!mayOpenOrder(network, flags)) {
+    console.log("MAINNET, real SOL: nothing sent. Add --yes-real-sol to open this order.");
     return;
   }
   if (!user || !u) throw new Error("no wallet");
@@ -670,6 +664,7 @@ async function pushPrice(connection: Connection, flags: Flags, user: Keypair, pl
  * `open_order` and the rungs. Without it, it pushes now.
  */
 async function pushOnly(connection: Connection, flags: Flags, mint: PublicKey) {
+  guardMainnet(flags);
   if (!str(flags, "push-pct") && !str(flags, "push-after-open")) throw new Error("--push-only needs --push-pct or --push-after-open");
   const user = loadKeypair(str(flags, "keypair") ?? DEFAULT_KEYPAIR);
   const amount = parseSol(str(flags, "amount") ?? "0.01");
@@ -1008,7 +1003,7 @@ const fmtFees = (f: { lpFeeBps: bigint; protocolFeeBps: bigint; creatorFeeBps: b
 
 async function simulateBuy(connection: Connection, flags: Flags, mint: PublicKey) {
   const payerText = str(flags, "payer");
-  if (!payerText) throw new Error("--simulate-buy needs --payer <PUBKEY> (any devnet account with SOL)");
+  if (!payerText) throw new Error("--simulate-buy needs --payer <PUBKEY> (any account with SOL)");
   const payer = new PublicKey(payerText);
   const amountText = str(flags, "amount");
   if (!amountText) throw new Error("--amount <SOL> is required");
@@ -1057,17 +1052,22 @@ async function simulateBuy(connection: Connection, flags: Flags, mint: PublicKey
 
 // --- main ----------------------------------------------------------------------------------
 
+/** The RPC URL of this run, kept only to keep it out of error messages. */
+let rpcInUse = "";
+
 async function main() {
   const flags = parseFlags(process.argv.slice(2));
-  const rpc = str(flags, "rpc") ?? DEFAULT_RPC;
+  const localFork = flags["local-fork"] !== undefined;
+  const mainnet = flags.mainnet !== undefined;
+  const rpc = str(flags, "rpc") ?? (mainnet ? process.env.RPC_URL : DEFAULT_RPC);
+  if (!rpc) throw new Error("--mainnet needs --rpc <url> or RPC_URL in the environment; nothing was sent.");
+  rpcInUse = rpc;
+  // Checked before the first request, so a wrong pair of flags reaches no network at all.
+  if (localFork) network = chooseNetwork({ genesisHash: "", rpc, localFork, mainnet });
   const connection = new Connection(rpc, "confirmed");
-  if (flags["local-fork"]) {
-    assertLocal(rpc);
-    localFork = true;
-    console.log("LOCAL FORK: a copy of a network running on this machine. Nothing here is a real buy.");
-  } else {
-    await assertDevnet(connection);
-  }
+  if (!localFork) network = chooseNetwork({ genesisHash: await connection.getGenesisHash(), rpc, localFork, mainnet });
+  if (network === "local fork") console.log("LOCAL FORK: a copy of a network running on this machine. Nothing here is a real buy.");
+  if (network === "mainnet") console.log(`MAINNET through ${rpcHost(rpc)}: real SOL.`);
 
   if (flags["find-pool"]) {
     await findPools(connection, Number(int(flags, "limit", 25n)));
@@ -1078,6 +1078,7 @@ async function main() {
     return;
   }
   if (flags.status || flags.refund || flags.cancel) {
+    guardMainnet(flags);
     const user = loadKeypair(str(flags, "keypair") ?? DEFAULT_KEYPAIR);
     if (flags.status) await status(connection, user.publicKey);
     else await refundOrCancel(connection, user, flags.refund ? "refund" : "cancel");
@@ -1096,6 +1097,6 @@ async function main() {
 main()
   .then(() => process.exit(0))
   .catch((e) => {
-    console.error(`Error: ${e instanceof Error ? e.message : String(e)}`);
+    console.error(`Error: ${hideRpc(e instanceof Error ? e.message : String(e), rpcInUse)}`);
     process.exit(1);
   });

@@ -113,7 +113,7 @@ To see a rung slip or a buy not happen, move the price right after the app's
 order opens, from a second devnet wallet:
 
 ```bash
-npx tsx scripts/devnet-ladder.ts --push-only --mint <MINT> --push-pct 4.5 \
+npx tsx scripts/ladder.ts --push-only --mint <MINT> --push-pct 4.5 \
   --wait-order <APP_WALLET_ADDRESS> --keypair <devnet keypair file>
 ```
 

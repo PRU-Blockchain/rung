@@ -1,5 +1,5 @@
 // Where a token trades now (pump.fun bonding curve or its PumpSwap pool) and
-// what an order there needs, the way scripts/devnet-ladder.ts reads it, with
+// what an order there needs, the way scripts/ladder.ts reads it, with
 // messages for the screen.
 
 import type { AccountInfo } from "@solana/web3.js";
