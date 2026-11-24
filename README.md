@@ -92,6 +92,15 @@ A run that did not buy, the same day: Tight mode, 0.01 SOL, on a curve in its la
 
 A buy in Launch mode (10% → 20% → 30%), minutes later, on another curve in its launch rush picked the same way (mint `4vaH2JyhznBfYe8m8Ssq26atmnzz6RWgzm7htA14pump`, 0.01 SOL): [order](https://explorer.solana.com/tx/5u5r1Brc2Ye2vsAh3ckvqBkdDPVGbDJpiyvYC4FY3Xmm33eTiwHru9P4TpvSyFNKEPzWEB6NEfs4EcpK44ygzUov), then the [10% rung filled](https://explorer.solana.com/tx/4QwNntuxY34rrZsd2obKp4NJrg1P7pnV3Wau825N3VtHpM1Pe3MdTW5astdrhqgNbbboyF5xwX7JZHZBQmmXzhxo) nine slots later, 1.42% above the price seen, and the [sweep](https://explorer.solana.com/tx/5kHJwPx8Ym9DFP49oar1d2FMRAo5jGgHm8oKeComRJQ3Gwjhqo6bHivwGxTAa1Ge5v3phqUqDw5WXRHb8sdyxZkr). The order allowed up to 30%; the buy used the first rung and paid 1.42%. The tokens were [sold back](https://explorer.solana.com/tx/2YPKeEaGtEFW4sMFUH3ja5kYEyZzxTbe2w2SHpP4SEkAPPMkWRuxUx6KLc6rCKURehpTCaXeYXdTmZDSkwSRr1hq) fourteen slots after the buy and the order account was [closed](https://explorer.solana.com/tx/5DAB3SNjZLXPWwc4ETwEqBgdbWJcWUPrsM4AbRzoa6rVKBZgde5ESnLuXZhEXbkurnXhJ4eqzxBxZqhiQFN5KQ8E).
 
+**The ladder climbing on mainnet.** Two buys the same day with a five-rung ladder (Custom: 1% → 2% → 3% → 5% → 8%), 0.01 SOL each, on curves in their launch rush picked with `--mint busy`. Nobody on our side moved the price; these are the trades of other people.
+
+| run | what happened | paid vs. seen | Rung's fees |
+|---|---|---|---|
+| mint `ryf34ZaLoiAmRWUUMHBzpJ2SWQmFiNBTx2TZ5k4pump` | [order](https://explorer.solana.com/tx/3cvQRfmNxPJ1vh8ckz8jPBzYDq6xFtwboxZcn5Rr9q49XFEaNrHdLBdZgi3ar86odTUGqtVPm2M9bzt7hknH1rKp); the rungs [1%](https://explorer.solana.com/tx/2dLYj9NKUPQf437mZTDjQKmm8W8SUC32RbLgdXkYTbFzmB7Zvy2GSjFyz8BemnqeUNrqes6G2hXQFQEqEop1KdyY), [2%](https://explorer.solana.com/tx/5TrarEEwnoyXSymsNzgKgLs33zTnzg52YYKNASWZRHR6ghrBDwrcso76WYUgTVW6csxYK3qSa1rDHYxEKfUvsDkR) and [3%](https://explorer.solana.com/tx/56HUqUTR1mnUgXGjwHMJayZ6Vqw6X3CcT4YXdg1yf9DBZUm62i5Hy7Lg5ezaDmtfR7wKNL2hL9j7VA9Bn1Fp5VnU) failed with pump's error 6042 as the price ran; the [5% rung filled](https://explorer.solana.com/tx/4W4dfEsypHZWpqMaCBq2PZDe2pVcVW3fkUxvtUsFWwurzfHvA3Tnen2pejFHvEmzDBz9oKKu2SQXwM9NEHsikJ3m) thirty slots after the order. The order allowed up to 8% | +3.83% | 0.000034 SOL |
+| mint `HKuZZoNLrSbXjwPBZAfx5V6QK54SJvrJLy5HjuFJpump` | [order](https://explorer.solana.com/tx/3tLqPhyJTQoGNX3Kd1gyAsbcxQmtVZD1skM7nxT6mVRyErd3mUdbeGXfPLDudZKmaX4xwyxbptYNCkaEcQ1Qejp9); the [1% rung](https://explorer.solana.com/tx/3PS4vLxvcVo21CEDDmyhqns4TULJt6BhfoSi9g4jHbJ4UCDDAV8d2gXfT7ys3VVfWkZLb4e9FeFdCeL5rzncTNE2) failed with 6042; the [2% rung filled](https://explorer.solana.com/tx/5teKLKm1RNyA8GpqjSfbrXfiVJvE7oCQSerfJJAtM5sieXm8qfyoWLx6TvqufLeWZSGMpGYA684ExsFDHDKqB6eU) twelve slots later | +2.28% | 0.000022 SOL |
+
+Each failed try cost 6,000 lamports; one order, one buy. Both buys were sold back six slots later ([first](https://explorer.solana.com/tx/3btwwah5aZS4RwhBFPPgaoMorbEegSfFREBjMMGhFVqJG2LYgCsz8rfi5NnNeqjufU4DJaMbizM4eqzEzWhDvCD1), [second](https://explorer.solana.com/tx/2SKoRtdjb1VUiuNavXDew2u6T1ygdkc7Wd937AjEsd8XHTagURxhrYt2yVLgqMgLsMyc9wDtMqv4EG6haSc9m62W)).
+
 ### Devnet runs
 
 Real transactions on devnet (test SOL, pump's devnet deployment, a live devnet curve), sent with the script (`scripts/ladder.ts`, then named `devnet-ladder.ts`) on Nov 23, 2026. Tight mode (1% → 2% → 3%), 0.01 SOL, mint `B8fRBPHkEVfqE6FfUYsPKkyZvdjH3SxvQpYpyYRtG511`. The wallet signs one transaction (`open_order`); every try is signed by the one-time session key.
@@ -279,7 +288,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 - At most 0.5 SOL per order (`MAX_ORDER_LAMPORTS` in [`constants.rs`](programs/rung/src/constants.rs)); at least 0.001 SOL. The highest cap any order can set is 30%. Raising the per-order limit is a team decision.
 - Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
 - Android emulator; not tested on a real device or Seeker.
-- On mainnet: four buys and one not-bought run so far, all through the script. Not yet on mainnet: the app, and a buy that filled on a later rung than the first.
+- On mainnet: seven buys and two not-bought runs so far, all through the script. Not yet on mainnet: the app.
 - Buys on pump.fun bonding curves and on a token's own (canonical) PumpSwap pool paired with SOL. Other pools and cashback pools: no.
 
 ## Architecture and program addresses
