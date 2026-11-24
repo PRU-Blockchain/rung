@@ -88,6 +88,8 @@ The second buy, the same day, from a pump.fun bonding curve: Tight mode, 0.01 SO
 
 Rung's fees for this buy: 0.000016 SOL. The tokens were [sold back](https://explorer.solana.com/tx/4vnepcwMAwWsC52vAgAJk4JXAY42kpU25dSbHu5ErqK6EciQAVWP5r1YftE9roUB4hSDxrzkxeLZFpru5JFvF6g5) with `--sell-all` and the order account was [closed](https://explorer.solana.com/tx/TtBDALpbKUsF9EekG3wSGWLyooVrB1KL2tmqiJVJXQAtPSGHSvdHSCkyhBEXKtUc4JvAXYoT6gwNuTi2h8oP5Ku).
 
+A run that did not buy, the same day: Tight mode, 0.01 SOL, on a curve in its launch rush (mint `5Z7jsmLUBwJM9g8sKg9FfwNdRuR2bnTCcWSraWTKpump`, about 200 trades a minute; the script picked it with `--mint busy`). By the time the [order](https://explorer.solana.com/tx/4A7ztAKgT1y32ajVq3fciAdzTXE9hokaRNTPKaiw1SUXfCChFtyo9nfqLRNwc6LGDy9zN5gV2uGP7pK2HYmCWoAD) landed the price was already 8.4% above the price seen, past the 3% cap. The rungs [1%](https://explorer.solana.com/tx/3wB8z2aNWztZGCBeKb69nVrhzbsvYacFjKujyWYYm2YgwxYakNTSR3DmqFY3NuyCWvw4B8XG9MHys5TuFEGkaUpe), [2%](https://explorer.solana.com/tx/3HE377FqavBvnJgYmTqavo9UTvLQJS1B9oM2dWwBaFHNuGA4xtMDqTfNr5hRzzR2r5JG4eubgMHzpsf8desVfdbG) and [3%](https://explorer.solana.com/tx/3c8tjAv76CGZKcYRBPAX8cjWtWsoscMmYCY8WgDc6pAELBeU4tXPtxg2gogwBthRjpGAovKhp43a1Erx7hhW3cEG) each failed with pump's error 6042, the [refund](https://explorer.solana.com/tx/4wQ8yDtGHnN79RfW1RopfpvPqqQxG3gnPrG33HzjgKBg7Lzcqt2bAmpAfH1TbSPHsj4Fwi5i8Y4TGsKnaaLeFprn) returned the order amount and the rent reserve in full, and the [sweep](https://explorer.solana.com/tx/2QqD5MyWp9zPDa9CchNuAQZiXQdQwgdCpCbAh6gQhJvDiqQn9KJV8rnvaePdh184Q9L2k7wxF3ef135dHL5tvknM) emptied the session key. The wallet ended 0.00003325 SOL lower: the "max fee" the plan had printed before the order, to the lamport.
+
 ### Devnet runs
 
 Real transactions on devnet (test SOL, pump's devnet deployment, a live devnet curve), sent with the script (`scripts/ladder.ts`, then named `devnet-ladder.ts`) on Nov 23, 2026. Tight mode (1% → 2% → 3%), 0.01 SOL, mint `B8fRBPHkEVfqE6FfUYsPKkyZvdjH3SxvQpYpyYRtG511`. The wallet signs one transaction (`open_order`); every try is signed by the one-time session key.
@@ -275,7 +277,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 - At most 0.5 SOL per order (`MAX_ORDER_LAMPORTS` in [`constants.rs`](programs/rung/src/constants.rs)); at least 0.001 SOL. The highest cap any order can set is 30%. Raising the per-order limit is a team decision.
 - Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
 - Android emulator; not tested on a real device or Seeker.
-- On mainnet: two buys so far, through the script, one from a PumpSwap pool and one from a bonding curve. Not yet on mainnet: a not-bought run, the app.
+- On mainnet: two buys and one not-bought run so far, all through the script. Not yet on mainnet: the app.
 - Buys on pump.fun bonding curves and on a token's own (canonical) PumpSwap pool paired with SOL. Other pools and cashback pools: no.
 
 ## Architecture and program addresses

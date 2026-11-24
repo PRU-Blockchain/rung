@@ -1122,7 +1122,8 @@ async function recentBuys(connection: Connection, limit: number, atOnce = 1) {
   const txs: Awaited<ReturnType<typeof getTx>>[] = [];
   for (let i = 0; i < sigs.length; i += atOnce) {
     txs.push(...(await Promise.all(sigs.slice(i, i + atOnce).map((s) => getTx(connection, s.signature).catch(() => null)))));
-    await pause(250);
+    // Stay under about 8 requests a second: a keyed RPC's free plan allows about 10.
+    await pause(atOnce > 1 ? 600 : 250);
   }
   for (const tx of txs) {
     if (!tx?.meta) continue;
@@ -1156,10 +1157,10 @@ async function recentBuys(connection: Connection, limit: number, atOnce = 1) {
  * `--mint busy`: among the mints of recent pump buys, the busiest open curve
  * whose price is not falling. Reads only; the rule is `pickBusyCurve`.
  */
-async function pickBusy(connection: Connection, flags: Flags): Promise<PublicKey> {
+async function pickBusy(connection: Connection, flags: Flags, round = 1): Promise<PublicKey> {
   const minTrades = Number(int(flags, "busy-min-trades", 30n));
-  const { scanned, mints } = await recentBuys(connection, Number(int(flags, "limit", 200n)), network === "devnet" ? 1 : 8);
-  const list = [...mints.keys()].slice(0, 30).map((m) => new PublicKey(m));
+  const { scanned, mints } = await recentBuys(connection, Number(int(flags, "limit", 120n)), network === "devnet" ? 1 : 3);
+  const list = [...mints.keys()].slice(0, 16).map((m) => new PublicKey(m));
   const curves = list.map(bondingCurvePda);
   const read = async () =>
     (await connection.getMultipleAccountsInfo(curves, "confirmed")).map((info) => (info ? decodeBondingCurve(info.data) : undefined));
@@ -1174,6 +1175,7 @@ async function pickBusy(connection: Connection, flags: Flags): Promise<PublicKey
       continue;
     }
     const sigs = await connection.getSignaturesForAddress(curves[i], { limit: 300 });
+    await pause(250);
     const now = Math.floor(Date.now() / 1000);
     trades.push(sigs.filter((s) => !s.err && s.blockTime && now - s.blockTime <= 60).length);
   }
@@ -1205,8 +1207,19 @@ async function pickBusy(connection: Connection, flags: Flags): Promise<PublicKey
   for (const [i, c] of activity.entries()) {
     console.log(`  ${c.mint}  ${(c.usable ? "usable" : reasons[i]).padEnd(19)}  ${String(c.tradesLastMinute).padStart(3)} trades in the last minute  price ${c.priceMoveBps >= 0 ? "+" : ""}${(c.priceMoveBps / 100).toFixed(2)}% in ${seconds} s`);
   }
-  const picked = pickBusyCurve(activity, minTrades);
+  let picked: CurveActivity;
+  try {
+    picked = pickBusyCurve(activity, minTrades);
+  } catch (e) {
+    // Launch tokens come and go within minutes: look again a few times before giving up.
+    if (round >= 4) throw e;
+    console.log(`--mint busy: none of these fits; looking again (${round + 1} of 4)`);
+    await pause(3_000);
+    return pickBusy(connection, flags, round + 1);
+  }
   console.log(`--mint busy: picked ${picked.mint}\n`);
+  // Let the RPC's rate limit recover, so no request of the order itself is slowed down.
+  await pause(1_500);
   return new PublicKey(picked.mint);
 }
 
