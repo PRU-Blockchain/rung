@@ -1,17 +1,18 @@
 // A wallet checks that the Android app asking for a signature really belongs
 // to the site it names (`APP_IDENTITY.uri`). It reads the site's
 // /.well-known/assetlinks.json and looks for the app's package and signing
-// certificate. Without that file Phantom shows "This app's identity could not
-// be verified", refuses the saved authorization and asks to connect again on
-// every buy.
+// certificate. Without a document it accepts, Phantom shows "This app's
+// identity could not be verified", refuses the saved authorization and asks to
+// connect again on every buy.
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 
 const root = new URL("../../", import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root), "utf8");
+const ROUTE = "web/app/.well-known/assetlinks.json/";
 
-const links = () => JSON.parse(read("web/public/.well-known/assetlinks.json")) as {
+const links = () => JSON.parse(read(`${ROUTE}statements.json`)) as {
   relation: string[];
   target: { namespace: string; package_name: string; sha256_cert_fingerprints: string[] };
 }[];
@@ -30,24 +31,23 @@ test("every certificate fingerprint is a SHA-256 in the colon form wallets compa
   for (const p of prints) assert.match(p, /^([0-9A-F]{2}:){31}[0-9A-F]{2}$/);
 });
 
-test("the site serves the file as exactly application/json", () => {
+test("the document is answered by a route that sets the bare content type itself", () => {
   // The wallets' verifier (solana-mobile/digital-asset-links-android, URISourceVerifier)
   // compares the Content-Type header with the bare string "application/json".
-  // Vercel's default for a .json file is "application/json; charset=utf-8", which
-  // made Phantom answer "Could not verify package" although the file was right.
-  const vercel = JSON.parse(read("web/vercel.json")) as {
-    headers?: { source: string; headers: { key: string; value: string }[] }[];
-  };
-  const rule = (vercel.headers ?? []).find((h) => h.source === "/.well-known/assetlinks.json");
-  assert.ok(rule, "vercel.json has no header rule for /.well-known/assetlinks.json");
-  const type = rule.headers.find((h) => h.key.toLowerCase() === "content-type");
-  assert.equal(type?.value, "application/json");
+  // Served as a static file the header was "application/json; charset=utf-8"
+  // (a header rule in vercel.json did not change that), and Phantom answered
+  // "Could not verify package" although the document was right.
+  const route = read(`${ROUTE}route.ts`);
+  assert.match(route, /"Content-Type":\s*"application\/json"/);
+  assert.doesNotMatch(route, /"application\/json;/);
+  // A static file at the same path would shadow the route.
+  assert.equal(existsSync(new URL("web/public/.well-known/assetlinks.json", root)), false);
 });
 
-test("the file sits on the site the app names as its identity", () => {
+test("the document sits on the site the app names as its identity", () => {
   const config = read("app/src/config.ts");
   const uri = /uri:\s*"(https:\/\/[^"]+)"/.exec(config)?.[1];
   assert.equal(uri, "https://rung-drab.vercel.app");
-  // web/ is what is deployed there; public/ is served from the site's root.
+  // web/ is what is deployed there.
   assert.ok(read("web/vercel.json").includes("nextjs"));
 });
