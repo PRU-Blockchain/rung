@@ -256,6 +256,42 @@ Phantom asks to connect again before every buy because it declines the saved aut
 
 The numbers about typed and needed slippage come from our own measurement of three 13-minute windows of mainnet blocks. The scripts are in [`measure/`](measure/README.md), with the tables they produced on Nov 22, 2026 in [`measure/results/`](measure/results/), and the method (in Turkish) in [`measure/docs/rapor-ikinci-olcum.md`](measure/docs/rapor-ikinci-olcum.md). [`measure/README.md`](measure/README.md#numbers--script) maps every row above to the script and output that produced it. They use public RPC endpoints only; the raw blocks are not in the repository and are downloaded again by the scripts (about 20 to 25 minutes per window). After being cleaned up for this repository the scripts were verified on a small slice against the original ones, not re-run end to end.
 
+### Replay on real trades: one buy with a fixed slippage against the ladder
+
+On Nov 24, 2026 we replayed 6,454 real mainnet buys. For each one: with the same SOL at the same moment, what would a single buy with a fixed slippage have done, and what would a Rung ladder have done?
+
+- **Hyped launch:** the first 60 seconds of the day's 11 busiest launches, every trade (4,262 buys).
+- **Volatile, not the launch:** the busiest five minutes later in the life of 12 curves (1,531 buys).
+- **Calm:** 40 ten-minute windows on 4 established PumpSwap pools (661 buys).
+
+*Fill* is the share of buys that would have bought. *Room* is the most a sandwich bot could take in the block where the buy fills, added up over all buys: a ceiling, not money that was taken. Fill and room are simulated on the real trades (price seen 3 slots before the order, Rung's first try 5 slots after it); what buyers typed and the sandwiches are read from the chain.
+
+**What buyers type today.** Launches: median 13.3%, and 59% of buys had no limit at all (233 buys decoded). Volatile windows: median 24.9%; 73% typed 20% or more and 29.5% had no limit (1,498 buys).
+
+| | fill | room |
+|---|---|---|
+| **Hyped launch** | | |
+| one buy at 20% | 92.9% | 323 SOL |
+| one buy at 25% | 94.8% | 390 SOL |
+| Rung Launch 10 → 20 → 30% | 88.4% | 140 SOL |
+| one buy at 5% | 72.5% | 120 SOL |
+| Rung Fast 5 → 10 → 15% | 74.7% | 87 SOL |
+| **Volatile, not the launch** | | |
+| one buy at 20% | 94.3% | 125 SOL |
+| one buy at 25% | 95.1% | 152 SOL |
+| Rung Launch 10 → 20 → 30% | 93.0% | 43.5 SOL |
+| one buy at 5% | 80.3% | 37.4 SOL |
+| Rung Fast 5 → 10 → 15% | 84.0% | 21.8 SOL |
+| **Calm** | | |
+| one buy at 3% | 100% | 21.8 SOL |
+| Rung Tight 1 → 2 → 3% | 100% | 4.7 SOL |
+
+With Launch, 71.5% of the launch buys and 84.7% of the volatile buys filled on the 10% rung; in the calm pools 99.3% filled on the 1% rung. Tight is the calm-market mode: in a launch the price outruns a 1% rung, which is why the app suggests Launch on a young token.
+
+**Sandwiches in the same windows.** 19 found by their pattern (13 / 5 / 1), with 30 victims. The largest: a 9 SOL buy that accepted almost any price (its limit was 400%) was pushed 131% and overpaid 4.80 SOL ([front-run](https://explorer.solana.com/tx/LJBrN4DJuzmpivdNPqDuw4k4bsFw4PdzoWJxS8nhZbrJFLTFWr9roR7WNBuUuGCdH7wapkZ7eFmhcoGyAAvKfWR), [victim](https://explorer.solana.com/tx/4xq195R48RW66BNwQUqrRPjHNGwoLLvFRCLEm7b1wdwpb7NohDmvtExJ3uVKxiU6sgLADy1JQsUbDChNBAg86M6w), [back-run](https://explorer.solana.com/tx/2u2UJLBpWQsfkqbnAYK2Ys6CiU1VgtT4oBhrKut2VJzpQaZfVzNTdUJy3TJ5hmbSNLgBuWKMh7j1pC19SMMEtgbB)). Replayed with Rung Tight, that order does not buy and the SOL comes back.
+
+Each replayed buy is alone: it does not move the market, and bots act as they did. A bot that also moves the price before the order opens, with a second trade of its own, can take more than the rung, up to the ladder's cap; the report gives both readings. Every figure with its sample size, the method, the checks against the chain and the commands to reproduce are in [the report](measure/replay/results/replay-2026-11-24.md); the scripts are in [`measure/replay/`](measure/replay/).
+
 ### B. Other people's measurements
 
 | number | source | caveat |
@@ -460,6 +496,8 @@ npm run build
 ### Measurement scripts
 
 Re-running them is described in [`measure/README.md`](measure/README.md#run-order). A full window takes 20–25 minutes and thousands of requests to public RPC endpoints; do not re-run all windows unless you need to.
+
+The replay has its own scripts in [`measure/replay/`](measure/replay/); the commands are at the end of [its report](measure/replay/results/replay-2026-11-24.md). The downloaded trades are not in the repository: a rerun from scratch makes about 20,000 read-only RPC requests.
 
 ## Before / during the event
 

@@ -1,0 +1,4526 @@
+{
+ "curve": [
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "29m4tDuYNKkaue5CsSLMt594XgA8r8bKsmKUCB84gindFSa6snFeGShuhfVxZRYrkE78ypbBbXPZMMfamViMkGBE",
+   "isBuy": true,
+   "tapeSol": 684690287,
+   "curveLamportsDelta": 689996637,
+   "tapeTok": 4237748694884,
+   "curveTokenDelta": -4237748694884,
+   "signerSolDeltaExFee": -1498440,
+   "tapeSpend": 693248916,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 5306350,
+   "reservesAfter": {
+    "vs": 72460543746,
+    "vt": 444241776960331
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "3WTDp2NPvjWz61kGpJ9r6W7RZHChj8cshbxbfhRMb1pDDdGoDP6mLEUeJBZXznVPh1sWuRPfixQYPk1xxdxNzjJm",
+   "isBuy": false,
+   "tapeSol": 7155264,
+   "curveLamportsDelta": -7155264,
+   "tapeTok": 44911272404,
+   "curveTokenDelta": 44911272404,
+   "signerSolDeltaExFee": 7027908,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 71610048536,
+    "vt": 449517929035140
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "31sFAkHAm9gicoKQXwjeg5ubF9jzk54ACwcyGJ5GKfAN1MLar8FZRFyRrynuRVS5vqUg2Xn2WT4z4bgBqNbqaJXr",
+   "isBuy": true,
+   "tapeSol": 136972601,
+   "curveLamportsDelta": 136972601,
+   "tapeTok": 871155022236,
+   "curveTokenDelta": -871155022236,
+   "signerSolDeltaExFee": -140835501,
+   "tapeSpend": 138684759,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 71211100858,
+    "vt": 452036274277784
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "2wkMdFxRQt26UTdtRzHH2ZuSdrrPZP6JDhuCo5etwFqyXsNuxmN3v8V11XRGBAqxU2jQSj28p6a3RoN9pR1XByAj",
+   "isBuy": true,
+   "tapeSol": 198915761,
+   "curveLamportsDelta": 200457359,
+   "tapeTok": 1292638946404,
+   "curveTokenDelta": -1292638946404,
+   "signerSolDeltaExFee": -1513839,
+   "tapeSpend": 201402209,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1541598,
+   "reservesAfter": {
+    "vs": 70480696605,
+    "vt": 456720808270428
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "uHcohRe7DAQQjQqcp9Wz5Xr37M1YhA5U2BijqhybYU4vkREKtYfYSKeC3hYsdECS3U69ZUt9tNEfi9Hk6sdnPat",
+   "isBuy": false,
+   "tapeSol": 211028035,
+   "curveLamportsDelta": -209392566,
+   "tapeTok": 1360499802981,
+   "curveTokenDelta": 1360499802981,
+   "signerSolDeltaExFee": 0,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1635469,
+   "reservesAfter": {
+    "vs": 70555816999,
+    "vt": 456234540148653
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "3PURVTT84K146rrCMDjpGkth5x5xn4ZgTTaMEFu3M85ngWsXvXzvZeSaGpuSoQjUxNPR1f9GVVdwpB4DpHzR5uGR",
+   "isBuy": true,
+   "tapeSol": 49504950,
+   "curveLamportsDelta": 49504950,
+   "tapeTok": 306897684413,
+   "curveTokenDelta": -306897684413,
+   "signerSolDeltaExFee": -51637603,
+   "tapeSpend": 50123763,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 72083718503,
+    "vt": 446564097892540
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "2Rmpqakt2Aqu5fPmTNqqKsHEWzWrN11ademgKEwdj8TAovH4QtrNi5UfNeR8g8TZJdZxNFKiJ1QdBfj2LGiXKNVt",
+   "isBuy": true,
+   "tapeSol": 392270503,
+   "curveLamportsDelta": 395310600,
+   "tapeTok": 2358334128004,
+   "curveTokenDelta": -2358334128004,
+   "signerSolDeltaExFee": -397173885,
+   "tapeSpend": 397173885,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3040097,
+   "reservesAfter": {
+    "vs": 73369362796,
+    "vt": 438738998157363
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "5NQs1yjpeNC9jNyK5GSLFFKdqx1KQVeZTd6At7TwKXNYzwc1muXCFf7sS9HvohWdCWDMDdBayiuHRsoNk9MN3Ut8",
+   "isBuy": true,
+   "tapeSol": 409445383,
+   "curveLamportsDelta": 412618586,
+   "tapeTok": 2237199797738,
+   "curveTokenDelta": -2237199797738,
+   "signerSolDeltaExFee": -414563452,
+   "tapeSpend": 414563452,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3173203,
+   "reservesAfter": {
+    "vs": 76959893234,
+    "vt": 418269820537385
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "wWWA93DeLxPNQJrb6iUuni43CcbQk7GNmNkZt2qfZm4ugdtBzXNS5nj2dVYHNYxo2GFftiix66K93pGpn5btJQS",
+   "isBuy": true,
+   "tapeSol": 49382715,
+   "curveLamportsDelta": 49765432,
+   "tapeTok": 265022881859,
+   "curveTokenDelta": -265022881859,
+   "signerSolDeltaExFee": -51500000,
+   "tapeSpend": 50000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 382717,
+   "reservesAfter": {
+    "vs": 77471995760,
+    "vt": 415504988857082
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "5cvVmv9B2abNguef4NUdvXpxp8xDvUdAEfyq8NFwHZ4KbG8J5agDmo9RCbE9z7KMpXBrA4jtrkh2zcW57yKHzk95",
+   "isBuy": true,
+   "tapeSol": 1360033736,
+   "curveLamportsDelta": 1370573999,
+   "tapeTok": 6355961483935,
+   "curveTokenDelta": -6355961483935,
+   "signerSolDeltaExFee": -1513840,
+   "tapeSpend": 1377034159,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 10540263,
+   "reservesAfter": {
+    "vs": 83676422255,
+    "vt": 384696188832953
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "4cxS2USTxzMWCH9UuNNJ9weCDfWu1PXxESXKYbcniHkWhbiMYatkngZZCKtS1Meq7TCu8ZmUJBteJ6ZKDKbWKSmq",
+   "isBuy": false,
+   "tapeSol": 41728717,
+   "curveLamportsDelta": -41405318,
+   "tapeTok": 190260608402,
+   "curveTokenDelta": 190260608402,
+   "signerSolDeltaExFee": 0,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 323399,
+   "reservesAfter": {
+    "vs": 84003180844,
+    "vt": 383199783814722
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "3MBjRtJhbwJDEXCEHgCVdtUVygky6cMDU3SUvegkSBD9VJf3MaUP8BgkvzyTjQmgwWUDu84DxAFvQcB1HAVvY5b",
+   "isBuy": false,
+   "tapeSol": 1047589529,
+   "curveLamportsDelta": -1039470709,
+   "tapeTok": 4373444518480,
+   "curveTokenDelta": 4373444518480,
+   "signerSolDeltaExFee": 1034494659,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 8118820,
+   "reservesAfter": {
+    "vs": 87287824065,
+    "vt": 368779965431636
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "DCAZWyhwfbFUrmEFYcuGMEQ7JXCF2qAeR6GQuZdiNa2Udj9RTZkW5KtyC8xS6kq3Q7LTv8BkrPRxynMMeadEYGb",
+   "isBuy": true,
+   "tapeSol": 2444444443,
+   "curveLamportsDelta": 2463388889,
+   "tapeTok": 9378598127665,
+   "curveTokenDelta": -9378598127665,
+   "signerSolDeltaExFee": -2503513840,
+   "tapeSpend": 2475000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 18944446,
+   "reservesAfter": {
+    "vs": 92827453314,
+    "vt": 346772421252803
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "479HiSfTXjeGoWxqG3wCo5iF5dyUjb1xzVWWMKDndA3FNiqYtdkWGouzjMvS6xmSxtHTns227QMJjjsKLJkyojkM",
+   "isBuy": false,
+   "tapeSol": 813606835,
+   "curveLamportsDelta": -813606835,
+   "tapeTok": 3036149591932,
+   "curveTokenDelta": 3036149591932,
+   "signerSolDeltaExFee": 803426749,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 92470665312,
+    "vt": 348110404934144
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "2ekPsZsrVgCKj5he38iVri1FD91oMv1WKHGEzwCWGpgkDKvm3j16fMwwsoA9vBcCV6w4dJq3bdes2y2aNvGYzNmb",
+   "isBuy": true,
+   "tapeSol": 478789548,
+   "curveLamportsDelta": 482500168,
+   "tapeTok": 1932174425373,
+   "curveTokenDelta": -1932174425373,
+   "signerSolDeltaExFee": -484774418,
+   "tapeSpend": 484774418,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3710620,
+   "reservesAfter": {
+    "vs": 89551683559,
+    "vt": 359457237089388
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "3ghMbb6rAcZdwR2vDwktkZPHGqNfLUB6d3UiGvJ2JST7bccp3yVCqap8oWfa3B1eMTzuqjtK1kuEFJQu6xnx92fx",
+   "isBuy": false,
+   "tapeSol": 491993810,
+   "curveLamportsDelta": -488180857,
+   "tapeTok": 1932174425373,
+   "curveTokenDelta": 1932174425373,
+   "signerSolDeltaExFee": 485843886,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3812953,
+   "reservesAfter": {
+    "vs": 90289471237,
+    "vt": 356519983009010
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "NH4RNyEcuVeXyh8ZHwVVcB67rygmeppXj2tSLU2NjYvAABmd8rHtVFE4BP99gcxkkC2kMockZUsuytawVdWKrEE",
+   "isBuy": false,
+   "tapeSol": 1120163610,
+   "curveLamportsDelta": -1111482341,
+   "tapeTok": 4699332399459,
+   "curveTokenDelta": 4699332399459,
+   "signerSolDeltaExFee": 1093099949,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 8681269,
+   "reservesAfter": {
+    "vs": 87037480026,
+    "vt": 369840679484509
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "56qSbdHJwv1T3qAuAsaXtRESszGMY3u9KVSrZHoih3F6qSaUmiChF3bp4v9zfbXvSXGXv7iWxmwZ7o576pRvdDmh",
+   "isBuy": true,
+   "tapeSol": 98765431,
+   "curveLamportsDelta": 99530864,
+   "tapeTok": 409687250880,
+   "curveTokenDelta": -409687250880,
+   "signerSolDeltaExFee": -102000000,
+   "tapeSpend": 100000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 765433,
+   "reservesAfter": {
+    "vs": 88141452971,
+    "vt": 365208419771726
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "YAGbNPmHXixGYEgaMGxFRGJpnUKWWmetBNMLFkZv5o1XFrTuA1RWPFZcHecKjSV4LT6t27DtefaSdNgp96C1tjC",
+   "isBuy": true,
+   "tapeSol": 49382715,
+   "curveLamportsDelta": 49765432,
+   "tapeTok": 199400145460,
+   "curveTokenDelta": -199400145460,
+   "signerSolDeltaExFee": -54360040,
+   "tapeSpend": 50000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 382717,
+   "reservesAfter": {
+    "vs": 89311078855,
+    "vt": 360425617643405
+   }
+  },
+  {
+   "id": "S2-7sCw9NvfSxgMaj4Q7gGWBZWkXPtmaoji82Zr61UTpump",
+   "sig": "5P4NuqbcGCe3b6PWZ8rCavLnixCjz6mihEQgW2tQNufcyqqSXWpmLobTdX3Y2UV2nTLVvsYM3UYZfNBaX93nrQzg",
+   "isBuy": true,
+   "tapeSol": 64215123,
+   "curveLamportsDelta": 64215123,
+   "tapeTok": 238212837320,
+   "curveTokenDelta": -238212837320,
+   "signerSolDeltaExFee": -68020093,
+   "tapeSpend": 65017813,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 93185053582,
+    "vt": 345441672492830
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "5aVYhNEqwmnnqYpzpGrGzpYv3q9r7n1FJwwzmGnvM1eRKWyJoUmSZwwvR3bDsM97M19wZ4QrURu8rAmbtSwFDGtT",
+   "isBuy": true,
+   "tapeSol": 296296296,
+   "curveLamportsDelta": 298592593,
+   "tapeTok": 1912877261833,
+   "curveTokenDelta": -1912877261833,
+   "signerSolDeltaExFee": -305513840,
+   "tapeSpend": 300000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2296297,
+   "reservesAfter": {
+    "vs": 70760553791,
+    "vt": 454914483268079
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "2uKxpH5MxpzaYukhHbH2iaoiDKUZbmJryDW66tknz94EsKQexJsNthEKxtRFLNFyJkFwvKKMmFaUCyFCyVXiJDQg",
+   "isBuy": false,
+   "tapeSol": 88267,
+   "curveLamportsDelta": -88267,
+   "tapeTok": 576722927,
+   "curveTokenDelta": 576722927,
+   "signerSolDeltaExFee": 87163,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 70190374531,
+    "vt": 458609901751673
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "5Khm4GpCdn6wmfbH3PrJtZc3EHGaf5ei2MnSk5WdS2ut8pgcQR9qtYBHQCtSDyjhJi3GSCLGYf6qZJPdmNsBggrx",
+   "isBuy": true,
+   "tapeSol": 323720923,
+   "curveLamportsDelta": 326229761,
+   "tapeTok": 2413019179202,
+   "curveTokenDelta": -2413019179202,
+   "signerSolDeltaExFee": -327767435,
+   "tapeSpend": 327767435,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2508838,
+   "reservesAfter": {
+    "vs": 65877207992,
+    "vt": 488636385059429
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "4x6stDuMbnT48UkssYpGpowpJvfju3M6cvjcxQciPipPrSDenKpwY59LsoctrmJpBFNnQbcZYbuVku5nsbz1xs2E",
+   "isBuy": false,
+   "tapeSol": 306558891,
+   "curveLamportsDelta": -304183059,
+   "tapeTok": 2598253109958,
+   "curveTokenDelta": 2598253109958,
+   "signerSolDeltaExFee": 298699635,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2375832,
+   "reservesAfter": {
+    "vs": 61474719687,
+    "vt": 523629891083377
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "4zwidAwibHQXTn5sdPENh2KbKwxYoitA2eLYXFpMd9AUyhGk8gu6nU5DNxKS8wwSW6uMv7AbKw8yopb3J3f3fFrd",
+   "isBuy": true,
+   "tapeSol": 635978115,
+   "curveLamportsDelta": 640906947,
+   "tapeTok": 4917079742109,
+   "curveTokenDelta": -4917079742109,
+   "signerSolDeltaExFee": -644927843,
+   "tapeSpend": 643927843,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 4928832,
+   "reservesAfter": {
+    "vs": 64843763720,
+    "vt": 496424003338637
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "eFSrybFKCj5P6mxgQY5tXUZKg1r1CWjh8cFnZzNH4U33RwRao9gTdcq5aS1posdqTJpBYUfRMmVBfLfAPsdGcUi",
+   "isBuy": false,
+   "tapeSol": 17355002,
+   "curveLamportsDelta": -17220499,
+   "tapeTok": 129149872017,
+   "curveTokenDelta": 129149872017,
+   "signerSolDeltaExFee": 15879634,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 134503,
+   "reservesAfter": {
+    "vs": 65761020385,
+    "vt": 489499715688722
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "5B7iU7kpe2YcVtugPPcKmQwx7KaF275D2VNfBSUEJUkJrYsbN7CVFE4yTMgwbZrQMHzQUqSSfqV6HEFt8iCD3mmo",
+   "isBuy": false,
+   "tapeSol": 2694849505,
+   "curveLamportsDelta": -2673964420,
+   "tapeTok": 15985717051997,
+   "curveTokenDelta": 15985717051997,
+   "signerSolDeltaExFee": 2632570637,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 20885085,
+   "reservesAfter": {
+    "vs": 72329981729,
+    "vt": 445043673682377
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "4Na5nibF4TMtKPRnxa6fZFjpcXWCcz5pE65PvjkkQkjXzcjigHKAuZXZuAbVEhMJTsnV3H3Cb7pS5aeSV85M18aM",
+   "isBuy": true,
+   "tapeSol": 507268180,
+   "curveLamportsDelta": 511199509,
+   "tapeTok": 3357049871969,
+   "curveTokenDelta": -3357049871969,
+   "signerSolDeltaExFee": -518983554,
+   "tapeSpend": 513609033,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3931329,
+   "reservesAfter": {
+    "vs": 69997060334,
+    "vt": 459876466751145
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "EcyzPf3dpeoJ7tfFLqC5BBFKBNeJwgnoM1GdjipLafihii6totmd1m1zeoKx1g4MoWVGRhTnFxSiDZKKgGq2FN3",
+   "isBuy": false,
+   "tapeSol": 783199724,
+   "curveLamportsDelta": -777129925,
+   "tapeTok": 4917079742109,
+   "curveTokenDelta": 4917079742109,
+   "signerSolDeltaExFee": 773409726,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 6069799,
+   "reservesAfter": {
+    "vs": 71214434978,
+    "vt": 452015111863320
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "3knbgKiAPuxH4xHgy9f2Q8Vqfk6YoBTuAeA8jagcvgiyBpHHYNVCGVkP53hzwrKZDKq8K12VmeAETpbEjTkVyKow",
+   "isBuy": true,
+   "tapeSol": 493827159,
+   "curveLamportsDelta": 497654321,
+   "tapeTok": 3052008640162,
+   "curveTokenDelta": -3052008640162,
+   "signerSolDeltaExFee": -506000000,
+   "tapeSpend": 500000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3827162,
+   "reservesAfter": {
+    "vs": 72417069106,
+    "vt": 444508472842525
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "uEWkVKUE2NwuQ88CTzEQdgvgxEWRhvTvaTGLkHgsy4SqHYitTvkNMZWMC4HZfh95JSqZQJ9YhDdywcTa61df3po",
+   "isBuy": true,
+   "tapeSol": 977777,
+   "curveLamportsDelta": 985356,
+   "tapeTok": 5678878333,
+   "curveTokenDelta": -5678878333,
+   "signerSolDeltaExFee": -1001866,
+   "tapeSpend": 990000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 7579,
+   "reservesAfter": {
+    "vs": 74447779709,
+    "vt": 432383624134755
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "4WH7uMHyRkKojg63f4qgn4YJR8LPGx6EED7Qu1z8dqBCJ5EoWbjZ1otwd2kKmZLGoCnLVGi2UtReVsJ1iTACv8GF",
+   "isBuy": true,
+   "tapeSol": 384966840,
+   "curveLamportsDelta": 387950334,
+   "tapeTok": 2426823814156,
+   "curveTokenDelta": -2426823814156,
+   "signerSolDeltaExFee": -389778926,
+   "tapeSpend": 389778926,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2983494,
+   "reservesAfter": {
+    "vs": 71651100350,
+    "vt": 449260383238607
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "5F5ZB8y66scivEdHoJ7Wns1FXhKZbNxbPu1JDG1hZij2RFeM52Q7KWhyUuoAMRWeoDmHxTrY6nzei64oXppAbkgi",
+   "isBuy": false,
+   "tapeSol": 46695251,
+   "curveLamportsDelta": -46333362,
+   "tapeTok": 309421862572,
+   "curveTokenDelta": 309421862572,
+   "signerSolDeltaExFee": 46101560,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 361889,
+   "reservesAfter": {
+    "vs": 69674822965,
+    "vt": 462003338305318
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "3JuRe4Q7J1rucdZvjgsiskyi3S9ZyZ5QmYUDseKKGtNApk7scp7tqVK98Gkq6Cms2JSSAV2fq4sgBxK9JnEDJD1N",
+   "isBuy": true,
+   "tapeSol": 1646090533,
+   "curveLamportsDelta": 1658847736,
+   "tapeTok": 9771483745957,
+   "curveTokenDelta": -9771483745957,
+   "signerSolDeltaExFee": -1680513839,
+   "tapeSpend": 1666666666,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 12757203,
+   "reservesAfter": {
+    "vs": 74466511184,
+    "vt": 432274861517189
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "4YsFWCxKARh6ciZZAv4eYcMeeGXjXJ74Q6A8kohy5kHjysVB93DBASVRA3xH9vhjRpVEEGE1shCG9iUpoCKUkxbn",
+   "isBuy": true,
+   "tapeSol": 146666666,
+   "curveLamportsDelta": 147803333,
+   "tapeTok": 828537496027,
+   "curveTokenDelta": -828537496027,
+   "signerSolDeltaExFee": -150000000,
+   "tapeSpend": 148500000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1136667,
+   "reservesAfter": {
+    "vs": 75560013065,
+    "vt": 426018994790101
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "4aMtu8GxKaeFm9RgV6Z5ZjGa6jhcCsnhEQPupR4baTnzs832U9SXWXRoXsYYTcdagkSuMg5M6y9QME5PbHpnHPdM",
+   "isBuy": true,
+   "tapeSol": 977777,
+   "curveLamportsDelta": 985356,
+   "tapeTok": 4447995373,
+   "curveTokenDelta": -4447995373,
+   "signerSolDeltaExFee": -1001866,
+   "tapeSpend": 990000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 7579,
+   "reservesAfter": {
+    "vs": 84120247346,
+    "vt": 382666502197986
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "4Pz1bdwCgikNqXYxK8QWBREfNMn6qDCenEkwNRqxPVz3GXNhJSHhKfAukr16kVKokbMywYvpVf3CgvzNuoFxCqNd",
+   "isBuy": false,
+   "tapeSol": 41648920,
+   "curveLamportsDelta": -41326140,
+   "tapeTok": 197630405094,
+   "curveTokenDelta": 197630405094,
+   "signerSolDeltaExFee": 39629976,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 322780,
+   "reservesAfter": {
+    "vs": 82342810166,
+    "vt": 390926672929271
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "3mRppcVBtTvpFGGdMAid7W6ynmg8Cmn93z5MKXqgvqChFhmtidjRCFf5DTWU2UhKbSPxnSEDF6GxXjxwUrNuM3eR",
+   "isBuy": false,
+   "tapeSol": 1063591364,
+   "curveLamportsDelta": -1055348530,
+   "tapeTok": 4775078685387,
+   "curveTokenDelta": 4775078685387,
+   "signerSolDeltaExFee": 1050146471,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 8242834,
+   "reservesAfter": {
+    "vs": 84145346788,
+    "vt": 382552357902886
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "42334aVRph6KWRHy2RC3HsQdAKXkSPxgG63WhngBHVtbKzGEySadty7tdBpaUkUNu8kzwgzfCtWxEzHTSUvHvbWA",
+   "isBuy": false,
+   "tapeSol": 1875957594,
+   "curveLamportsDelta": -1861418922,
+   "tapeTok": 8301489088985,
+   "curveTokenDelta": 8301489088985,
+   "signerSolDeltaExFee": 1831996763,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 14538672,
+   "reservesAfter": {
+    "vs": 84356371136,
+    "vt": 381595371984161
+   }
+  },
+  {
+   "id": "S2-8RKV9GyNmhQAVaKVEYK9tBMWkJy7BAJ5JpXAsSV8pump",
+   "sig": "Uw45b1CsXL24VcByN6DJDXnPzrQKdvUqYxVsb8SjrC2Gt5By7ujT23Qz8kp17X1bYSSJRqAL5uzWHbiT9bT64qH",
+   "isBuy": true,
+   "tapeSol": 48888888,
+   "curveLamportsDelta": 49267778,
+   "tapeTok": 216987234273,
+   "curveTokenDelta": -216987234273,
+   "signerSolDeltaExFee": -51696814,
+   "tapeSpend": 49500000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 378890,
+   "reservesAfter": {
+    "vs": 85186962648,
+    "vt": 377874733710626
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "64N9X6DFhtyjQart6tuMu383Ywechd8SMnnJYrHFWy4kL6kwgv3UoCAzs2dqLdCTfUX6AxeTpE1VpFrXCwyQkg73",
+   "isBuy": true,
+   "tapeSol": 1387837167,
+   "curveLamportsDelta": 1387837167,
+   "tapeTok": 38053781421993,
+   "curveTokenDelta": -38053781421993,
+   "signerSolDeltaExFee": -1406798973,
+   "tapeSpend": 1405185133,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 34964374578,
+    "vt": 920651389693065
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "HYr1yQGPx632VyZHtxpD5nTWKrvar2y8MqYHuwXacaKcdmrQC5ooDHddDiQRkFrQVsQZ5UNeCnBu9QivtgsCy3u",
+   "isBuy": true,
+   "tapeSol": 685827159,
+   "curveLamportsDelta": 685827159,
+   "tapeTok": 4931012470383,
+   "curveTokenDelta": -4931012470383,
+   "signerSolDeltaExFee": -702878840,
+   "tapeSpend": 694400000,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 67255140008,
+    "vt": 478625128757710
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "3553f7JewYCa897Pngw77MCia7TpsM96PZNJuT7eFKUCAiuEptJ1jYepseVtvkMt6UgrXN6GAHy7gMKR1sEwvV4i",
+   "isBuy": true,
+   "tapeSol": 97777777,
+   "curveLamportsDelta": 98535556,
+   "tapeTok": 686389983239,
+   "curveTokenDelta": -686389983239,
+   "signerSolDeltaExFee": -103497433,
+   "tapeSpend": 99000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 757779,
+   "reservesAfter": {
+    "vs": 67765499232,
+    "vt": 475020481089014
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "3axNxW8aay1gDyPwp4R9CzZK9caP3DARLdHBgFmPUCA4YM4PEjQBk33xShyNBrBySs2bBmMNPSkHqmk8pPZifiN7",
+   "isBuy": false,
+   "tapeSol": 5765549875,
+   "curveLamportsDelta": -5720866863,
+   "tapeTok": 43709524846490,
+   "curveTokenDelta": 43709524846490,
+   "signerSolDeltaExFee": 5693370501,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 44683012,
+   "reservesAfter": {
+    "vs": 62342722289,
+    "vt": 516339339465531
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "3bXLhaRmTPNnURB1ggJk2bk9Tpj51hjZ7qJrMKZkkQZP2s8LoooDskNQ8gnnCmXDRHag78PYYnDQFhxupu1nt69v",
+   "isBuy": false,
+   "tapeSol": 21132399,
+   "curveLamportsDelta": -21132399,
+   "tapeTok": 175028363792,
+   "curveTokenDelta": 175028363792,
+   "signerSolDeltaExFee": 19286331,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 62331426926,
+    "vt": 516432907690249
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "2UKM5wW5JiJbTjG1XPttipNyxiyhyxAk8PtYtSbKLY4psaPCokJzhejJ6NVfXLNdiw93y5kDnnP88nhaxGaaAuZU",
+   "isBuy": false,
+   "tapeSol": 3969647870,
+   "curveLamportsDelta": -3938883098,
+   "tapeTok": 34967619877192,
+   "curveTokenDelta": 34967619877192,
+   "signerSolDeltaExFee": 3919917271,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 30764772,
+   "reservesAfter": {
+    "vs": 58498745493,
+    "vt": 550268211351310
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "4SSFMD23GZ4MpTUPV7r23TWfAxSs9SsL65G384bmc7eAZYnLidCaM5hSwPgou2kMVBqKjuxHCc9PXspUizEV3LZp",
+   "isBuy": false,
+   "tapeSol": 3486833953,
+   "curveLamportsDelta": -3459810989,
+   "tapeTok": 34967619877192,
+   "curveTokenDelta": 34967619877192,
+   "signerSolDeltaExFee": 3443138528,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 27022964,
+   "reservesAfter": {
+    "vs": 54939032663,
+    "vt": 585922221211741
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "47oVuoaLpfEUME94hvnoQ5NfQzju7pXna3kfpVinh9n8nhZv9ejFb8HfrpwVW73HKBU6FXQUzUGUqUcnw9SEQCLY",
+   "isBuy": false,
+   "tapeSol": 277178918,
+   "curveLamportsDelta": -277178918,
+   "tapeTok": 2918257685457,
+   "curveTokenDelta": 2918257685457,
+   "signerSolDeltaExFee": 273714181,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 55155680904,
+    "vt": 583620753511608
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "455sxpFvUFirhFygf3QKcwLazn4eW5SAPrejpW3fYxe8hhgh2K4XtqDha26duCQDqx49gNwqHpeym2iW4u5CENZb",
+   "isBuy": true,
+   "tapeSol": 86992452,
+   "curveLamportsDelta": 87666645,
+   "tapeTok": 899322902262,
+   "curveTokenDelta": -899322902262,
+   "signerSolDeltaExFee": -90666987,
+   "tapeSpend": 88079859,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 674193,
+   "reservesAfter": {
+    "vs": 55844701243,
+    "vt": 576419952731451
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "32uT9VGWn3VY9wpLkVMarYP35EoiA9cEhiNEia92A7NvnbiBh4zaTaK7b1Mf6aaPgCspmLJ7jJLLS2MuDAveseL6",
+   "isBuy": true,
+   "tapeSol": 82965794,
+   "curveLamportsDelta": 83608780,
+   "tapeTok": 852814288908,
+   "curveTokenDelta": -852814288908,
+   "signerSolDeltaExFee": -86548608,
+   "tapeSpend": 84002868,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 642986,
+   "reservesAfter": {
+    "vs": 56002153234,
+    "vt": 574799328115823
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "2X2CN2DobcyZvRv2yMkKo52T5fMaMtfS3UPnvG4iNYUkchKVrjrMe5VH94J6jHsAh1fJYnScryr8RwonhHraPeHF",
+   "isBuy": true,
+   "tapeSol": 1936000000,
+   "curveLamportsDelta": 1951004000,
+   "tapeTok": 17940957948809,
+   "curveTokenDelta": -17940957948809,
+   "signerSolDeltaExFee": -1982513840,
+   "tapeSpend": 1960200000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 15004000,
+   "reservesAfter": {
+    "vs": 59913264344,
+    "vt": 537276684979339
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "tVnfSTjzrjhigLniXe3jicsdYFcteHwSsWjhC5p61QgJYMnpfkjWyZzPFrpMnVu2UQj6jhajLTqKCazkeos98vh",
+   "isBuy": true,
+   "tapeSol": 77509320,
+   "curveLamportsDelta": 78110018,
+   "tapeTok": 692338337605,
+   "curveTokenDelta": -692338337605,
+   "signerSolDeltaExFee": -79454282,
+   "tapeSpend": 78478187,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 600698,
+   "reservesAfter": {
+    "vs": 60070137743,
+    "vt": 535873584838895
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "3gemj2qYBmyHNRVabwm8WtLGofvqTweGMWkNZf9FAdBCm5g1NYTqxvGv8oZrqnpGiw9S86991KQREwox8fmJRa1T",
+   "isBuy": true,
+   "tapeSol": 244444443,
+   "curveLamportsDelta": 246338889,
+   "tapeTok": 2165496253529,
+   "curveTokenDelta": -2165496253529,
+   "signerSolDeltaExFee": -252022199,
+   "tapeSpend": 247500000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1894446,
+   "reservesAfter": {
+    "vs": 60402153231,
+    "vt": 532928022152941
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "5DACC2ZWwmeXEGsWPgTExeP9ZYzjPLicUfZfDEEbVyaoTVFnmXrVZ1trzfmvcj6PWEKySjFiv9cATD47XHbd8pHu",
+   "isBuy": true,
+   "tapeSol": 137060491,
+   "curveLamportsDelta": 137060491,
+   "tapeTok": 1205453699626,
+   "curveTokenDelta": -1205453699626,
+   "signerSolDeltaExFee": -140854912,
+   "tapeSpend": 138773748,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 60566616996,
+    "vt": 531480899096046
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "5cWR88CWNhCW6oEJNDBjxhq1cnLHb1cseHQnguG3ZD5xAxFiTqiRRQAkUvrKf2WhCN63e9Pa3kKZ58HJxM4CdHYR",
+   "isBuy": true,
+   "tapeSol": 221513917,
+   "curveLamportsDelta": 223230651,
+   "tapeTok": 1927982201526,
+   "curveTokenDelta": -1927982201526,
+   "signerSolDeltaExFee": -226734856,
+   "tapeSpend": 224282842,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1716734,
+   "reservesAfter": {
+    "vs": 60925686258,
+    "vt": 528348583895874
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "3dbfsFQH3DNroYEhg9xpTRi9TmPEYmbvD4hVGQw1mjzdd9mVadi7jTB39y7oZXZBx8rLZsGNS7SEcParR1vs73CD",
+   "isBuy": false,
+   "tapeSol": 3847266120,
+   "curveLamportsDelta": -3817449806,
+   "tapeTok": 34967619877192,
+   "curveTokenDelta": 34967619877192,
+   "signerSolDeltaExFee": 3799065292,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 29816314,
+   "reservesAfter": {
+    "vs": 57619313944,
+    "vt": 558666840238982
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "5BqqWGK2ZDL24bLSJFeyrDK83HeyshxtEczz2CiKC3s129UReqxH5GNDbxM4VAPsNSKVaGDsoGmTZ1bjwE1Zuq9W",
+   "isBuy": true,
+   "tapeSol": 13763298,
+   "curveLamportsDelta": 13869964,
+   "tapeTok": 131157132767,
+   "curveTokenDelta": -131157132767,
+   "signerSolDeltaExFee": -15449180,
+   "tapeSpend": 13935340,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 106666,
+   "reservesAfter": {
+    "vs": 58126904401,
+    "vt": 553788308368722
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "krktGMBCZXn6HRVv3wnw7v9vMHFyekC1bf1Vh3bxBut6tKQHoxEoZC4cZVuMRMgWrH1JNZcqbXDmvtDGxXsX4pg",
+   "isBuy": true,
+   "tapeSol": 987654320,
+   "curveLamportsDelta": 987654320,
+   "tapeTok": 9222198907381,
+   "curveTokenDelta": -9222198907381,
+   "signerSolDeltaExFee": -1003257600,
+   "tapeSpend": 1000000000,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 59210452901,
+    "vt": 543654008420753
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "67MydqVsVvXNW9dhH4T2dVJdmoVXgJ5uBi5jDFSBnoq5kkCzrFkHBThKXYQr3Jwv7NepGV4hncehDhFmDt6ZBs3X",
+   "isBuy": false,
+   "tapeSol": 514669162,
+   "curveLamportsDelta": -514669162,
+   "tapeTok": 4747374737493,
+   "curveTokenDelta": 4747374737493,
+   "signerSolDeltaExFee": 508230796,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 58817419978,
+    "vt": 547286842453722
+   }
+  },
+  {
+   "id": "S2-9xDieoDR64vPoZKFd3a8RpKYTpcRfSQk6Mzk5yhJpump",
+   "sig": "5KuS4sFsLU67BDBA9yGdWoDymiMubgA2zeS8iJSVYn2zsikDYJxyYCCFfvdmJLnT867Nuy8EbidKdZipS3GpURzw",
+   "isBuy": true,
+   "tapeSol": 158668736,
+   "curveLamportsDelta": 158668736,
+   "tapeTok": 1472410626677,
+   "curveTokenDelta": -1472410626677,
+   "signerSolDeltaExFee": -162902139,
+   "tapeSpend": 160652097,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 58976187478,
+    "vt": 545813512854406
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "JtWeokLBdf7MNzTFkaR3si9NgidC4dbDaxRDoXU3anL47UrG1theAjXVHwF7dDTRumnb9LenDscPa2tRfkY2DSz",
+   "isBuy": true,
+   "tapeSol": 25755085,
+   "curveLamportsDelta": 25755085,
+   "tapeTok": 189468562859,
+   "curveTokenDelta": -189468562859,
+   "signerSolDeltaExFee": -27719640,
+   "tapeSpend": 26077025,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 66161896186,
+    "vt": 486533821967210
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "21eBXG7rBoPVA1qvv4eipWSam4vRh1ePH1yQgorw9zfvr8zZM5fwEwLEiz1Rn4u1s97Wg3f58nuEQjbyQimno3oP",
+   "isBuy": true,
+   "tapeSol": 27480086,
+   "curveLamportsDelta": 27480086,
+   "tapeTok": 203234027711,
+   "curveTokenDelta": -203234027711,
+   "signerSolDeltaExFee": -29473200,
+   "tapeSpend": 27823588,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 65987513233,
+    "vt": 487819568404981
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "3ANwf1rxxYdfwwnyWSy7V4aq4oYJ4WJXz6PKkGfSeuiSiiFTnBxDipg3jv7BD19Y3ttvs29So8qhJQE3FYGLjRyS",
+   "isBuy": false,
+   "tapeSol": 331754628,
+   "curveLamportsDelta": -329183529,
+   "tapeTok": 2515234859140,
+   "curveTokenDelta": 2515234859140,
+   "signerSolDeltaExFee": 327607695,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2571099,
+   "reservesAfter": {
+    "vs": 64994129500,
+    "vt": 495275503782128
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "5dbNWnvh9rNvgsiu4E3XD92v7WDuCHetjQqfws248niZvKa2NEoZPu5w7VMFbG7wu8Tjyjx9XEZF9FpTyA6bnDyf",
+   "isBuy": true,
+   "tapeSol": 1377185184,
+   "curveLamportsDelta": 1377185184,
+   "tapeTok": 9379202833136,
+   "curveTokenDelta": -9379202833136,
+   "signerSolDeltaExFee": -1401613840,
+   "tapeSpend": 1394400000,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 69442198322,
+    "vt": 463550996584766
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "4A4aymrYJpNFndazAcKpf61iJeUgTceLVp2JBpYxDNiXThqDbATN8JhTJaa8eAJeYAWew9sgTP7NMh2kQxo1VEyb",
+   "isBuy": true,
+   "tapeSol": 2132747326,
+   "curveLamportsDelta": 2149276118,
+   "tapeTok": 14443002849482,
+   "curveTokenDelta": -14443002849482,
+   "signerSolDeltaExFee": -3012280,
+   "tapeSpend": 2159406668,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 16528792,
+   "reservesAfter": {
+    "vs": 70019408634,
+    "vt": 459729678813824
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "5bhgFcpJ3AYwLKhXbcFkazMyXMLJe7J1L726xHo8YyjX6x9atQYeyiAgbQqSViJzPMJXcFZCLu3YGJ1VjNo6dEZ8",
+   "isBuy": true,
+   "tapeSol": 96246428,
+   "curveLamportsDelta": 96992339,
+   "tapeTok": 566805065281,
+   "curveTokenDelta": -566805065281,
+   "signerSolDeltaExFee": -1488440,
+   "tapeSpend": 97449510,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 745911,
+   "reservesAfter": {
+    "vs": 73980731604,
+    "vt": 435113299774357
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "5Kh2zHu4X7BGwDdcu1STJVvECaR1nDAcbCw1jq8BQT1CgqqihijCabPdufGqraKRHi9muHAJHTFebCrCGf5JMwk5",
+   "isBuy": false,
+   "tapeSol": 9338003,
+   "curveLamportsDelta": -9265632,
+   "tapeTok": 56789175208,
+   "curveTokenDelta": 56789175208,
+   "signerSolDeltaExFee": 9128877,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 72371,
+   "reservesAfter": {
+    "vs": 72748969150,
+    "vt": 442480500131030
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "4xMP3USM9d3hTm1RvyeVMMmQ8E21TUKWzN1pa75vrpT3FLpybi3UkTbHya2B2rFCPHTRyy96SRHVQB3mhZoTTtG4",
+   "isBuy": true,
+   "tapeSol": 1187428105,
+   "curveLamportsDelta": 1187428105,
+   "tapeTok": 5975524952281,
+   "curveTokenDelta": -5975524952281,
+   "signerSolDeltaExFee": -1209229473,
+   "tapeSpend": 1202270958,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 80574945333,
+    "vt": 399503842377968
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "3JWuViQkdtwPVDzy8DpPj7TdAoFQXhV9UYanVbyHZJQpLNYTPdb7tRMRySirh9tGwbaf5UxCg8W3irDgUkLFiKYH",
+   "isBuy": true,
+   "tapeSol": 756908641,
+   "curveLamportsDelta": 762774684,
+   "tapeTok": 3906147361858,
+   "curveTokenDelta": -3906147361858,
+   "signerSolDeltaExFee": -1498440,
+   "tapeSpend": 766370000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 5866043,
+   "reservesAfter": {
+    "vs": 79357684431,
+    "vt": 405631798564360
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "2nskhhB9TtswrdFo84VNvyFTEm1pZdEN1AFdjRC9dEiWkc8smfgrh8e81hj2JdTPSAmM5uaoM4ifT7CbmfqucrgM",
+   "isBuy": true,
+   "tapeSol": 98764,
+   "curveLamportsDelta": 98764,
+   "tapeTok": 420641380,
+   "curveTokenDelta": -420641380,
+   "signerSolDeltaExFee": -1613840,
+   "tapeSpend": 100000,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 86936444915,
+    "vt": 370270492454458
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "4YkJh19apGEuJvtnzSkpDHuNRCfS6jvS5HohJip76jhDWRikCXJw3sf5KcnXrwxqRWzQkwvW2thscJRP4Viv3bGY",
+   "isBuy": true,
+   "tapeSol": 1966419752,
+   "curveLamportsDelta": 1966419752,
+   "tapeTok": 8811721801504,
+   "curveTokenDelta": -8811721801504,
+   "signerSolDeltaExFee": -2001613840,
+   "tapeSpend": 1991000000,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 85744476005,
+    "vt": 375417773543423
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "QKoGyrSqb8uFUdnvmUbtxKaBfF6XBRiBfWai3NTjt2g1vJH3TYWhrjSw4WgGiucYMqpARTJamiG4XZV9KTPRaRN",
+   "isBuy": true,
+   "tapeSol": 1244049381,
+   "curveLamportsDelta": 1253690765,
+   "tapeTok": 5363688434772,
+   "curveTokenDelta": -5363688434772,
+   "signerSolDeltaExFee": -1262639280,
+   "tapeSpend": 1259600000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 9641384,
+   "reservesAfter": {
+    "vs": 87030985335,
+    "vt": 369868273420953
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "36xbyrFEhyrULwN3ET7dfAoipLm9X888dGSzirNJhs5a98n47f7A5P5sBLjVv7q16R4cRu4wfpPnptKNr6gopmsi",
+   "isBuy": false,
+   "tapeSol": 1849282363,
+   "curveLamportsDelta": -1834950423,
+   "tapeTok": 7740735250022,
+   "curveTokenDelta": 7740735250022,
+   "signerSolDeltaExFee": 1827654772,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 14331940,
+   "reservesAfter": {
+    "vs": 86774458948,
+    "vt": 370961693967499
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "46othkduK1ceBsba7BQ2xuVSAizo1TAGSLdWF7pWF4orHddE2r32KAXbJUEEfVCEAy3UEB1qkeVQoyXPds33wUbr",
+   "isBuy": false,
+   "tapeSol": 193200,
+   "curveLamportsDelta": -193200,
+   "tapeTok": 759401207,
+   "curveTokenDelta": 759401207,
+   "signerSolDeltaExFee": 190784,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 90495927654,
+    "vt": 355706617113449
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "5FNrd1E4qpUtDmLezTua7S9cZ4zQ6dAoUHEY34zxhUQj2BzA2t664qFc7HQWR6EBWgeppm5Bb6cC4sx6qASQpEu",
+   "isBuy": false,
+   "tapeSol": 110714989,
+   "curveLamportsDelta": -110714989,
+   "tapeTok": 409164134905,
+   "curveTokenDelta": 409164134905,
+   "signerSolDeltaExFee": 108829777,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 93273295791,
+    "vt": 345114858653892
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "5AGZ64jUNv7wGf9X8EabhiMxa9G1RqTgHRD3Hrm4MunsWohb9jcHqFy6c9Ny4owHNcXZQvfSe4Y2fTYt3STvTWYJ",
+   "isBuy": true,
+   "tapeSol": 41376384,
+   "curveLamportsDelta": 41697052,
+   "tapeTok": 138187735081,
+   "curveTokenDelta": -138187735081,
+   "signerSolDeltaExFee": -44432237,
+   "tapeSpend": 41893590,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 320668,
+   "reservesAfter": {
+    "vs": 98195937377,
+    "vt": 327813972321301
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "4ZmyQ8UN4DqiMZvjeTLGxFpc96rkbmYFtFrHULAw2Ei5ceKmcQt4jnvGemyRC3k15ecq58AhnmRy143e9w2TzcsT",
+   "isBuy": true,
+   "tapeSol": 137560493,
+   "curveLamportsDelta": 138626588,
+   "tapeTok": 413527294884,
+   "curveTokenDelta": -413527294884,
+   "signerSolDeltaExFee": -3012280,
+   "tapeSpend": 139280000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1066095,
+   "reservesAfter": {
+    "vs": 103548526789,
+    "vt": 310868742413043
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "59sthLgFad9wbdJ5nkdDjBoBuQBkUCxsVTNj1XyJx3UAMzPKDG7MpxwZrqfdR5Wpckb4g3sS1EmyyzBBMHkEsoqr",
+   "isBuy": true,
+   "tapeSol": 230344590,
+   "curveLamportsDelta": 232129761,
+   "tapeTok": 705705714856,
+   "curveTokenDelta": -705705714856,
+   "signerSolDeltaExFee": -1513840,
+   "tapeSpend": 233223898,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1785171,
+   "reservesAfter": {
+    "vs": 102618497641,
+    "vt": 313686138907562
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "5VechPqT8et2EQ212GEQyV1EJvuCugyExNcXHdQ5YYwMrjwKhmLgZQo9N2iDLeCFKmCKo4qkYXRVD8X4VZh7Kn3N",
+   "isBuy": false,
+   "tapeSol": 1316945864,
+   "curveLamportsDelta": -1306739533,
+   "tapeTok": 4226452241680,
+   "curveTokenDelta": 4226452241680,
+   "signerSolDeltaExFee": -1498440,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 10206331,
+   "reservesAfter": {
+    "vs": 99494963570,
+    "vt": 323533967484230
+   }
+  },
+  {
+   "id": "S2-CPbxALSgZgQnox3itnuW6y2T9N9od7bd9QpPnTtVGn63",
+   "sig": "2NA3XYHyHVWPUWXTKrC2EERZxa1PfVxaaKqYP5ewKE4MzW1W8JBApjK2SztmdRThTtcwD2MdBbHXLPsPA1tBHL9A",
+   "isBuy": true,
+   "tapeSol": 275161875,
+   "curveLamportsDelta": 275161875,
+   "tapeTok": 847430846394,
+   "curveTokenDelta": -847430846394,
+   "signerSolDeltaExFee": -282732560,
+   "tapeSpend": 278601399,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 102373352490,
+    "vt": 314437297691250
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "6ywxTeYtSpNBpN6e2hsKd24zqhqJnxpzCWMF344WgrtV9RfvZakfwEBmSaCdVc1o49pMc7AkbnxnKnjJUMDmx9U",
+   "isBuy": true,
+   "tapeSol": 1305190522,
+   "curveLamportsDelta": 1315305749,
+   "tapeTok": 34441351533418,
+   "curveTokenDelta": -34441351533418,
+   "signerSolDeltaExFee": -3012280,
+   "tapeSpend": 1321505404,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 10115227,
+   "reservesAfter": {
+    "vs": 35585375215,
+    "vt": 904585095161078
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "4tdSDdFU5hvuLJ8WrDUgoAeccyFa9qKo6CTY8GDZW3NTpcnVYhpCA2b7jJdMGwXhtyPBa2HrtRejC37ngB3NjHH4",
+   "isBuy": true,
+   "tapeSol": 493827159,
+   "curveLamportsDelta": 497654321,
+   "tapeTok": 8674414228869,
+   "curveTokenDelta": -8674414228869,
+   "signerSolDeltaExFee": -502488440,
+   "tapeSpend": 500000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3827162,
+   "reservesAfter": {
+    "vs": 43055917144,
+    "vt": 747632431702569
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "hNxpQL1YYTcLWmzWHM57yJ7cfgf4wmfLzwMRbFy6Ao538rUw9HXYEpJYEACY6AvjAPQXv3sTFPPaof1vUV8NWsa",
+   "isBuy": true,
+   "tapeSol": 12717194,
+   "curveLamportsDelta": 12815753,
+   "tapeTok": 177276580022,
+   "curveTokenDelta": -177276580022,
+   "signerSolDeltaExFee": -14390000,
+   "tapeSpend": 12876160,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 98559,
+   "reservesAfter": {
+    "vs": 48060457861,
+    "vt": 669781385187133
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "wEcieGRVhT2Dd3sywzjh6r3SZxAng3ZZyyYrQD4M3DFUJTpZjhrupq6SL7kVt9LqJdpTeBqr5S5fMBgHLvvAt2H",
+   "isBuy": false,
+   "tapeSol": 611124683,
+   "curveLamportsDelta": -611124683,
+   "tapeTok": 8739722969826,
+   "curveTokenDelta": 8739722969826,
+   "signerSolDeltaExFee": 603475623,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 47138905020,
+    "vt": 682875430197222
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "3QAW9vGRZQ9gLhHbtz8YDs2nD5xYEJassf5QdXQg2ZWsjvqjVsY4v1crXEhvUCEUn7VnkxmzXRX8wwXA3k3jDwJQ",
+   "isBuy": false,
+   "tapeSol": 516379566,
+   "curveLamportsDelta": -516379566,
+   "tapeTok": 8022907488890,
+   "curveTokenDelta": 8022907488890,
+   "signerSolDeltaExFee": 503625573,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 45260117922,
+    "vt": 711222186916929
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "aG5AEnPW2HNzBKJwQ3g7vLBF1U1jKA4mu4gtvt1SkytHVCuXPYu83hmhkbHb88ftDJvdMFAJ9KpiAE8mPJZhxNj",
+   "isBuy": false,
+   "tapeSol": 10897037,
+   "curveLamportsDelta": -10812584,
+   "tapeTok": 177276580022,
+   "curveTokenDelta": 177276580022,
+   "signerSolDeltaExFee": 12274663,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 84453,
+   "reservesAfter": {
+    "vs": 44477035366,
+    "vt": 723744282624624
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "enMz1Lcm1HkKgKmapX1BUy4DTk9EMh8bqpfKzT6q3ZE4bAZJy43dAQjS4iMY6UfNuJcSC8SmJMQPDarTaq1w7xD",
+   "isBuy": false,
+   "tapeSol": 67256216,
+   "curveLamportsDelta": -67256216,
+   "tapeTok": 790912059770,
+   "curveTokenDelta": 790912059770,
+   "signerSolDeltaExFee": 64751357,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 52285764673,
+    "vt": 615655145528090
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "5eNmyzKt8cxqxy6jqXKFe7xDpsyPcG7GDPitYfRMkurMLVj8hFK4UpY8hieH4szefp3HsedWqjyRsnTbaUDNGtZo",
+   "isBuy": true,
+   "tapeSol": 6024691357,
+   "curveLamportsDelta": 6071382716,
+   "tapeTok": 65040677800114,
+   "curveTokenDelta": -65040677800114,
+   "signerSolDeltaExFee": -7018195409,
+   "tapeSpend": 6100000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 46691359,
+   "reservesAfter": {
+    "vs": 57700742559,
+    "vt": 557878436853742
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "2f6HBraPM7B2zpfF6SzuuZBwH6PhvEC64qfjTMqifQeLyftzpvHpQhjW1932TJqnXqcESD1m9D7jRJT72YfSRi59",
+   "isBuy": true,
+   "tapeSol": 691358023,
+   "curveLamportsDelta": 696716049,
+   "tapeTok": 5095536996959,
+   "curveTokenDelta": -5095536996959,
+   "signerSolDeltaExFee": -700200000,
+   "tapeSpend": 700000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 5358026,
+   "reservesAfter": {
+    "vs": 66433731401,
+    "vt": 484543008333712
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "3FnkbszkizMBBT3q17YVMHxXst6o1SnsR9Cfr899kTLz8snYBQspfCx3nLxAyoqdxZCUor1EU9NL6hpUZ6TtkENH",
+   "isBuy": true,
+   "tapeSol": 172839505,
+   "curveLamportsDelta": 174179012,
+   "tapeTok": 1306473737193,
+   "curveTokenDelta": -1306473737193,
+   "signerSolDeltaExFee": -175200000,
+   "tapeSpend": 175000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1339507,
+   "reservesAfter": {
+    "vs": 65344160366,
+    "vt": 492622445405275
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "m7Arj4nJUbHxJQf9K3hXtFNpBsCiE2MyKHuif8TsaVYiqLUKJJesigxUBPF81Zx9dAicTRvTL2sw1aKb8SML5bk",
+   "isBuy": false,
+   "tapeSol": 133349483,
+   "curveLamportsDelta": -133349483,
+   "tapeTok": 960431373905,
+   "curveTokenDelta": 960431373905,
+   "signerSolDeltaExFee": 129365787,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 66786679938,
+    "vt": 481982336995866
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "5HWuMyB4sVKcgLh8uX8crNmLLQkT4ipoasRpRaq7UaASg8sj7fPbEe8WArgkG6uy1aRfbQggSywchDJEvN6AxcTi",
+   "isBuy": true,
+   "tapeSol": 292638316,
+   "curveLamportsDelta": 294906264,
+   "tapeTok": 1959270276906,
+   "curveTokenDelta": -1959270276906,
+   "signerSolDeltaExFee": -303773098,
+   "tapeSpend": 296296296,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2267948,
+   "reservesAfter": {
+    "vs": 69485686458,
+    "vt": 463260877486818
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "51tcZJDJUofed8zDpMGu3MUBUUfZuXSEEsMyF3vRUqWq46M5hNLL1KTzvTFTL71bNEJdBsaATuDG5RNnxeuteLTy",
+   "isBuy": true,
+   "tapeSol": 391111110,
+   "curveLamportsDelta": 394142222,
+   "tapeTok": 2344081026001,
+   "curveTokenDelta": -2344081026001,
+   "signerSolDeltaExFee": -398209000,
+   "tapeSpend": 396000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3031112,
+   "reservesAfter": {
+    "vs": 73482362657,
+    "vt": 438064304427612
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "Vnt9jAxVDuYA1LpuAMcBm2G8VQfciWcLhsKo7zkU58FK1eARPM55ymf5yq4QTd789wzCancZwqNPQJMAJXUqtYe",
+   "isBuy": false,
+   "tapeSol": 690230139,
+   "curveLamportsDelta": -684880854,
+   "tapeTok": 4530661336783,
+   "curveTokenDelta": 4530661336783,
+   "signerSolDeltaExFee": 681602261,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 5349285,
+   "reservesAfter": {
+    "vs": 69684529512,
+    "vt": 461938974308766
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "2cBWWxaYKt2XQ5AmeabK99gjTxDRNmvRRScQG8UaNcu3w6nLF6tAtYaF6pTNrSADW7PTQRKTcP59FBUEYrp3w5Sb",
+   "isBuy": false,
+   "tapeSol": 780260359,
+   "curveLamportsDelta": -780260359,
+   "tapeTok": 4719584239323,
+   "curveTokenDelta": 4719584239323,
+   "signerSolDeltaExFee": 766981368,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 72561432591,
+    "vt": 443624098125473
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "3YpNCeNsjA7DNXHtCduPV4HMFLqTqv7UcJYYpxi1oVtQSMjHGigtpvpN8DX9sw1b1thm56YAmEvK5nDZZqTGStST",
+   "isBuy": true,
+   "tapeSol": 1326584367,
+   "curveLamportsDelta": 1336865397,
+   "tapeTok": 8676195322411,
+   "curveTokenDelta": -8676195322411,
+   "signerSolDeltaExFee": -1344166673,
+   "tapeSpend": 1343166673,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 10281030,
+   "reservesAfter": {
+    "vs": 70822176772,
+    "vt": 454518648856133
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "3qgjZXEeDYru7S1oj1cBZVFoYSeJQzBDTKa5wmBiNtkCazhnoaUr3hkhh8bmpt1PSMTYxTwgnxZrNBphGG8a9t9M",
+   "isBuy": true,
+   "tapeSol": 377547967,
+   "curveLamportsDelta": 380473964,
+   "tapeTok": 2426211194702,
+   "curveTokenDelta": -2426211194702,
+   "signerSolDeltaExFee": -382267317,
+   "tapeSpend": 382267317,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2925997,
+   "reservesAfter": {
+    "vs": 70964413152,
+    "vt": 453607641765817
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "RafShRdXemUqprUwYqgy9nn5LWQuQ5WbqosFLaHYpKvYAeW41FR6K4ZAHqSz3KPAbmrvWbzc1o2kaAoEuwQm8GN",
+   "isBuy": true,
+   "tapeSol": 987654320,
+   "curveLamportsDelta": 995308642,
+   "tapeTok": 5152863402420,
+   "curveTokenDelta": -5152863402420,
+   "signerSolDeltaExFee": -1021513841,
+   "tapeSpend": 1000000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 7654322,
+   "reservesAfter": {
+    "vs": 79044017241,
+    "vt": 407241448839048
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "5hW43k1dUNoVD3oqU7UzLLxVC38FMfkiYz5FSVGMSNmXDn7ankyor9onSdiuAnrwsAy7KMrKJug9hpbXjweaR9RA",
+   "isBuy": true,
+   "tapeSol": 1393333333,
+   "curveLamportsDelta": 1404131667,
+   "tapeTok": 6971852375435,
+   "curveTokenDelta": -6971852375435,
+   "signerSolDeltaExFee": -1426000000,
+   "tapeSpend": 1410750000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 10798334,
+   "reservesAfter": {
+    "vs": 80906994765,
+    "vt": 397864241529703
+   }
+  },
+  {
+   "id": "S2-Ddnd1DGVjtE2DT3ZjDXZsNzu6oHbe3GEj5VE9x6avYsA",
+   "sig": "5GFDKr5K3C712NhJ47V2f3iqB8aGQFs4w5DaTwP4iE3CGkmCVvoy1gnAHKaFP6ibG7b7WrPiRKQsv6ezmnZRGtSR",
+   "isBuy": true,
+   "tapeSol": 682984742,
+   "curveLamportsDelta": 688277875,
+   "tapeTok": 3542337582760,
+   "curveTokenDelta": -3542337582760,
+   "signerSolDeltaExFee": -691522053,
+   "tapeSpend": 691522053,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 5293133,
+   "reservesAfter": {
+    "vs": 79123146697,
+    "vt": 406834174999245
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "SfKis24xEkjFi95WsTjkp9dHqWGpQUKWSt2mn6chRqayw8FGHhFYgC6jJtaC14SjEh9yYmZkgS2nvTzDihwYXZQ",
+   "isBuy": true,
+   "tapeSol": 78124201,
+   "curveLamportsDelta": 78729664,
+   "tapeTok": 443129559979,
+   "curveTokenDelta": -443129559979,
+   "signerSolDeltaExFee": -3002280,
+   "tapeSpend": 79100754,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 605463,
+   "reservesAfter": {
+    "vs": 75372533635,
+    "vt": 427078658359906
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "4t1ArF8dzWYXZwVEp8nf9VkCh4i3Gcx4ksoR632TNfj5vuRDqF5JqvdRr7gRR61EioXTJj2TozzrXspd1x6zNMGZ",
+   "isBuy": false,
+   "tapeSol": 7701406,
+   "curveLamportsDelta": -7641719,
+   "tapeTok": 44216929752,
+   "curveTokenDelta": 44216929752,
+   "signerSolDeltaExFee": 6529086,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 59687,
+   "reservesAfter": {
+    "vs": 74873629149,
+    "vt": 429924406119827
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "5HuJMqrio4WTM1sRszjR8mcQHAZwHVLwvPFXyXSTFFTXdZmLwhSVfPo3SiPT28JLzB4bUT7nctVoNgjwytzncLpB",
+   "isBuy": false,
+   "tapeSol": 506649677,
+   "curveLamportsDelta": -506649677,
+   "tapeTok": 2816948566626,
+   "curveTokenDelta": 2816948566626,
+   "signerSolDeltaExFee": 500306555,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 75836629882,
+    "vt": 424465071826313
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "23rRAb7wjjVpUDywXAawyCRHmTXSjpvg4ToZDikMjbpEkxY8mNKZFwvDpFKmPkv3PUhmR9YNLqPmkJPMVN6w1ioT",
+   "isBuy": true,
+   "tapeSol": 703753560,
+   "curveLamportsDelta": 703753560,
+   "tapeTok": 3631813942022,
+   "curveTokenDelta": -3631813942022,
+   "signerSolDeltaExFee": -717295291,
+   "tapeSpend": 712550480,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 79331181971,
+    "vt": 405767313112062
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "biQHCt2KnBZTsu1DPuKvWzowTVRxuDHKFT4X2Us5rFzdm1kbjcyNAJHcjmucpbiAFQyJcYxPuHnLbDGJPoojnBy",
+   "isBuy": false,
+   "tapeSol": 460324925,
+   "curveLamportsDelta": -456757406,
+   "tapeTok": 2318177347205,
+   "curveTokenDelta": 2318177347205,
+   "signerSolDeltaExFee": 454570863,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3567519,
+   "reservesAfter": {
+    "vs": 79720342094,
+    "vt": 403786533174156
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "62UgLkzykP6JML9zyaw8awmP9YbcF6ZiRriu6Q921QQHkoh2QokQyAhGUk1sK2rM3Sb9irXzvLnJCc29413oDHUj",
+   "isBuy": false,
+   "tapeSol": 1074857,
+   "curveLamportsDelta": -1074857,
+   "tapeTok": 5601995986,
+   "curveTokenDelta": 5601995986,
+   "signerSolDeltaExFee": 1046644,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 78588959149,
+    "vt": 409599527856204
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "3PTgJJUxnB8RsrnkQydeu6Zyg4Xt1LSRLtsNVVDiQv8V3oDAZc96BQ9jXDgErFkWtJAMyses2Ph3tuKovvd3MBcm",
+   "isBuy": true,
+   "tapeSol": 390946362,
+   "curveLamportsDelta": 393976198,
+   "tapeTok": 1996118905871,
+   "curveTokenDelta": -1996118905871,
+   "signerSolDeltaExFee": -397521633,
+   "tapeSpend": 395833193,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3029836,
+   "reservesAfter": {
+    "vs": 79596696162,
+    "vt": 404413777442740
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "3ZQSq9Pa41VPd4cW88CxMMuJNGrAsViMtGxvS5wER4gdNjcUcCVYRtXYYKEgxD1vP6SRfiQPCrHmo1No2XqhTRh6",
+   "isBuy": true,
+   "tapeSol": 353955555,
+   "curveLamportsDelta": 353955555,
+   "tapeTok": 1682779142220,
+   "curveTokenDelta": -1682779142220,
+   "signerSolDeltaExFee": -360010000,
+   "tapeSpend": 358380000,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 82462286366,
+    "vt": 390360272440464
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "3vsYcsdNxjDT33BiHp8EgRoqajZJEdLaoCdT3PpKeJ141tdUHHdSfo4tfGGzT32MnTBnBJRfU8d5aoBYNtBQ4Jvw",
+   "isBuy": false,
+   "tapeSol": 335921558,
+   "curveLamportsDelta": -333318165,
+   "tapeTok": 1623890065903,
+   "curveTokenDelta": 1623890065903,
+   "signerSolDeltaExFee": 328305313,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2603393,
+   "reservesAfter": {
+    "vs": 81434271295,
+    "vt": 395288127021353
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "nL9jET7GjJ7NPppyUfpRMjKG9bdwM7vyb1ackYdUvyL5ZYf154Dd63eXGKL71vqYz51YRB3xmpTvdvjnezqoF7V",
+   "isBuy": false,
+   "tapeSol": 393463,
+   "curveLamportsDelta": -390413,
+   "tapeTok": 1910121707,
+   "curveTokenDelta": 1910121707,
+   "signerSolDeltaExFee": 365956,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3050,
+   "reservesAfter": {
+    "vs": 81429367440,
+    "vt": 395311932175510
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "Z92enqjktNqrfERiqxtUsRkh7ZQPa3wucgutEZodT2yhmixaZejQT3AX6Mb2fTbo9aBphAe6Fkzxrki6oEc2d7V",
+   "isBuy": false,
+   "tapeSol": 108006,
+   "curveLamportsDelta": -107167,
+   "tapeTok": 526236648,
+   "curveTokenDelta": 526236648,
+   "signerSolDeltaExFee": 86885,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 839,
+   "reservesAfter": {
+    "vs": 81282069666,
+    "vt": 396028308752754
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "3XDotRZgypHWw9ZWAtBd2RTXSvy4r235rknLYTN8uaatX7e8vy2vRGL23jL8sezpfGzu4qAaBnJzUAAPtfzTBEBe",
+   "isBuy": false,
+   "tapeSol": 452072482,
+   "curveLamportsDelta": -452072482,
+   "tapeTok": 2235262895285,
+   "curveTokenDelta": 2235262895285,
+   "signerSolDeltaExFee": 444402678,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 80460659001,
+    "vt": 400071301731469
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "51ZFqysWmAyo62xa6MVufg51EX4Hc238T2FDot2BBfEP4oxa2ULkcUGN3oy1SKipS4i58dcaWQM2aFMqj7xLERer",
+   "isBuy": true,
+   "tapeSol": 217866666,
+   "curveLamportsDelta": 219555133,
+   "tapeTok": 1080691466710,
+   "curveTokenDelta": -1080691466710,
+   "signerSolDeltaExFee": -224795900,
+   "tapeSpend": 220590000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1688467,
+   "reservesAfter": {
+    "vs": 80666329649,
+    "vt": 399051261264328
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "3n4iWJBGhAbXth8uatGphTHg2VPgt6d9eWH1oUBT5Hu7sixhC2w8Ym9QgorMBUAVTUfSHpDiNBt2u4NB8NDsm6h4",
+   "isBuy": true,
+   "tapeSol": 338131340,
+   "curveLamportsDelta": 338131340,
+   "tapeTok": 1738155714101,
+   "curveTokenDelta": -1738155714101,
+   "signerSolDeltaExFee": -347771823,
+   "tapeSpend": 342357983,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 79302471126,
+    "vt": 405914218489680
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "2Z7RJNp49LZXS1EoG1fkFyZyaLpmUdLGMfPv2KZtuDXG1LcphFtCgpmYrARhnPGMaCo6ypW8nkn1qb8PXABaoXqm",
+   "isBuy": false,
+   "tapeSol": 354392635,
+   "curveLamportsDelta": -351646091,
+   "tapeTok": 1943341590229,
+   "curveTokenDelta": 1943341590229,
+   "signerSolDeltaExFee": 345463099,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2746544,
+   "reservesAfter": {
+    "vs": 76440559227,
+    "vt": 421111526663277
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "2Bjrb711MLbWZrNAe463yztJ5qdqWuEq5eJ7pJ5PLSmFYAF1FVQU2Upk2ahAkn7NXkVQ5HHVvgzB358RLiPpiMiS",
+   "isBuy": true,
+   "tapeSol": 19555555,
+   "curveLamportsDelta": 19555555,
+   "tapeTok": 91707233623,
+   "curveTokenDelta": -91707233623,
+   "signerSolDeltaExFee": -20100000,
+   "tapeSpend": 19800000,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 82860015869,
+    "vt": 388486536740411
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "59HwX1NNqYHJyDytozswJesPzN5Uwc5kbcr7iQecPz73qznhSm9oCNUKXCUJZdkivirobX1v6hsWdbB4V7e7cKJv",
+   "isBuy": false,
+   "tapeSol": 1611283571,
+   "curveLamportsDelta": -1611283571,
+   "tapeTok": 8469300480586,
+   "curveTokenDelta": 8469300480586,
+   "signerSolDeltaExFee": 1583882385,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 77455417891,
+    "vt": 415593918156830
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "gNiGr35oHHW9wtsM6jkrrcNDUfuVEPCenAfH6wdGSfgvRSjAUSoevBQWMpNP99LFCCFTsC6DP4YPzdeH5QHM6Db",
+   "isBuy": true,
+   "tapeSol": 9777777,
+   "curveLamportsDelta": 9853556,
+   "tapeTok": 43911644880,
+   "curveTokenDelta": -43911644880,
+   "signerSolDeltaExFee": -20977352,
+   "tapeSpend": 9900000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 75779,
+   "reservesAfter": {
+    "vs": 84667309672,
+    "vt": 380193970189118
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "2x2dkGWfBSaRuUiERqgv8eMvR1jJem3xx2TjTSqRRb1bUCX2LDk9BSNLaUVGnoUCgsT81NsMaqBCpHeb3KQab2tV",
+   "isBuy": false,
+   "tapeSol": 1550848372,
+   "curveLamportsDelta": -1538829296,
+   "tapeTok": 7515244466819,
+   "curveTokenDelta": 7515244466819,
+   "signerSolDeltaExFee": 1531462766,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 12019076,
+   "reservesAfter": {
+    "vs": 80731266477,
+    "vt": 398730281569954
+   }
+  },
+  {
+   "id": "S2-EzKEuCEnA2LMuP4bnDcX7akh4sSGgv3ahwkXBHRSb2S4",
+   "sig": "6747uLk3bPzm73NHbGpyoQhBt6zjdQ1ZcwigrYUMmE3S6wPrBxCY1SgQJk6qN4bKFEyNaPUrLvVEGUj53LXJWawL",
+   "isBuy": false,
+   "tapeSol": 19169493,
+   "curveLamportsDelta": -19169493,
+   "tapeTok": 97256490939,
+   "curveTokenDelta": 97256490939,
+   "signerSolDeltaExFee": 18844361,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 79644218470,
+    "vt": 404172471480138
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "5mP9rMZ1i4DLH3AEfWTPcNfAQ7wymrsWAzLsANPfSZ5qYeKfWK23xZSDJokuUKfATYvXje6AQ6KPkS22xUWyx328",
+   "isBuy": false,
+   "tapeSol": 3088563324,
+   "curveLamportsDelta": -3064626958,
+   "tapeTok": 36406470329905,
+   "curveTokenDelta": 36406470329905,
+   "signerSolDeltaExFee": -1498440,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 23936366,
+   "reservesAfter": {
+    "vs": 50736131445,
+    "vt": 634459114827721
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "2qdGZsWdmwLzZLUVbA6d4UYsPfHUNUtpjKeKHVBpkk9WQiNZUBa6bgQ3ACP9Psb7y1kDASYu5dFLQriNthcy181m",
+   "isBuy": false,
+   "tapeSol": 1159514206,
+   "curveLamportsDelta": -1150527970,
+   "tapeTok": 15336226797547,
+   "curveTokenDelta": 15336226797547,
+   "signerSolDeltaExFee": 1129583047,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 8986236,
+   "reservesAfter": {
+    "vs": 48756847603,
+    "vt": 660214977597572
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "5xABbi3nom3AN85q5f9uCHJMyugZRKshi6vZWumrMoMXQe6JmVciRqcuJzgVFBD18B2hf4oKMCASuyiVusb1KzBs",
+   "isBuy": true,
+   "tapeSol": 12839506172,
+   "curveLamportsDelta": 12939012346,
+   "tapeTok": 87874318782014,
+   "curveTokenDelta": -87874318782014,
+   "signerSolDeltaExFee": -16131513840,
+   "tapeSpend": 13000000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 99506174,
+   "reservesAfter": {
+    "vs": 75300546371,
+    "vt": 427486951974859
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "2YLGbczjjzT2kUgLN3zpvVaEkrakSYN2V3ZF2zvWTpAqReLHUdyJqnErgTGAqQutyqzPYThHQijumNx4f6j3FaGh",
+   "isBuy": true,
+   "tapeSol": 493827159,
+   "curveLamportsDelta": 497654321,
+   "tapeTok": 2252040410865,
+   "curveTokenDelta": -2252040410865,
+   "signerSolDeltaExFee": -502513840,
+   "tapeSpend": 500000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3827162,
+   "reservesAfter": {
+    "vs": 84262868216,
+    "vt": 382018814849781
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "5R8guHbqj9j7WAGTr3f2A12uA28ZLD1C7SM8K6U6AEBtnACopuhk25DXWuP2Gn6F1U3AqsFApkC5dp365xteAFb1",
+   "isBuy": true,
+   "tapeSol": 493827159,
+   "curveLamportsDelta": 497654321,
+   "tapeTok": 2091708210356,
+   "curveTokenDelta": -2091708210356,
+   "signerSolDeltaExFee": -503157610,
+   "tapeSpend": 500000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3827162,
+   "reservesAfter": {
+    "vs": 87423362039,
+    "vt": 368208226067116
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "5VWBqFQnLYpDVJUkGCgs3NcPGp1sqBZNXY8Ekug4jMJhidpS8XgBsEkSs5VE1cnFEJCGKHPdLWZm7cqFMBP3Gf5E",
+   "isBuy": true,
+   "tapeSol": 1080473425,
+   "curveLamportsDelta": 1080473425,
+   "tapeTok": 4328344878474,
+   "curveTokenDelta": -4328344878474,
+   "signerSolDeltaExFee": -1096493184,
+   "tapeSpend": 1093979344,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 90182847807,
+    "vt": 356941500931546
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "ReyrHrGmKFuuoQ6qzQnJktSzgvJV8a7zNekG3XJ2UwtUiHUEpnrJUR9Qu1XQ8jKJikQQawE3CASeDnXjch5p2Ra",
+   "isBuy": true,
+   "tapeSol": 49382715,
+   "curveLamportsDelta": 49765432,
+   "tapeTok": 185132042687,
+   "curveTokenDelta": -185132042687,
+   "signerSolDeltaExFee": -52513840,
+   "tapeSpend": 50000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 382717,
+   "reservesAfter": {
+    "vs": 92687869525,
+    "vt": 347294648378472
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "5WnpsGjEWB4dD1ALQmu61shZ871G9RFuiUZxhzFqr9Fa2oNeaZueyrsGqC87jYSXgHcT3LxfgThWURUEfiscuoSL",
+   "isBuy": true,
+   "tapeSol": 192379104,
+   "curveLamportsDelta": 192379104,
+   "tapeTok": 686952596504,
+   "curveTokenDelta": -686952596504,
+   "signerSolDeltaExFee": -197786124,
+   "tapeSpend": 194783844,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 95042103938,
+    "vt": 338692008312468
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "4M4Fiyx8BFiUJFizwyvmnoUfcy3Gf5WaYNc9e5JnjVp6igbvg9VVsnBXsLE3wQvStdXAyBqmRt9sVF969DNQknVU",
+   "isBuy": true,
+   "tapeSol": 790123456,
+   "curveLamportsDelta": 796246914,
+   "tapeTok": 2699320718584,
+   "curveTokenDelta": -2699320718584,
+   "signerSolDeltaExFee": -801513840,
+   "tapeSpend": 800000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 6123458,
+   "reservesAfter": {
+    "vs": 97464904304,
+    "vt": 330272740615795
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "5zjsKuDP7J1tHZCv2eUzLDGPaSqpmtRU8rXHSNb3uFReh2eiY3wwxx6BxvXFAxXc6ZwKW1rn1J4angvjd5BtLLcD",
+   "isBuy": true,
+   "tapeSol": 493827159,
+   "curveLamportsDelta": 493827159,
+   "tapeTok": 2123488642519,
+   "curveTokenDelta": -2123488642519,
+   "signerSolDeltaExFee": -501518840,
+   "tapeSpend": 500000000,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 86768560556,
+    "vt": 370986920295951
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "4MWjtUNDmmKXEsz7mo698ZQfyKQQpmnmTC6zvB4b8mfHRjiXzVnzKjngiv4nUc5JVE9d7w3B2PpB6nicijWn4nnW",
+   "isBuy": true,
+   "tapeSol": 407318448,
+   "curveLamportsDelta": 410475167,
+   "tapeTok": 1618783256028,
+   "curveTokenDelta": -1618783256028,
+   "signerSolDeltaExFee": -415449210,
+   "tapeSpend": 412409930,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3156719,
+   "reservesAfter": {
+    "vs": 90201957010,
+    "vt": 356865883264701
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "21oJpmSAK9eum1R8MySKsTpZsMYNqXuFcYBo46s4JGHoq5eVJBA72SDvcr7AsMoKwcEYNHfdwAzPCsMCjJPrkdKV",
+   "isBuy": true,
+   "tapeSol": 98765431,
+   "curveLamportsDelta": 99530864,
+   "tapeTok": 382185450590,
+   "curveTokenDelta": -382185450590,
+   "signerSolDeltaExFee": -101613840,
+   "tapeSpend": 100000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 765433,
+   "reservesAfter": {
+    "vs": 91255919138,
+    "vt": 352744253369581
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "2i14YoEWucZzXVEq4LPcq1iSBFgi3UzpYBQM2orpJ5LuULgbdXZarz9uxRrGTYU4rX4yh5CVVVigadSJMkPrrfx5",
+   "isBuy": true,
+   "tapeSol": 987654320,
+   "curveLamportsDelta": 995308642,
+   "tapeTok": 3744966051327,
+   "curveTokenDelta": -3744966051327,
+   "signerSolDeltaExFee": -1002613840,
+   "tapeSpend": 1000000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 7654322,
+   "reservesAfter": {
+    "vs": 92633204747,
+    "vt": 347499594242469
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "3FUSM3ezkcL76NL1rg3AhaBWKZakmyBdfPqGWSks114JimaMyFgi16e1ZG9xm66y67Fjttr3Tok26BxtFdHePgDP",
+   "isBuy": false,
+   "tapeSol": 1094524442,
+   "curveLamportsDelta": -1086041876,
+   "tapeTok": 4175280743873,
+   "curveTokenDelta": 4175280743873,
+   "signerSolDeltaExFee": 1082356725,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 8482566,
+   "reservesAfter": {
+    "vs": 91315202451,
+    "vt": 352515246092182
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "ZXS3vsyQZ3Y71GGQrAdkUMUN9ZQHbDbxii1oHFG2jnJaF2ma7Cx3FppKqt5YAy8uq8G48DjYZQxrkTbydniJfFd",
+   "isBuy": true,
+   "tapeSol": 172460141,
+   "curveLamportsDelta": 173796708,
+   "tapeTok": 640275188213,
+   "curveTokenDelta": -640275188213,
+   "signerSolDeltaExFee": -177129734,
+   "tapeSpend": 174615894,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1336567,
+   "reservesAfter": {
+    "vs": 93201672832,
+    "vt": 345380078347246
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "5aWPuExx3zvrW9197Ut3t6cegzmmJmZgDrqA3jo9ihNxfYNyVRq1mrctUa13YskQod7AL5TJSKKtJnQpFAxYeNb7",
+   "isBuy": true,
+   "tapeSol": 592592592,
+   "curveLamportsDelta": 597185185,
+   "tapeTok": 2243185307845,
+   "curveTokenDelta": -2243185307845,
+   "signerSolDeltaExFee": -600100000,
+   "tapeSpend": 600000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 4592593,
+   "reservesAfter": {
+    "vs": 92512718827,
+    "vt": 347952167808347
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "3svWcmjAocqiWoZH2MJVBn1NWXqUaJHEg3AihLe8xPyezHcH3PPpxRvx3oxvEAG4rPWYGh3LLPySZS4tdPbDzjSK",
+   "isBuy": true,
+   "tapeSol": 474428571,
+   "curveLamportsDelta": 478105393,
+   "tapeTok": 1930767201847,
+   "curveTokenDelta": -1930767201847,
+   "signerSolDeltaExFee": -480358929,
+   "tapeSpend": 480358929,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3676822,
+   "reservesAfter": {
+    "vs": 89174219509,
+    "vt": 360978781129552
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "tLGPc6ihfwiJ7cZjG9f2zDKWEoNhQwcKLJuWjuWVMoirPsELGt43TL4abA2GLiAHMj3cWYJ2ieyssgDctQNkhWu",
+   "isBuy": true,
+   "tapeSol": 27319859,
+   "curveLamportsDelta": 27531589,
+   "tapeTok": 109302360422,
+   "curveTokenDelta": -109302360422,
+   "signerSolDeltaExFee": -29954606,
+   "tapeSpend": 27661358,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 211730,
+   "reservesAfter": {
+    "vs": 89712112115,
+    "vt": 358814437747191
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "2UadnGGhoxLvibRxEugusc6BktdQGLWHSagJnbKd7JmMKKLd4cMU64n2jH9FGw9taUZvqzvahzWLeTDfBzKdWgda",
+   "isBuy": true,
+   "tapeSol": 70292344,
+   "curveLamportsDelta": 70292344,
+   "tapeTok": 272153675878,
+   "curveTokenDelta": -272153675878,
+   "signerSolDeltaExFee": -72684840,
+   "tapeSpend": 71171000,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 91216793758,
+    "vt": 352895555114106
+   }
+  },
+  {
+   "id": "S2-FJkjZxhs27s4SyiiBVF6AGLw3YN3W7fEmM2sotGbpump",
+   "sig": "F46oDNBYyefv7fGj9g6JMK12dbJZwbzKeMvGEG9xeA4Xf3uhsCEYHs9GirpcwDxdZahxMQZGkwS2cqp1yLN9C16",
+   "isBuy": true,
+   "tapeSol": 493827159,
+   "curveLamportsDelta": 497654321,
+   "tapeTok": 1998736372957,
+   "curveTokenDelta": -1998736372957,
+   "signerSolDeltaExFee": -504039280,
+   "tapeSpend": 500000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3827162,
+   "reservesAfter": {
+    "vs": 89427821071,
+    "vt": 359955108877024
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "LJBrN4DJuzmpivdNPqDuw4k4bsFw4PdzoWJxS8nhZbrJFLTFWr9roR7WNBuUuGCdH7wapkZ7eFmhcoGyAAvKfWR",
+   "isBuy": true,
+   "tapeSol": 17777777777,
+   "curveLamportsDelta": 17915555556,
+   "tapeTok": 320546277747081,
+   "curveTokenDelta": -320546277747081,
+   "signerSolDeltaExFee": -21061513840,
+   "tapeSpend": 18000000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 137777779,
+   "reservesAfter": {
+    "vs": 52066406187,
+    "vt": 618248936642481
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "2wCxKW75YrZbmz45yqmfGKLuWT3wP3Ngx2AF3Tp69oDheBwuv6jgxVaUadGB3UoHS6PHbSL4ohLcwAfoQujo68aq",
+   "isBuy": true,
+   "tapeSol": 4922308,
+   "curveLamportsDelta": 4922308,
+   "tapeTok": 40957095061,
+   "curveTokenDelta": -40957095061,
+   "signerSolDeltaExFee": -8016132,
+   "tapeSpend": 4983837,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 62201011942,
+    "vt": 517515700586919
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "2gWKKmnkKwWfvv53VfQArE8djyMpzUCkidnS8zRftJsRXtrivcBCKGUuCyzRNmnpoEJzwaxV6XErPd4rKbKgQWYm",
+   "isBuy": true,
+   "tapeSol": 696568366,
+   "curveLamportsDelta": 701966772,
+   "tapeTok": 5074705325370,
+   "curveTokenDelta": -5074705325370,
+   "signerSolDeltaExFee": -728810360,
+   "tapeSpend": 705275472,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 5398406,
+   "reservesAfter": {
+    "vs": 66820921604,
+    "vt": 481735353447400
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "5dmBi5DsNZNssjEbi7qmbpxSxz1XAEkmvDBfjx2RnBWXCtfq2ucCYnYoPZVV1SV9EfuqtPbXH4aeTK8PweWpy9kK",
+   "isBuy": true,
+   "tapeSol": 54222350,
+   "curveLamportsDelta": 54222350,
+   "tapeTok": 318925526654,
+   "curveTokenDelta": -318925526654,
+   "signerSolDeltaExFee": -59122893,
+   "tapeSpend": 54900131,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 74005529682,
+    "vt": 434967500903213
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "3zLGcNymGL7vKHp7XqbKVzJZXdbVMqCdQ4t5tiLpSDe5Rj1zX2c1XzqnXy5d2VSJBud3pw8tqTGA3S6doqZu1pEt",
+   "isBuy": true,
+   "tapeSol": 2155435258,
+   "curveLamportsDelta": 2172139882,
+   "tapeTok": 11812968874456,
+   "curveTokenDelta": -11812968874456,
+   "signerSolDeltaExFee": -3012280,
+   "tapeSpend": 2182378199,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 16704624,
+   "reservesAfter": {
+    "vs": 77724051764,
+    "vt": 414157517268053
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "3dFGn1JqT4sB9XuGXZ35ACASHDyiFCSp1vbANJsSmnUyoUnSmGUBivnQ6XFoN6STKE516zzyYcPzJXr2KexkxxLP",
+   "isBuy": true,
+   "tapeSol": 76266667,
+   "curveLamportsDelta": 76266667,
+   "tapeTok": 413107757102,
+   "curveTokenDelta": -413107757102,
+   "signerSolDeltaExFee": -78733842,
+   "tapeSpend": 77220002,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 77127814495,
+    "vt": 417359165856912
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "4SDB5RDa1NNYQ8KxcauvQKmJ1HjPvwXwGbSZd1oTXEpH4c8z55ENSGCTmq2yk4QvxsKk7S8mYpwkNADgSfCucWZR",
+   "isBuy": true,
+   "tapeSol": 2177042548,
+   "curveLamportsDelta": 2193914629,
+   "tapeTok": 11825138952818,
+   "curveTokenDelta": -11825138952818,
+   "signerSolDeltaExFee": -1523840,
+   "tapeSpend": 2204255581,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 16872081,
+   "reservesAfter": {
+    "vs": 78078506087,
+    "vt": 412277359626140
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "56qN3NNy9mvB8ffpS6J33xUL6c1u64KM69yeMocaU4nUgxQdxRjxwukMvYPCBr847BmuJtuVgfLTnRzpmfdeagTu",
+   "isBuy": true,
+   "tapeSol": 21753023,
+   "curveLamportsDelta": 21921610,
+   "tapeTok": 103136631969,
+   "curveTokenDelta": -103136631969,
+   "signerSolDeltaExFee": -1498440,
+   "tapeSpend": 22024937,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 168587,
+   "reservesAfter": {
+    "vs": 82408335986,
+    "vt": 390615827367229
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "5M3Po5ASomEHBdEgA8EgbEgHoraXQ4NKR7yU4dAa55u6K2yyVHDfAuFzAJZANKQxPvDWA1zYJkhiQKZH4eeNXrQC",
+   "isBuy": true,
+   "tapeSol": 98320987,
+   "curveLamportsDelta": 98320987,
+   "tapeTok": 395647259437,
+   "curveTokenDelta": -395647259437,
+   "signerSolDeltaExFee": -101523840,
+   "tapeSpend": 99550000,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 89488706896,
+    "vt": 359710196610328
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "4166kdYHmVfJzoMPh9WZ3HA6o8BZicnkijRY7v1jSzBbV6j3VJxbdAEeW2YatapEt8Y5u3FazWP9pwa8sPzgzJKJ",
+   "isBuy": false,
+   "tapeSol": 394746714,
+   "curveLamportsDelta": -391687426,
+   "tapeTok": 1470564746644,
+   "curveTokenDelta": 1470564746644,
+   "signerSolDeltaExFee": 384854885,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3059288,
+   "reservesAfter": {
+    "vs": 92758889762,
+    "vt": 347028736998447
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "upFPw8xTWmox3Ta6iJBkrUSc4HxcbP124U2R3DusZgt4a4mZHUA3MSvVfhbiNCTCcrnyFcK7wkBPw8PUkxEJ294",
+   "isBuy": false,
+   "tapeSol": 3687412795,
+   "curveLamportsDelta": -3687412795,
+   "tapeTok": 15498932508234,
+   "curveTokenDelta": 15498932508234,
+   "signerSolDeltaExFee": 3626566674,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 85688290705,
+    "vt": 375663933810455
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "364ABJqzHgThToYuvj3grNd2ji87BzywoRYAjVYeESBFcom1e9mp9zFb4TzVeESdJGwFmokan1UZyyUN4NEmhF6E",
+   "isBuy": true,
+   "tapeSol": 544622893,
+   "curveLamportsDelta": 548843721,
+   "tapeTok": 2874307583719,
+   "curveTokenDelta": -2874307583719,
+   "signerSolDeltaExFee": -3012280,
+   "tapeSpend": 551430680,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 4220828,
+   "reservesAfter": {
+    "vs": 78371128630,
+    "vt": 410737996768256
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "3n6mr1KJJVVVcVGHo43mJctTnrC92aF2bn3qBkpX8yFFt6ibofijRhAHdmRtBmLpfXyD9pydTbLvsRxrzLokXcSE",
+   "isBuy": true,
+   "tapeSol": 136605703,
+   "curveLamportsDelta": 136605703,
+   "tapeTok": 655584587144,
+   "curveTokenDelta": -655584587144,
+   "signerSolDeltaExFee": -143227231,
+   "tapeSpend": 138313276,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 81967696862,
+    "vt": 392715687029123
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "MnkEJspzWtgFrf9qi7FY7AiFSYjEqvQhwtZayEhFjhL4TPxjWEuUxLBFykYka4pk6JjpY5yDfshkpBzQLjrw7rK",
+   "isBuy": true,
+   "tapeSol": 329327510,
+   "curveLamportsDelta": 331879799,
+   "tapeTok": 1647503149734,
+   "curveTokenDelta": -1647503149734,
+   "signerSolDeltaExFee": -1513840,
+   "tapeSpend": 333444105,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2552289,
+   "reservesAfter": {
+    "vs": 80380900533,
+    "vt": 400468272744943
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "4M6uCsHKfJbB4BzzKBAFYSXt8GeP3iS34y976nPmm6Zq1iy4NGFXVXdXa4w5rN19P9gZ2PNSVTRqEDNCMpWiGRg5",
+   "isBuy": true,
+   "tapeSol": 49160493,
+   "curveLamportsDelta": 49160493,
+   "tapeTok": 229959311926,
+   "curveTokenDelta": -229959311926,
+   "signerSolDeltaExFee": -51523840,
+   "tapeSpend": 49775000,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 82979685797,
+    "vt": 387926274956450
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "5v3mTDAXT1kynzVKj4m9WTbMqvFnprMz1RcEvZXGC5s3a7AR1haexnRkrptFxSagXfziUk6x5XwthZJHSWGyxVSs",
+   "isBuy": true,
+   "tapeSol": 695945156,
+   "curveLamportsDelta": 701338732,
+   "tapeTok": 2674691298934,
+   "curveTokenDelta": -2674691298934,
+   "signerSolDeltaExFee": -3012280,
+   "tapeSpend": 704644471,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 5393576,
+   "reservesAfter": {
+    "vs": 91867613139,
+    "vt": 350395523715539
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "624TmGqmeami14MNGEqdYVrsdp91wSVcZumqLoA4vgcr3N14qqqFPn8VtfhUQ9JSyjctuE4EqSQ8DZsShxNULfF4",
+   "isBuy": true,
+   "tapeSol": 218430666,
+   "curveLamportsDelta": 218430666,
+   "tapeTok": 890502119138,
+   "curveTokenDelta": -890502119138,
+   "signerSolDeltaExFee": -223563086,
+   "tapeSpend": 221161050,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 88967954075,
+    "vt": 361815675780780
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "4MKzg3jhdDSWmGXNsAkoiM1uNgSUa3WmGKtBHJ2mhhRATtEp8A9dUAviFt5Xq1GPWM42swx2ctbYtwHHARPoaspR",
+   "isBuy": false,
+   "tapeSol": 755416256,
+   "curveLamportsDelta": -755416256,
+   "tapeTok": 3405241958956,
+   "curveTokenDelta": 3405241958956,
+   "signerSolDeltaExFee": 742606672,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 84127602918,
+    "vt": 382633039788800
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "28uMSu2KteNsTy11adpNREvbhxKxn1C1Fd552d88AueTP1cosHQYwKWkpehP93RZNm4RQnULj1HnULorJYawk8h8",
+   "isBuy": true,
+   "tapeSol": 272866190,
+   "curveLamportsDelta": 272866190,
+   "tapeTok": 1261764371369,
+   "curveTokenDelta": -1261764371369,
+   "signerSolDeltaExFee": -277396564,
+   "tapeSpend": 276277018,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 83571151521,
+    "vt": 385180769416621
+   }
+  },
+  {
+   "id": "S2-GDGm7tAM3iTQEJnYziYmGPkNLu3fgyVoQB3BqG7xpump",
+   "sig": "5xJjFPjJecTUmE4mna8medD4uKfnDEAydNYZpF8bhrm4HRzjgoaGbBxHGpLCrbNBsW3tXEKigRqc6GJNoWNDaDY4",
+   "isBuy": false,
+   "tapeSol": 95447264,
+   "curveLamportsDelta": -94707547,
+   "tapeTok": 329129077106,
+   "curveTokenDelta": 329129077106,
+   "signerSolDeltaExFee": -1498440,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 739717,
+   "reservesAfter": {
+    "vs": 96570524872,
+    "vt": 333331526312831
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "2DphbEvzcwtZVoSoSF9dWgD2XYgFcPnzCqGTee9Nf8uSgMXezLAxxyx9153jw3KkLuwt79217QnaQSh6A2APaa3E",
+   "isBuy": false,
+   "tapeSol": 63696380,
+   "curveLamportsDelta": -63202732,
+   "tapeTok": 349824455645,
+   "curveTokenDelta": 349824455645,
+   "signerSolDeltaExFee": -1498440,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 493648,
+   "reservesAfter": {
+    "vs": 76526547766,
+    "vt": 420638348543317
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "22a7DxXDgymPcWgxfVLZ8cVc7SRh3nKPNgWWtTub6EHpZacsoTh2CA9ozsCDTvZqHGT8qZQoCZgTtmCUoqExsWt9",
+   "isBuy": true,
+   "tapeSol": 40825323,
+   "curveLamportsDelta": 40825323,
+   "tapeTok": 219837177118,
+   "curveTokenDelta": -219837177118,
+   "signerSolDeltaExFee": -41532491,
+   "tapeSpend": 41335640,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 77337368789,
+    "vt": 416228288819451
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "FVDtSXVkJapgGDeAfRw8a8ACjJZZnkHYyxwvZsPYyEEqDSSJRifN4WmFnmsDp5gnYxCnphTsVgSjyrc1mtKa8q3",
+   "isBuy": true,
+   "tapeSol": 387311519,
+   "curveLamportsDelta": 390313184,
+   "tapeTok": 2016838515790,
+   "curveTokenDelta": -2016838515790,
+   "signerSolDeltaExFee": -393841354,
+   "tapeSpend": 392152914,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3001665,
+   "reservesAfter": {
+    "vs": 78817894436,
+    "vt": 408409802165871
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "PjWkVmCfaCuWcmFyaNfvGyTweiDAN8edpR4GucKCrEFD1gF1AboHcAibg59znHm9XZ9JSpmgTp5boZMFM5cYXFa",
+   "isBuy": true,
+   "tapeSol": 39111110,
+   "curveLamportsDelta": 39414222,
+   "tapeTok": 203704582104,
+   "curveTokenDelta": -203704582104,
+   "signerSolDeltaExFee": -41513840,
+   "tapeSpend": 39600000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 303112,
+   "reservesAfter": {
+    "vs": 78635416088,
+    "vt": 409357542393793
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "2sWcL5erJfyLdwSA8SC2njkjbkVRYNBYuyKTu4XkA9C2EHvUFarRfJ3aSHb1wBVUZuGqaRAcUES1aP5d8vNeyuDJ",
+   "isBuy": false,
+   "tapeSol": 112250019,
+   "curveLamportsDelta": -111380080,
+   "tapeTok": 589051844861,
+   "curveTokenDelta": 589051844861,
+   "signerSolDeltaExFee": 111804492,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 869939,
+   "reservesAfter": {
+    "vs": 78264664477,
+    "vt": 411296731301012
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "412B1BHHwFoEWNExwYEL8Buw2QdFX3j3PYjzoehEUwgBGzCiX33YoF9xAuU28fzF12HKGBYMKi6WjKoU9VJ4xEDG",
+   "isBuy": true,
+   "tapeSol": 58617271,
+   "curveLamportsDelta": 58617271,
+   "tapeTok": 311016193567,
+   "curveTokenDelta": -311016193567,
+   "signerSolDeltaExFee": -59628270,
+   "tapeSpend": 59349988,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 77919328884,
+    "vt": 413119583261359
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "4qJTHHWhhzxuDSrDpdfBVBMseTh7Tg7H6LoYYc2oPmbNxXM2NCwigedC844zMNHHVbyw7CZ9F2EY83X24jWTiCry",
+   "isBuy": true,
+   "tapeSol": 454999221,
+   "curveLamportsDelta": 458525466,
+   "tapeTok": 1837061240618,
+   "curveTokenDelta": -1837061240618,
+   "signerSolDeltaExFee": -463825992,
+   "tapeSpend": 460686712,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3526245,
+   "reservesAfter": {
+    "vs": 89518031807,
+    "vt": 359592363995005
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "4pk7oHSXdpgtnRNEPqbgQBohX5RGYSahdBewYQYUYe8jAbTfsz87WtUsEhMfxP86dbGVH15NPYSh2qba4ZYakW6m",
+   "isBuy": true,
+   "tapeSol": 483559020,
+   "curveLamportsDelta": 487306604,
+   "tapeTok": 1913116871164,
+   "curveTokenDelta": -1913116871164,
+   "signerSolDeltaExFee": -489603509,
+   "tapeSpend": 489603509,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3747584,
+   "reservesAfter": {
+    "vs": 90443754432,
+    "vt": 355911813710109
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "2VkyH3mkFPiAciraodRnL6neyQ8eeNno6g9S6VuvXaEW1ZSFHKgko6q9j7j8CBGUFS3HgsojAteTzX3oQKisXjHL",
+   "isBuy": false,
+   "tapeSol": 56398107,
+   "curveLamportsDelta": -56398107,
+   "tapeTok": 219837177118,
+   "curveTokenDelta": 219837177118,
+   "signerSolDeltaExFee": 55432510,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 90846337826,
+    "vt": 354334598949292
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "xD3X5232HVHvaxW3cmSMTBCdLZ7zBY4Gy4YcFgmvFEZdXqw6sZxyyGBxYczysqRv4gFvFeNvkmigvdabihjAYVL",
+   "isBuy": true,
+   "tapeSol": 778186353,
+   "curveLamportsDelta": 784217299,
+   "tapeTok": 3115606458292,
+   "curveTokenDelta": -3115606458292,
+   "signerSolDeltaExFee": -787913684,
+   "tapeSpend": 787913684,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 6030946,
+   "reservesAfter": {
+    "vs": 90056598903,
+    "vt": 357441887350707
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "2TGMyZg4ycJQAnATarvqGiM2JVpiprf53zMcrQZ3omC8nFa2F7jymsX4WDffhhi7pe4NvtxE45UAQeh2op3riV8H",
+   "isBuy": true,
+   "tapeSol": 248930880,
+   "curveLamportsDelta": 248930880,
+   "tapeTok": 975557154020,
+   "curveTokenDelta": -975557154020,
+   "signerSolDeltaExFee": -254705675,
+   "tapeSpend": 252042517,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 90754872329,
+    "vt": 354691708062213
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "3yTZQ2egW4tC3jRv2mkseTQNACeTbNkmvmUHBa9jd5TzgbYqSX5WSivh7Ba2UXkmHKqUKJVimw3PMXaCxo95jz6S",
+   "isBuy": false,
+   "tapeSol": 1373305712,
+   "curveLamportsDelta": -1362662591,
+   "tapeTok": 5494168307331,
+   "curveTokenDelta": 5494168307331,
+   "signerSolDeltaExFee": -1498440,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 10643121,
+   "reservesAfter": {
+    "vs": 89016116449,
+    "vt": 361619917450616
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "28MrAhhEXRLiW3wtFZKRTHtyxN3rDkswA4tc4Q7xoTofGfZHoQjq5gaqMsPh3BvQAmcjkxRZaJ2JVaxAvYG7cNom",
+   "isBuy": false,
+   "tapeSol": 253164558,
+   "curveLamportsDelta": -253164558,
+   "tapeTok": 1009245760982,
+   "curveTokenDelta": 1009245760982,
+   "signerSolDeltaExFee": 246500000,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 89732899553,
+    "vt": 358731310847328
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "4gzEBtQCedgFBxPDiuaxuMi5vQQP1MmV4eRheZryenKiGBsxXggoPMQwd4ear9pSygijoBn96vbRA8mUQLMAAWn3",
+   "isBuy": true,
+   "tapeSol": 49382715,
+   "curveLamportsDelta": 49765432,
+   "tapeTok": 196409633295,
+   "curveTokenDelta": -196409633295,
+   "signerSolDeltaExFee": -51523840,
+   "tapeSpend": 50000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 382717,
+   "reservesAfter": {
+    "vs": 89988243342,
+    "vt": 357713402199402
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "4m4jyS1hnhcvW1eZ4h5fMNZxJC46t5FTdgTshNmpQjriu7eNKBLw91HmjtinhUtWr1h4gtBwzxXyLC6a3q4rCYcG",
+   "isBuy": false,
+   "tapeSol": 33577169,
+   "curveLamportsDelta": -33577169,
+   "tapeTok": 134969909389,
+   "curveTokenDelta": 134969909389,
+   "signerSolDeltaExFee": 32725879,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 89471059397,
+    "vt": 359781150476558
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "Nk977goRQ4sj5L6cgL2dc5bxdvpJTyySpYgvRZeGA1oXEBK5ifbZ1TkA8Ut9EFGf2PwHUSuAkcLBoqmFDteu3Zi",
+   "isBuy": true,
+   "tapeSol": 1460197014,
+   "curveLamportsDelta": 1471513542,
+   "tapeTok": 5807397303818,
+   "curveTokenDelta": -5807397303818,
+   "signerSolDeltaExFee": -3012280,
+   "tapeSpend": 1478449478,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 11316528,
+   "reservesAfter": {
+    "vs": 90698447751,
+    "vt": 354912366012007
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "4VLMaCR2QPNJGt7RTemBWqDp6LyV1roV7feFG5Y71iaZYQqc4mKSX64FE6AhJcMnGEGZUK2ngLV6vG8LzYxZdXt7",
+   "isBuy": false,
+   "tapeSol": 1368005022,
+   "curveLamportsDelta": -1357402982,
+   "tapeTok": 5424867213495,
+   "curveTokenDelta": 5424867213495,
+   "signerSolDeltaExFee": -1498440,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 10602040,
+   "reservesAfter": {
+    "vs": 89415480268,
+    "vt": 360004784281314
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "2Mjvz3DGhZBrWAwbQhU9bHPboCtCFxheqnpY1smaABo6UBvqzSGX44pE65RZo542Lv37r871Q63rA9BD9DYdjYR8",
+   "isBuy": true,
+   "tapeSol": 28092587,
+   "curveLamportsDelta": 28310305,
+   "tapeTok": 114362219400,
+   "curveTokenDelta": -114362219400,
+   "signerSolDeltaExFee": -3012280,
+   "tapeSpend": 28443745,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 217718,
+   "reservesAfter": {
+    "vs": 88937243739,
+    "vt": 361940614891552
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "2VTiALCRjfTvMsoeMi7kht7WRF3n3WT3j3ftoatw2yQXGoqis4f8oXApEGMhZiKPjFYGspXUerSvSxbvoMmG5Vgt",
+   "isBuy": true,
+   "tapeSol": 188476235,
+   "curveLamportsDelta": 188476235,
+   "tapeTok": 758277423184,
+   "curveTokenDelta": -758277423184,
+   "signerSolDeltaExFee": -193122423,
+   "tapeSpend": 190832189,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 89543130854,
+    "vt": 359491569924003
+   }
+  },
+  {
+   "id": "S2-GMLSyjZCKGtFwztp2mtT8PDeNUA6WEk7oQoe3QkFpump",
+   "sig": "tpLQJkfFD5taz3R5ashWKAYGv7AivFSzrB3pWaDXLCk2thu5AU3Rn26vxUdpaidEDBjicVFoFtCZ4FTsWZ2fzWu",
+   "isBuy": false,
+   "tapeSol": 253164558,
+   "curveLamportsDelta": -253164558,
+   "tapeTok": 1016512771047,
+   "curveTokenDelta": 1016512771047,
+   "signerSolDeltaExFee": 246500000,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 89411123113,
+    "vt": 360022327945158
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "5Jtfv9NpsaQ97Qf6XNonKnfWaMqoapnapx1yUvrJx7KFwQMX3bQdPBFCBxk8KkcBTHNTx5LX3jSY7PMeFCKkE6Rh",
+   "isBuy": true,
+   "tapeSol": 75772619,
+   "curveLamportsDelta": 76359857,
+   "tapeTok": 329912580212,
+   "curveTokenDelta": -329912580212,
+   "signerSolDeltaExFee": -1513840,
+   "tapeSpend": 76719777,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 587238,
+   "reservesAfter": {
+    "vs": 86021807603,
+    "vt": 374207449986736
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "67Gm8wECmBoiUQCrx1EXFgWz8q6riZtHCcoUGgH26WXBCNym6gpVwCmJcRjWTxpFUPik7jYYsz4SJGHGonukMUtQ",
+   "isBuy": true,
+   "tapeSol": 293333333,
+   "curveLamportsDelta": 295606667,
+   "tapeTok": 1271103122420,
+   "curveTokenDelta": -1271103122420,
+   "signerSolDeltaExFee": -301514772,
+   "tapeSpend": 297000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2273334,
+   "reservesAfter": {
+    "vs": 86335587039,
+    "vt": 372847424464424
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "78uZQFDXYA2SV5sW3CyUti6gbawvFdCN93yTHTvNTaFWAjognpQgdQsZFMwqk4NSNM7wknS5E1Tn7aZhSsFRF59",
+   "isBuy": false,
+   "tapeSol": 139049993,
+   "curveLamportsDelta": -137972355,
+   "tapeTok": 598551505357,
+   "curveTokenDelta": 598551505357,
+   "signerSolDeltaExFee": 0,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1077638,
+   "reservesAfter": {
+    "vs": 86406428698,
+    "vt": 372541739687905
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "5vEfXj8dP1AxDoSna39VsVP3d3pnJggnKDuNSxFUzVAUA8eWHXgczbV5CY4nKd8jTCXbEXFaHJjHD3TmKjWUMGC4",
+   "isBuy": true,
+   "tapeSol": 70591345,
+   "curveLamportsDelta": 71138429,
+   "tapeTok": 303187869998,
+   "curveTokenDelta": -303187869998,
+   "signerSolDeltaExFee": -1513840,
+   "tapeSpend": 71473738,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 547084,
+   "reservesAfter": {
+    "vs": 86607873678,
+    "vt": 371675228825630
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "35YigVEYKScPHC9cfwRJCtbrTCwzZWYScnbuR2H3b36ith5C3qPZDgQyfQFZy2ZUFBCtjvN5Wzgx7dokWCD2jjG",
+   "isBuy": true,
+   "tapeSol": 130164897,
+   "curveLamportsDelta": 131173676,
+   "tapeTok": 557904076424,
+   "curveTokenDelta": -557904076424,
+   "signerSolDeltaExFee": 0,
+   "tapeSpend": 131791959,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1008779,
+   "reservesAfter": {
+    "vs": 86726899335,
+    "vt": 371165134630293
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "3kSCUhgTh7kwRKfovxdoJtm24oiMcGs8BQknauBRpi9BdnoBRW2wzKq3D1HSzRv3HAs4SKU52D9vRb6c1Bdk4wrq",
+   "isBuy": false,
+   "tapeSol": 105501751,
+   "curveLamportsDelta": -104684111,
+   "tapeTok": 450832024504,
+   "curveTokenDelta": 450832024504,
+   "signerSolDeltaExFee": 0,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 817640,
+   "reservesAfter": {
+    "vs": 86739916102,
+    "vt": 371109435136998
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "2xMMKdRUqDtDT9hz4mhrh3XiHEstkYwD49KYdbvk8bvUvU6J8LMWPPVjNVCWXL768jLbjN32WT12p4VECLd8kpj1",
+   "isBuy": false,
+   "tapeSol": 755830248,
+   "curveLamportsDelta": -749972563,
+   "tapeTok": 3298332636090,
+   "curveTokenDelta": 3298332636090,
+   "signerSolDeltaExFee": 0,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 5857685,
+   "reservesAfter": {
+    "vs": 85509515238,
+    "vt": 376449348112108
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "5MmD2Dbvroke779LgmEPpJiFMnTbS8PiPwVP4y33sczmQcJTaCtH8v1vCtsQG211sAre4XR2JqDnny8V1HZdnXGU",
+   "isBuy": false,
+   "tapeSol": 2295588836,
+   "curveLamportsDelta": -2277798022,
+   "tapeTok": 10415116213951,
+   "curveTokenDelta": 10415116213951,
+   "signerSolDeltaExFee": 2244035396,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 17790814,
+   "reservesAfter": {
+    "vs": 83091710562,
+    "vt": 387403280680378
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "5s8Am1uuzmgJ1wQNToQzeoBNi3nBAvuPcYmzXM6wpPJgPE4ESfNooDdMeGksaRWMJwBCBVWysZhWqZLMb7k3su2g",
+   "isBuy": false,
+   "tapeSol": 419294138,
+   "curveLamportsDelta": -416044607,
+   "tapeTok": 2061271927304,
+   "curveTokenDelta": 2061271927304,
+   "signerSolDeltaExFee": 414052960,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3249531,
+   "reservesAfter": {
+    "vs": 80709948897,
+    "vt": 398835604649028
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "2czNh6jLqdZoRNMWHCHBzYEpFV9FbaB3Nb6jS7rJAcxKXzuePGxVWypaepaSX1vSXRc1chbRSaMiq5jodQqWsk3b",
+   "isBuy": false,
+   "tapeSol": 35088298,
+   "curveLamportsDelta": -34816363,
+   "tapeTok": 171757665314,
+   "curveTokenDelta": 171757665314,
+   "signerSolDeltaExFee": 33303198,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 271935,
+   "reservesAfter": {
+    "vs": 81075498835,
+    "vt": 397037350773904
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "WJsD8Teea8V113TLwWaYCx1z2U1wS9HpR8pwuTnxWVuUrnqQYzjj29K4ZYGRjyCqrBWmKtGR3kcPAhnAyUHibBm",
+   "isBuy": true,
+   "tapeSol": 493827159,
+   "curveLamportsDelta": 497654321,
+   "tapeTok": 2278934505374,
+   "curveTokenDelta": -2278934505374,
+   "signerSolDeltaExFee": -500000000,
+   "tapeSpend": 500000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3827162,
+   "reservesAfter": {
+    "vs": 83765658225,
+    "vt": 384286376453237
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "2krf3naRT8ghbtB3DPDbCqshrUmd1FrxV1XFH7Kh2fUtxGBp5SN3h4yAGNV1UEMCKfNg92fFXvuk16cJhFxHjPea",
+   "isBuy": true,
+   "tapeSol": 216704985,
+   "curveLamportsDelta": 218384449,
+   "tapeTok": 911036200471,
+   "curveTokenDelta": -911036200471,
+   "signerSolDeltaExFee": -220927638,
+   "tapeSpend": 219413798,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1679464,
+   "reservesAfter": {
+    "vs": 87612263157,
+    "vt": 367414333465593
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "5bN2mVxgmNN2TdiDXfUJqsNwsKBUVEDWsvtQP6p2AtpmMWhrG3SvHZgQ4AzfTSj19r5gRsk1fsXoiNqSWU39Aw9r",
+   "isBuy": false,
+   "tapeSol": 254032448,
+   "curveLamportsDelta": -252063695,
+   "tapeTok": 1067225527703,
+   "curveTokenDelta": 1067225527703,
+   "signerSolDeltaExFee": 0,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1968753,
+   "reservesAfter": {
+    "vs": 87407119597,
+    "vt": 368276650919285
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "5pwy77NdnaditwzUQqb9eNiCskZhhxbMH5Djz4BQNS6TYTnw3ekUkgxR7g3dzghgdTeAE7ZfJQoTgHw9YGvRtvpU",
+   "isBuy": false,
+   "tapeSol": 11139240,
+   "curveLamportsDelta": -11052910,
+   "tapeTok": 43517578430,
+   "curveTokenDelta": 43517578430,
+   "signerSolDeltaExFee": 10888130,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 86330,
+   "reservesAfter": {
+    "vs": 90767269244,
+    "vt": 354643271079927
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "5ZB7M8xYbGrCnucFDb3HnP2SnU76ArhB92DELPB7XaJZviwgkrFfgPiu4q21yLzaV46CEFghGkNn4xd6958t8ae",
+   "isBuy": false,
+   "tapeSol": 11139240,
+   "curveLamportsDelta": -11052910,
+   "tapeTok": 43538947434,
+   "curveTokenDelta": 43538947434,
+   "signerSolDeltaExFee": 10888130,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 86330,
+   "reservesAfter": {
+    "vs": 90744990764,
+    "vt": 354730338288326
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "4nXyb3JpFXvwm15GiAjeJ68gE9UniDNEZVvUP3sPTVT3Z6pxsEUK5gw76nkjKevkAQfR4WbBEF3CMF16YwVrtUD4",
+   "isBuy": true,
+   "tapeSol": 1469643800,
+   "curveLamportsDelta": 1481033541,
+   "tapeTok": 5476740472314,
+   "curveTokenDelta": -5476740472314,
+   "signerSolDeltaExFee": -1503234037,
+   "tapeSpend": 1488014349,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 11389741,
+   "reservesAfter": {
+    "vs": 93678324096,
+    "vt": 343622727915049
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "649RpsNMbtgtiaZ3hNHDq3Xy8zfivMX7bTotQBjVypn2qamZHDqZiMZAZhhRypYVHezGUL2d4Tm2c5gwdjDm8SpB",
+   "isBuy": true,
+   "tapeSol": 163448047,
+   "curveLamportsDelta": 164714771,
+   "tapeTok": 596608095770,
+   "curveTokenDelta": -596608095770,
+   "signerSolDeltaExFee": -1513840,
+   "tapeSpend": 165491149,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1266724,
+   "reservesAfter": {
+    "vs": 93990452030,
+    "vt": 342481609328214
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "2eKpPExQVLB7dqtHdmZuEc5hrVgJoey29Mwa19MX3FcEjTSUSgwHKKV73SUbrq69aEAbf3w4Nks1wQ59gXcQTLNy",
+   "isBuy": true,
+   "tapeSol": 68444443,
+   "curveLamportsDelta": 68974889,
+   "tapeTok": 249770259990,
+   "curveTokenDelta": -249770259990,
+   "signerSolDeltaExFee": -71000000,
+   "tapeSpend": 69300000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 530446,
+   "reservesAfter": {
+    "vs": 93954475788,
+    "vt": 342612749455292
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "5Rcdx2PQRt9BPSanAAw5KK8w4Ysck92xaHjvRxnfb8aacHtg619HFGb2mBKCj31sH3wyTGFVatv5Vf5B8m3RPTCq",
+   "isBuy": true,
+   "tapeSol": 49185184,
+   "curveLamportsDelta": 49185184,
+   "tapeTok": 181330888844,
+   "curveTokenDelta": -181330888844,
+   "signerSolDeltaExFee": -51523840,
+   "tapeSpend": 49800000,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 93466514538,
+    "vt": 344401430106886
+   }
+  },
+  {
+   "id": "S2-GoUMWxBvgnSD8tGSzSSjqXi1RR252dPYiwzXdxdvpump",
+   "sig": "2ywhAQn9BGGQStn6tjiKfnPqTR26srCoWZYEoVVMXPNFw6KpXmb8yQ56fdLgcLZWqiZmt1HJEXaDUQdM7RK2ejzS",
+   "isBuy": true,
+   "tapeSol": 106343355,
+   "curveLamportsDelta": 107167517,
+   "tapeTok": 390254473561,
+   "curveTokenDelta": -390254473561,
+   "signerSolDeltaExFee": -1513840,
+   "tapeSpend": 107672648,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 824162,
+   "reservesAfter": {
+    "vs": 93710507274,
+    "vt": 343504716931693
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "3w1eUREq1RJtgBs2uQYX9hE73ueNkrWB95Ek6WARbdydyDxqKTm6QnmjEoZ4BBvwcFNKUN7nimnHAU6sKzaRQmSx",
+   "isBuy": false,
+   "tapeSol": 1447559546,
+   "curveLamportsDelta": -1447559546,
+   "tapeTok": 13836285738792,
+   "curveTokenDelta": 13836285738792,
+   "signerSolDeltaExFee": 1430978891,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 57312922474,
+    "vt": 561653454272487
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "4icFgL7PyM3RgJEs1t6S8gTvdjH3okqxjRQx2752kn3F1eUncrBNg7W4ALdDSAYcapiUa38Te5Nm3xMaeysRZxcS",
+   "isBuy": true,
+   "tapeSol": 646285117,
+   "curveLamportsDelta": 651293828,
+   "tapeTok": 6450301932689,
+   "curveTokenDelta": -6450301932689,
+   "signerSolDeltaExFee": -655877522,
+   "tapeSpend": 654363682,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 5008711,
+   "reservesAfter": {
+    "vs": 57115458558,
+    "vt": 563595245451759
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "HEHBAkNT9cLr7B51CqE8Mcfbj1RCpALGx1f2Hns7S2wAbafB4Vor22XhdSS4yHJixbCJaivqWeejUYLQVCsNANv",
+   "isBuy": true,
+   "tapeSol": 1879530933,
+   "curveLamportsDelta": 1894097298,
+   "tapeTok": 19539061817533,
+   "curveTokenDelta": -19539061817533,
+   "signerSolDeltaExFee": -1905097640,
+   "tapeSpend": 1903025070,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 14566365,
+   "reservesAfter": {
+    "vs": 56593627158,
+    "vt": 568791973693745
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "32i7k5Ew3QjYqA7gjkHb4gwEuKWqXpT9azkPfUq2QxzQJ7fCjRptuhuqjRGBMHJYt1datUf1SwkxHWPkiXHK3agR",
+   "isBuy": true,
+   "tapeSol": 847607547,
+   "curveLamportsDelta": 854176506,
+   "tapeTok": 7676182901451,
+   "curveTokenDelta": -7676182901451,
+   "signerSolDeltaExFee": -858212642,
+   "tapeSpend": 858202642,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 6568959,
+   "reservesAfter": {
+    "vs": 60044386578,
+    "vt": 536103418301641
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "3aWCmukh1ew8EW44cvRgpEBxMKc9pM9nqzPzUKuvUnLPA4YebTJ7BPimKU25Ap13EGk6AvQrXmxTPUCfqkq52i1M",
+   "isBuy": false,
+   "tapeSol": 1031555082,
+   "curveLamportsDelta": -1023560529,
+   "tapeTok": 11916420547522,
+   "curveTokenDelta": 11916420547522,
+   "signerSolDeltaExFee": 1017660642,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 7994553,
+   "reservesAfter": {
+    "vs": 52274570440,
+    "vt": 615786999795199
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "5WMr8uKSapDT5cnY8oRV3XrNU2H1NTFVmjSEER7XSUzo7bo5zbTa5DTzjRrwkWc6vVnE3T9TBwktH7f8Z5V3Eyix",
+   "isBuy": false,
+   "tapeSol": 82970,
+   "curveLamportsDelta": -82970,
+   "tapeTok": 943833486,
+   "curveTokenDelta": 943833486,
+   "signerSolDeltaExFee": 81932,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 53195308074,
+    "vt": 605128573650203
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "5krQm1yUBQCnKZkKCwK3XjNDavLBddNd5J1wiHvj6NDfyEBii9GJtRwowbJxejV6Fy88kTEY9a5MWysd17MMRNvL",
+   "isBuy": true,
+   "tapeSol": 2301224690,
+   "curveLamportsDelta": 2319059183,
+   "tapeTok": 26802936622442,
+   "curveTokenDelta": -26802936622442,
+   "signerSolDeltaExFee": -2513840,
+   "tapeSpend": 2329990000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 17834493,
+   "reservesAfter": {
+    "vs": 53734514574,
+    "vt": 599056326413983
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "3WZ2bAUoeftfh25PnfeRtCAJzGuch11S5RnTuqssCzTDGpfem47XB4rE4cdcAkcrgYBrz5EHcSQgpUiMSH1Yr1Xj",
+   "isBuy": false,
+   "tapeSol": 1239778503,
+   "curveLamportsDelta": -1230170219,
+   "tapeTok": 11711294193649,
+   "curveTokenDelta": 11711294193649,
+   "signerSolDeltaExFee": 1210059176,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 9608284,
+   "reservesAfter": {
+    "vs": 57758832939,
+    "vt": 557317370657012
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "4Umr9Mre5HSvt46uAxxonin3a3kCZt7qeZKyqvijyJAL3eHmp8zcgNg53uGeL733yy8TBqaQuXdo7AcNqHQjyiVs",
+   "isBuy": true,
+   "tapeSol": 1687901234,
+   "curveLamportsDelta": 1700982469,
+   "tapeTok": 16535106762426,
+   "curveTokenDelta": -16535106762426,
+   "signerSolDeltaExFee": -1712039280,
+   "tapeSpend": 1709000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 13081235,
+   "reservesAfter": {
+    "vs": 58173373656,
+    "vt": 553345953402621
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "34MFGxWcbARPHuEPEyKDBusZzCjxwDxaWKm87A64zHTnB8pCbykZzEjas3Ar5HpSeLFgXquFACk5chey3uA79Jnk",
+   "isBuy": false,
+   "tapeSol": 115351567,
+   "curveLamportsDelta": -115351567,
+   "tapeTok": 1006553753520,
+   "curveTokenDelta": 1006553753520,
+   "signerSolDeltaExFee": 113809672,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 60679410457,
+    "vt": 530492973968348
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "2b3jYwEpyfALoV1kXEUBFR8r7jKRgsLeEqE4zEgSPc3U6ypyVhfJh7xhHCQtr1zYxMAgrmuF4fm5VgPp6b61Asx7",
+   "isBuy": true,
+   "tapeSol": 69403478,
+   "curveLamportsDelta": 69403478,
+   "tapeTok": 506094023883,
+   "curveTokenDelta": -506094023883,
+   "signerSolDeltaExFee": -72077075,
+   "tapeSpend": 70271023,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 66475610419,
+    "vt": 484237763499668
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "28PKsVPnNJbbJNFnHfAJog9jS4Pso5iDQabtCAo5gfhBYz9gukNS2rck3bWezYqpvvE8GLnNjkmL1UcScUBH8hkS",
+   "isBuy": false,
+   "tapeSol": 466198348,
+   "curveLamportsDelta": -462585309,
+   "tapeTok": 2180654340428,
+   "curveTokenDelta": 2180654340428,
+   "signerSolDeltaExFee": 455267159,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3613039,
+   "reservesAfter": {
+    "vs": 82724114966,
+    "vt": 389124754401213
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "2nSNZykaY2BxKPczFi7n5Ha47weHz1LGEDebjFcQesiSkXZmys6ipsNEv4rJbVgontBPKT4tbAvToFaTmw6y8P4F",
+   "isBuy": true,
+   "tapeSol": 714492404,
+   "curveLamportsDelta": 720029721,
+   "tapeTok": 3497441265917,
+   "curveTokenDelta": -3497441265917,
+   "signerSolDeltaExFee": -726602474,
+   "tapeSpend": 723423560,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 5537317,
+   "reservesAfter": {
+    "vs": 81451167608,
+    "vt": 395206132308052
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "3H9foL2T7ViJkauQcM6E4FyBPvLVj3Q9xWd4k8FYmB5kCx7HkKAoSRUxyyYa3aF8tD4jJ64mN7NHdVAYLxCudpQo",
+   "isBuy": true,
+   "tapeSol": 279584627,
+   "curveLamportsDelta": 281751408,
+   "tapeTok": 1322577786775,
+   "curveTokenDelta": -1322577786775,
+   "signerSolDeltaExFee": -285593275,
+   "tapeSpend": 283079435,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2166781,
+   "reservesAfter": {
+    "vs": 82630902647,
+    "vt": 389563709146535
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "2ykFPhXMW4SyJwEaQJVVuDLErGFhJxDV34FgN2PcgStpgRzg9amFzK9LHRScqLjf3fPx7y23yTXJtqb5Ba98kzt9",
+   "isBuy": false,
+   "tapeSol": 2181884362,
+   "curveLamportsDelta": -2164974757,
+   "tapeTok": 9992899537582,
+   "curveTokenDelta": 9992899537582,
+   "signerSolDeltaExFee": 2156550086,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 16909605,
+   "reservesAfter": {
+    "vs": 82752165250,
+    "vt": 388992853919244
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "bLZojYJ4pUQghCtsZP4V9stcuaiURtq6BoieHmyCNgMCS3UqjLUAdBvcDbhC1LKa8yDBi6oiYYZRSo41ks9SDuk",
+   "isBuy": false,
+   "tapeSol": 3206084244,
+   "curveLamportsDelta": -3181237090,
+   "tapeTok": 13401468311221,
+   "curveTokenDelta": 13401468311221,
+   "signerSolDeltaExFee": -1000000,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 24847154,
+   "reservesAfter": {
+    "vs": 86166577458,
+    "vt": 373578734138745
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "xC3Wgrvoyz8h2f7NDvEagWsNTp4fZUjXRSoRkCi2J9MZHpHWdNyvrc2TbHUq7ocDwS2GH5zmHwTaJ78XXw1Rn49",
+   "isBuy": true,
+   "tapeSol": 164300086,
+   "curveLamportsDelta": 164300086,
+   "tapeTok": 751038229208,
+   "curveTokenDelta": -751038229208,
+   "signerSolDeltaExFee": -168629654,
+   "tapeSpend": 166353838,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 83998884402,
+    "vt": 383219386351012
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "kdFzZoKbqVaXfPCsve8x5eDxygwocALdUnHNJTT45nqVBMdFL2QNXvpRWYniZfbDrcUgHpZhsf8H37pRNvrFvXj",
+   "isBuy": false,
+   "tapeSol": 1441094477,
+   "curveLamportsDelta": -1441094477,
+   "tapeTok": 6259938783577,
+   "curveTokenDelta": 6259938783577,
+   "signerSolDeltaExFee": 1417754320,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 85366317585,
+    "vt": 377080818859144
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "3UytxnYq1ScDZ53f8BMYe2zjVxkiAcDYm1ZR2uUPVW5a6KuNcAQDzCeNHhZGXeVL1WxgMZPfmamv45rb3FWp55i2",
+   "isBuy": true,
+   "tapeSol": 120112715,
+   "curveLamportsDelta": 121043590,
+   "tapeTok": 540105883527,
+   "curveTokenDelta": -540105883527,
+   "signerSolDeltaExFee": -121614125,
+   "tapeSpend": 121614125,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 930875,
+   "reservesAfter": {
+    "vs": 84668877048,
+    "vt": 380186936015450
+   }
+  },
+  {
+   "id": "S2-HgxPiLhX6r2a8fH39x1qc5qxnTZwLwzbGsi9TPRFpump",
+   "sig": "3Y6AFyLx9msDBJ47BDc6xDYoU1JnHxuLhUDFjudjR6YMftH6xtRNTiBQv2kGyjn6UykLVvcNEug2vsqUJRShnAcg",
+   "isBuy": false,
+   "tapeSol": 33274164,
+   "curveLamportsDelta": -33016288,
+   "tapeTok": 132018174800,
+   "curveTokenDelta": 132018174800,
+   "signerSolDeltaExFee": 34367076,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 257876,
+   "reservesAfter": {
+    "vs": 90056900525,
+    "vt": 357440693120028
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "5feTe6HbMZ8ShifVY4whKM8pTcNKB3VnhT7HDDbXXZHj779BuodxDhbPzEuVVUz4N5DEH9dKtMXdGodqET55eScH",
+   "isBuy": false,
+   "tapeSol": 155888539,
+   "curveLamportsDelta": -154680402,
+   "tapeTok": 3310598289369,
+   "curveTokenDelta": 3310598289369,
+   "signerSolDeltaExFee": 150466839,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 1208137,
+   "reservesAfter": {
+    "vs": 38854817699,
+    "vt": 828468710622907
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "4Y4UHNLDRYcd5xEpq4sRK6GDyrRpHxK8zYT2obPPf79c5D4ZjsYi9EFJL6Xmw6dhuzQVdiwWSfAXefa8z14viDrj",
+   "isBuy": true,
+   "tapeSol": 41019161,
+   "curveLamportsDelta": 41337061,
+   "tapeTok": 873694804902,
+   "curveTokenDelta": -873694804902,
+   "signerSolDeltaExFee": -54377028,
+   "tapeSpend": 41531902,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 317900,
+   "reservesAfter": {
+    "vs": 38895836860,
+    "vt": 827595015818005
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "6vsTBKuFKNQXtqrqLPdeQA5AHXTePHdci46BTGFjCZbAnqa7NBywbJxYbep2sSLh7wb8dKMC7XQU65VrXbzAZna",
+   "isBuy": false,
+   "tapeSol": 6327660,
+   "curveLamportsDelta": -6278620,
+   "tapeTok": 134656882162,
+   "curveTokenDelta": 134656882162,
+   "signerSolDeltaExFee": 4196319,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 49040,
+   "reservesAfter": {
+    "vs": 38889509200,
+    "vt": 827729672700167
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "ZAPBsqwQLmK35mhqh2oAQDWw2FYRrWuj9t8pHDAZVtnQRsmDdY4mzCVE7sFAyuoRqUhEfgB815wEj5EphrqbHiF",
+   "isBuy": true,
+   "tapeSol": 105107136,
+   "curveLamportsDelta": 105921717,
+   "tapeTok": 2231084765768,
+   "curveTokenDelta": -2231084765768,
+   "signerSolDeltaExFee": -118434472,
+   "tapeSpend": 106420976,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 814581,
+   "reservesAfter": {
+    "vs": 38994616336,
+    "vt": 825498587934399
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "5LSFwkQLjR35oQYcsJtDLdAV5yL7o8aJMkR6HwAehAdbrcfwmTBhcZLtFEZxS1KTxCWVJTNQgq2McAuDwB5fQG9W",
+   "isBuy": false,
+   "tapeSol": 2071402056,
+   "curveLamportsDelta": -2055348689,
+   "tapeTok": 46310688445199,
+   "curveTokenDelta": 46310688445199,
+   "signerSolDeltaExFee": 0,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 16053367,
+   "reservesAfter": {
+    "vs": 36923214280,
+    "vt": 871809276379598
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "5GJnNXGpsekBrNLS6anNKJSVKJG3chgGrz3fyvyuJSEqSzQU3NRRdhnZK2oAzyxCSqDANrshhwGuBjJDCV1xcEbX",
+   "isBuy": true,
+   "tapeSol": 736659772,
+   "curveLamportsDelta": 706625362,
+   "tapeTok": 17053344921540,
+   "curveTokenDelta": -17053344921540,
+   "signerSolDeltaExFee": -747496860,
+   "tapeSpend": 745868020,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": -30034410,
+   "reservesAfter": {
+    "vs": 37659874052,
+    "vt": 854755931458058
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "4p3jaEo2s7fJHGp8b6SmzzzdnJHLRD9W1k5sv5QVfqGdzzpVsdBx2sP9xfwWNeomszc3McGgq9amRryhZo9GYtCR",
+   "isBuy": true,
+   "tapeSol": 1975308641,
+   "curveLamportsDelta": 1990617284,
+   "tapeTok": 42598687878412,
+   "curveTokenDelta": -42598687878412,
+   "signerSolDeltaExFee": -2001000000,
+   "tapeSpend": 2000000000,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 15308643,
+   "reservesAfter": {
+    "vs": 39635182693,
+    "vt": 812157243579646
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "32iwcWvFj69PRGV8QpRwJqxc62MU8Jm33m5rYpV9pmVmgjuunpWRhUUTqURthdHkREa5f14ZfvAUr37KvngWjMfM",
+   "isBuy": false,
+   "tapeSol": 344815824,
+   "curveLamportsDelta": -342143500,
+   "tapeTok": 7127565648041,
+   "curveTokenDelta": 7127565648041,
+   "signerSolDeltaExFee": 336913520,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 2672324,
+   "reservesAfter": {
+    "vs": 39290366869,
+    "vt": 819284809227687
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "5QSFnnq78TKqZagqTNoS2sJoG1ScaPYHZM3fqUGj3MLpwbvCXLMFaJ7La7kGdbjsMNNpC7h3HNsZSodZNjjzpXRr",
+   "isBuy": true,
+   "tapeSol": 422270214,
+   "curveLamportsDelta": 425542809,
+   "tapeTok": 8711573854586,
+   "curveTokenDelta": -8711573854586,
+   "signerSolDeltaExFee": -442824229,
+   "tapeSpend": 427548593,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 3272595,
+   "reservesAfter": {
+    "vs": 39712637083,
+    "vt": 810573235373101
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "48kxJgrAgRNKncCTTEVA4g6kgWgHY5dnw1HyYuUQhMXJCTcX3J3ajtnUhJ1UVCGK942bJK31x6nEQR2GFQFQuwsF",
+   "isBuy": true,
+   "tapeSol": 53033950,
+   "curveLamportsDelta": 53033950,
+   "tapeTok": 1081030409142,
+   "curveTokenDelta": -1081030409142,
+   "signerSolDeltaExFee": -53949603,
+   "tapeSpend": 53696875,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 39765671033,
+    "vt": 809492204963959
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "AfJaxVyiK4cKqtottvP61rCWbFb8FhUN3ga7a5Ftcnjb28LpKSThEdEsxttuh7AmBpBJwgwEZMRUa8auM4K5EaL",
+   "isBuy": true,
+   "tapeSol": 40684141,
+   "curveLamportsDelta": 40999444,
+   "tapeTok": 827342620356,
+   "curveTokenDelta": -827342620356,
+   "signerSolDeltaExFee": -52586589,
+   "tapeSpend": 41192694,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 315303,
+   "reservesAfter": {
+    "vs": 39806355174,
+    "vt": 808664862343603
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "29mdUerM8XAsRu4JAgfPrMe6YbM7xbkVQSsHryVtDTqYNwt37n8tgcjDKtm7YyXH9gchVMmrDoCPaePPMedE9Kjf",
+   "isBuy": true,
+   "tapeSol": 6823224,
+   "curveLamportsDelta": 6876105,
+   "tapeTok": 138589806445,
+   "curveTokenDelta": -138589806445,
+   "signerSolDeltaExFee": -17956779,
+   "tapeSpend": 6908515,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 52881,
+   "reservesAfter": {
+    "vs": 39813178398,
+    "vt": 808526272537158
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "RxJRNqknhFWtgDVRq3H84ozJtXweoejJvoT3XJQAktZERW9JU4unJhNL6NNtnAa2yXRHXTh6oPNJ35iBHKZoyk1",
+   "isBuy": true,
+   "tapeSol": 23881592,
+   "curveLamportsDelta": 24066675,
+   "tapeTok": 484696756206,
+   "curveTokenDelta": -484696756206,
+   "signerSolDeltaExFee": -35406718,
+   "tapeSpend": 24180113,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 185083,
+   "reservesAfter": {
+    "vs": 39837059990,
+    "vt": 808041575780952
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "3FejUShudL4fBWadc1NsB6yq5rdKuAq2yxZQ2ts5TPpbUsquFHVJ8qLC3VdVPGJWXo4ruhRHXnQWLZ4VbBckqqWf",
+   "isBuy": true,
+   "tapeSol": 13745201,
+   "curveLamportsDelta": 13851727,
+   "tapeTok": 278706867137,
+   "curveTokenDelta": -278706867137,
+   "signerSolDeltaExFee": -25041526,
+   "tapeSpend": 13917017,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 106526,
+   "reservesAfter": {
+    "vs": 39850805191,
+    "vt": 807762868913815
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "RgqhfcPcGRjceasATAsR8gF2rdutdskhFc8HwubbzKcrJxnumjrtNzCEEYyfQP7Hi4fF1T8ZxvNgde7Th9QRbA2",
+   "isBuy": true,
+   "tapeSol": 51458712,
+   "curveLamportsDelta": 51857518,
+   "tapeTok": 1041706208200,
+   "curveTokenDelta": -1041706208200,
+   "signerSolDeltaExFee": -63611192,
+   "tapeSpend": 52101947,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 398806,
+   "reservesAfter": {
+    "vs": 39902263903,
+    "vt": 806721162705615
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "4NirAYt1a7jdpYDmwDUfaDC5BFsvJGgqXeJdSARmJbhKSgM881VQqbLz4trWjc1uFdjeSxfp76KuhtGUsL8AMio5",
+   "isBuy": true,
+   "tapeSol": 86115774,
+   "curveLamportsDelta": 86783172,
+   "tapeTok": 1737290109895,
+   "curveTokenDelta": -1737290109895,
+   "signerSolDeltaExFee": -99051433,
+   "tapeSpend": 87192222,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 667398,
+   "reservesAfter": {
+    "vs": 39988379677,
+    "vt": 804983872595720
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "5ikzNf7Pdd4sZ7C2DowrEC9McTXfvTMohQnvfmq3CVLL8Kkt8SW8FpuVAirfNmoabo7ToDaBHxDeXd4TBDAnXycK",
+   "isBuy": false,
+   "tapeSol": 9814778,
+   "curveLamportsDelta": -9738712,
+   "tapeTok": 197624366939,
+   "curveTokenDelta": 197624366939,
+   "signerSolDeltaExFee": -1498440,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 76066,
+   "reservesAfter": {
+    "vs": 39978564899,
+    "vt": 805181496962659
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "2jYkCSkM6dYEK5ZSxjPYtPUB2ujQyGX2ySPtdwouzLY9jxtcUM1uUBspPtV9UU6rjTXGHjGkfdYyAN9H5TVJdLMi",
+   "isBuy": true,
+   "tapeSol": 7417492,
+   "curveLamportsDelta": 7474979,
+   "tapeTok": 149363005486,
+   "curveTokenDelta": -149363005486,
+   "signerSolDeltaExFee": -18571413,
+   "tapeSpend": 7510212,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 57487,
+   "reservesAfter": {
+    "vs": 39985982391,
+    "vt": 805032133957173
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "4szg4j6vSAZFa89nvnxJHKFutpAT6qRT8EZ1vifhyAE41vWZrVkudkK6UpCGY4N2J2XqVvxkD438WhfuU5zUf9vi",
+   "isBuy": false,
+   "tapeSol": 3776220,
+   "curveLamportsDelta": -3746953,
+   "tapeTok": 76033291830,
+   "curveTokenDelta": 76033291830,
+   "signerSolDeltaExFee": 2691726,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": false,
+   "curveKeepsExtra": 29267,
+   "reservesAfter": {
+    "vs": 39982206171,
+    "vt": 805108167249003
+   }
+  },
+  {
+   "id": "S2-J9cZTMNvVfmsMqCrvLeojyxqhkoAGCeKWhvcfhhtzBnW",
+   "sig": "4hdbsGZBN2DQE1QbHP1WmCT5PSAjjJZoDrMehkLWD7sXFdVryHNDTUdYj1qxemX1jk3YegGmCcLo9yWCJeZYUoWV",
+   "isBuy": false,
+   "tapeSol": 3644099827,
+   "curveLamportsDelta": -3644099827,
+   "tapeTok": 80738784397887,
+   "curveTokenDelta": 80738784397887,
+   "signerSolDeltaExFee": 3583154384,
+   "tapeSpend": null,
+   "tokMatch": true,
+   "solMatch": true,
+   "curveKeepsExtra": 0,
+   "reservesAfter": {
+    "vs": 36338106344,
+    "vt": 885846951646890
+   }
+  }
+ ],
+ "pool": [
+  {
+   "id": "S3-4CxjZyMNoF1p6eXHXHv1TWpS2X47CuUmLwtGe18spump-0",
+   "buys": 1,
+   "eventMatched": 1
+  },
+  {
+   "id": "S3-4CxjZyMNoF1p6eXHXHv1TWpS2X47CuUmLwtGe18spump-1",
+   "buys": 2,
+   "eventMatched": 2
+  },
+  {
+   "id": "S3-4CxjZyMNoF1p6eXHXHv1TWpS2X47CuUmLwtGe18spump-2",
+   "buys": 13,
+   "eventMatched": 13
+  },
+  {
+   "id": "S3-4CxjZyMNoF1p6eXHXHv1TWpS2X47CuUmLwtGe18spump-3",
+   "buys": 39,
+   "eventMatched": 39
+  },
+  {
+   "id": "S3-4CxjZyMNoF1p6eXHXHv1TWpS2X47CuUmLwtGe18spump-4",
+   "buys": 32,
+   "eventMatched": 32
+  },
+  {
+   "id": "S3-4CxjZyMNoF1p6eXHXHv1TWpS2X47CuUmLwtGe18spump-5",
+   "buys": 23,
+   "eventMatched": 23
+  },
+  {
+   "id": "S3-4CxjZyMNoF1p6eXHXHv1TWpS2X47CuUmLwtGe18spump-6",
+   "buys": 59,
+   "eventMatched": 59
+  },
+  {
+   "id": "S3-4CxjZyMNoF1p6eXHXHv1TWpS2X47CuUmLwtGe18spump-7",
+   "buys": 0,
+   "eventMatched": 0
+  },
+  {
+   "id": "S3-4CxjZyMNoF1p6eXHXHv1TWpS2X47CuUmLwtGe18spump-8",
+   "buys": 32,
+   "eventMatched": 32
+  },
+  {
+   "id": "S3-4CxjZyMNoF1p6eXHXHv1TWpS2X47CuUmLwtGe18spump-9",
+   "buys": 26,
+   "eventMatched": 26
+  },
+  {
+   "id": "S3-9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump-0",
+   "buys": 10,
+   "eventMatched": 10
+  },
+  {
+   "id": "S3-9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump-1",
+   "buys": 2,
+   "eventMatched": 2
+  },
+  {
+   "id": "S3-9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump-2",
+   "buys": 0,
+   "eventMatched": 0
+  },
+  {
+   "id": "S3-9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump-3",
+   "buys": 12,
+   "eventMatched": 12
+  },
+  {
+   "id": "S3-9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump-4",
+   "buys": 3,
+   "eventMatched": 3
+  },
+  {
+   "id": "S3-9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump-5",
+   "buys": 5,
+   "eventMatched": 5
+  },
+  {
+   "id": "S3-9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump-6",
+   "buys": 6,
+   "eventMatched": 6
+  },
+  {
+   "id": "S3-9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump-7",
+   "buys": 5,
+   "eventMatched": 5
+  },
+  {
+   "id": "S3-9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump-8",
+   "buys": 6,
+   "eventMatched": 6
+  },
+  {
+   "id": "S3-9cRCn9rGT8V2imeM2BaKs13yhMEais3ruM3rPvTGpump-9",
+   "buys": 20,
+   "eventMatched": 20
+  },
+  {
+   "id": "S3-Ai66LHZG9MCzg1WKdawwqduVAXpNDUuV8M3uyq5ppump-0",
+   "buys": 23,
+   "eventMatched": 23
+  },
+  {
+   "id": "S3-Ai66LHZG9MCzg1WKdawwqduVAXpNDUuV8M3uyq5ppump-1",
+   "buys": 8,
+   "eventMatched": 8
+  },
+  {
+   "id": "S3-Ai66LHZG9MCzg1WKdawwqduVAXpNDUuV8M3uyq5ppump-2",
+   "buys": 5,
+   "eventMatched": 5
+  },
+  {
+   "id": "S3-Ai66LHZG9MCzg1WKdawwqduVAXpNDUuV8M3uyq5ppump-3",
+   "buys": 23,
+   "eventMatched": 23
+  },
+  {
+   "id": "S3-Ai66LHZG9MCzg1WKdawwqduVAXpNDUuV8M3uyq5ppump-4",
+   "buys": 16,
+   "eventMatched": 16
+  },
+  {
+   "id": "S3-Ai66LHZG9MCzg1WKdawwqduVAXpNDUuV8M3uyq5ppump-5",
+   "buys": 23,
+   "eventMatched": 23
+  },
+  {
+   "id": "S3-Ai66LHZG9MCzg1WKdawwqduVAXpNDUuV8M3uyq5ppump-6",
+   "buys": 11,
+   "eventMatched": 11
+  },
+  {
+   "id": "S3-Ai66LHZG9MCzg1WKdawwqduVAXpNDUuV8M3uyq5ppump-7",
+   "buys": 13,
+   "eventMatched": 13
+  },
+  {
+   "id": "S3-Ai66LHZG9MCzg1WKdawwqduVAXpNDUuV8M3uyq5ppump-8",
+   "buys": 6,
+   "eventMatched": 6
+  },
+  {
+   "id": "S3-Ai66LHZG9MCzg1WKdawwqduVAXpNDUuV8M3uyq5ppump-9",
+   "buys": 122,
+   "eventMatched": 122
+  },
+  {
+   "id": "S3-Ce2gx9KGXJ6C9Mp5b5x1sn9Mg87JwEbrQby4Zqo3pump-0",
+   "buys": 6,
+   "eventMatched": 6
+  },
+  {
+   "id": "S3-Ce2gx9KGXJ6C9Mp5b5x1sn9Mg87JwEbrQby4Zqo3pump-1",
+   "buys": 34,
+   "eventMatched": 34
+  },
+  {
+   "id": "S3-Ce2gx9KGXJ6C9Mp5b5x1sn9Mg87JwEbrQby4Zqo3pump-2",
+   "buys": 6,
+   "eventMatched": 6
+  },
+  {
+   "id": "S3-Ce2gx9KGXJ6C9Mp5b5x1sn9Mg87JwEbrQby4Zqo3pump-3",
+   "buys": 3,
+   "eventMatched": 3
+  },
+  {
+   "id": "S3-Ce2gx9KGXJ6C9Mp5b5x1sn9Mg87JwEbrQby4Zqo3pump-4",
+   "buys": 52,
+   "eventMatched": 52
+  },
+  {
+   "id": "S3-Ce2gx9KGXJ6C9Mp5b5x1sn9Mg87JwEbrQby4Zqo3pump-5",
+   "buys": 0,
+   "eventMatched": 0
+  },
+  {
+   "id": "S3-Ce2gx9KGXJ6C9Mp5b5x1sn9Mg87JwEbrQby4Zqo3pump-6",
+   "buys": 4,
+   "eventMatched": 4
+  },
+  {
+   "id": "S3-Ce2gx9KGXJ6C9Mp5b5x1sn9Mg87JwEbrQby4Zqo3pump-7",
+   "buys": 1,
+   "eventMatched": 1
+  },
+  {
+   "id": "S3-Ce2gx9KGXJ6C9Mp5b5x1sn9Mg87JwEbrQby4Zqo3pump-8",
+   "buys": 9,
+   "eventMatched": 9
+  },
+  {
+   "id": "S3-Ce2gx9KGXJ6C9Mp5b5x1sn9Mg87JwEbrQby4Zqo3pump-9",
+   "buys": 0,
+   "eventMatched": 0
+  }
+ ]
+}
