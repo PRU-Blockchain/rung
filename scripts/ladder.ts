@@ -15,6 +15,8 @@
 //   npx tsx scripts/ladder.ts --status | --refund | --cancel
 //       [--mint busy [--busy-min-trades 30]]   instead of a mint: the busiest open curve among recent pump buys
 //         whose price is not falling (rule in scripts/pick.ts). For test buys on a token that is moving.
+//       [--no-early-try]   send the first try only after the order is confirmed (the old way). By default
+//         the first try is sent together with the order and lands right behind it. Off with the push test aids.
 //       [--then-sell-all]   after a buy that filled: sell it back at once (as --sell-all does), wait for the
 //         order's lifetime to end and close the order account. For test buys whose SOL should come back.
 //   npx tsx scripts/ladder.ts --sell-all --mint <MINT> [--slippage-bps 100] [--keypair ...]
@@ -37,6 +39,7 @@ import { homedir } from "node:os";
 import {
   BondingCurve,
   Connection,
+  EarlyTry,
   FeeConfig,
   Keypair,
   LadderResult,
@@ -107,6 +110,7 @@ import {
   resolveVenue,
   runLadder,
   sendAndConfirm,
+  sendFirstTryEarly,
   startsWith,
   tokenAccountAmount,
   txFeeLamports,
@@ -532,7 +536,32 @@ async function run(connection: Connection, flags: Flags, mint: PublicKey): Promi
       lifetimeSlots: plan.lifetimeSlots,
     },
   });
-  const opened = await sendAndConfirm(connection, [open], user);
+  // The first try goes out together with the order, not after its confirmation: it
+  // lands in the first block after the order exists. The push test aids need the old
+  // order of events (order, push, then the first try), so they switch this off.
+  const pushing = str(flags, "push-after-open") !== undefined || str(flags, "push-pct") !== undefined;
+  const earlyWanted = flags["no-early-try"] === undefined && !pushing;
+  const earlyBlockhash = earlyWanted ? await connection.getLatestBlockhash("confirmed") : undefined;
+  let earlyTry: Promise<EarlyTry | undefined> = Promise.resolve(undefined);
+  const opened = await sendAndConfirm(connection, [open], user, () => {
+    if (!earlyBlockhash) return;
+    earlyTry = sendFirstTryEarly({
+      connection,
+      user: u,
+      mint,
+      tokenProgram: m.tokenProgram,
+      buybackRecipient: m.buybackRecipient,
+      venue: m.venue,
+      pool: m.venue === "PumpSwap" ? m.pm.poolAccounts : undefined,
+      sessionKeypair: session,
+      blockhash: earlyBlockhash.blockhash,
+      lastValidBlockHeight: earlyBlockhash.lastValidBlockHeight,
+      cuLimit: plan.cuLimit,
+      cuPrice: plan.cuPrice,
+    }).catch(() => undefined);
+  });
+  const firstTry = await earlyTry;
+  if (firstTry && (!opened.landed || opened.err)) firstTry.stop();
   console.log(`open_order ${opened.signature} slot ${opened.slot ?? "?"} fee ${opened.fee ?? "?"}`);
   if (!opened.landed) throw new Error("open_order did not land (blockhash expired); nothing was opened");
   if (opened.err) throw new Error(`open_order failed: ${describeFailure(classifyFailure(opened.err, opened.logs, [open.programId]))}`);
@@ -552,6 +581,7 @@ async function run(connection: Connection, flags: Flags, mint: PublicKey): Promi
     pool: m.venue === "PumpSwap" ? m.pm.poolAccounts : undefined,
     sessionKeypair: session,
     order,
+    firstTry,
     cuLimit: plan.cuLimit,
     cuPrice: plan.cuPrice,
     onEvent: (e) => {

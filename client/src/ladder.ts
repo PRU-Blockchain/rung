@@ -73,6 +73,14 @@ export interface LadderParams {
   refundCuLimit?: number;
   /** Slot polling interval. */
   pollMs?: number;
+  /**
+   * The try of rung 0 that was sent together with `open_order`
+   * (`sendFirstTryEarly`). The ladder takes its result instead of sending
+   * rung 0 itself.
+   */
+  firstTry?: EarlyTry;
+  /** How long to wait for that early try before sending rung 0 the ordinary way. */
+  firstTryWaitMs?: number;
   onEvent?: (event: LadderEvent) => void;
 }
 
@@ -126,6 +134,15 @@ export async function sendAndConfirm(
   tx.sign(signer);
   const signature = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: true });
   onSent?.(signature);
+  return confirmSent(connection, { signature, blockhash, lastValidBlockHeight });
+}
+
+/** Waits for a transaction that was already sent and reads what it did. */
+export async function confirmSent(
+  connection: Connection,
+  sent: { signature: string; blockhash: string; lastValidBlockHeight: number },
+): Promise<Landed> {
+  const { signature, blockhash, lastValidBlockHeight } = sent;
   try {
     await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight }, "confirmed");
   } catch (e) {
@@ -157,6 +174,95 @@ export async function sendAndConfirm(
   // Confirmed but not yet served by getTransaction: report what the status says.
   const status = (await connection.getSignatureStatuses([signature])).value[0];
   return { signature, landed: true, slot: status?.slot, err: status?.err ?? undefined, logs: [] };
+}
+
+/** A try of rung 0 that is already on its way (see `sendFirstTryEarly`). */
+export interface EarlyTry {
+  signature: string;
+  blockhash: string;
+  lastValidBlockHeight: number;
+  /** Programs of the transaction's instructions, in order, to read a failure. */
+  programIds: PublicKey[];
+  /** Ends the re-sends. */
+  stop: () => void;
+}
+
+/**
+ * Sends `try_rung(0)` without waiting for `open_order` to be confirmed, so the
+ * first try lands in the first block after the order exists instead of
+ * seconds later. Until the order lands the session key holds no SOL, so a copy
+ * that arrives too early cannot land and costs nothing; the same signed bytes
+ * are therefore sent again every `resendMs` for a while.
+ *
+ * Give it the blockhash the order transaction uses. It stays a transaction of
+ * its own, signed only by the session key: the price the rung is measured
+ * from is the one `open_order` wrote down before this try runs.
+ */
+export async function sendFirstTryEarly(p: {
+  connection: Connection;
+  user: PublicKey;
+  mint: PublicKey;
+  tokenProgram: PublicKey;
+  buybackRecipient: PublicKey;
+  venue: Order["venue"];
+  pool?: PoolAccounts;
+  sessionKeypair: Keypair;
+  blockhash: string;
+  lastValidBlockHeight: number;
+  cuLimit?: number;
+  cuPrice?: bigint;
+  /** Pause between re-sends (default 400 ms, about one slot). */
+  resendMs?: number;
+  /** How many times the same bytes are sent again (default 15). */
+  resends?: number;
+}): Promise<EarlyTry> {
+  const session = p.sessionKeypair;
+  const instructions = [
+    computeUnitLimitIx(p.cuLimit ?? cuLimitFor(p.venue)),
+    computeUnitPriceIx(p.cuPrice ?? DEFAULT_CU_PRICE),
+    tryRungIx({
+      sessionKey: session.publicKey,
+      user: p.user,
+      mint: p.mint,
+      tokenProgram: p.tokenProgram,
+      buybackRecipient: p.buybackRecipient,
+      rungIndex: 0,
+      venue: p.venue,
+      pool: p.pool,
+    }),
+  ];
+  const tx = new Transaction({
+    feePayer: session.publicKey,
+    blockhash: p.blockhash,
+    lastValidBlockHeight: p.lastValidBlockHeight,
+  }).add(...instructions);
+  tx.sign(session);
+  const raw = tx.serialize();
+  // maxRetries 0: the re-sends below are the retries, on our own clock.
+  const send = () => p.connection.sendRawTransaction(raw, { skipPreflight: true, maxRetries: 0 });
+  const signature = await send();
+
+  let stopped = false;
+  const resends = p.resends ?? 15;
+  const resendMs = p.resendMs ?? 400;
+  void (async () => {
+    for (let i = 0; i < resends && !stopped; i++) {
+      await sleep(resendMs);
+      if (stopped) break;
+      // "Already processed" and the like are expected once it has landed.
+      await send().catch(() => undefined);
+    }
+  })();
+
+  return {
+    signature,
+    blockhash: p.blockhash,
+    lastValidBlockHeight: p.lastValidBlockHeight,
+    programIds: instructions.map((x) => x.programId),
+    stop: () => {
+      stopped = true;
+    },
+  };
 }
 
 function attemptText(a: Attempt): string {
@@ -197,7 +303,9 @@ export async function runLadder(p: LadderParams): Promise<LadderResult> {
 
   const order = p.order ?? (await fetchOrder(connection, user));
   if (!order) throw new Error("order account not found");
-  if (order.status !== "Open") throw new Error(`order is ${order.status}, not Open`);
+  // An early first try can have bought before the order was read back; its result is taken below.
+  const filledByEarlyTry = order.status === "Filled" && p.firstTry !== undefined;
+  if (order.status !== "Open" && !filledByEarlyTry) throw new Error(`order is ${order.status}, not Open`);
   if (!order.sessionKey.equals(session.publicKey)) throw new Error("session key does not match the order");
   if (order.venue === "PumpSwap" && !p.pool) throw new Error("a PumpSwap order needs the pool's accounts");
   const cuLimit = p.cuLimit ?? cuLimitFor(order.venue);
@@ -212,6 +320,30 @@ export async function runLadder(p: LadderParams): Promise<LadderResult> {
       slot = BigInt(await connection.getSlot("processed"));
     }
     if (slot >= order.lastSlot) break; // expired: only a refund is left
+
+    if (i === 0 && p.firstTry) {
+      const early = p.firstTry;
+      p.onEvent?.({ type: "sent", kind: "try", rungIndex: 0, signature: early.signature });
+      const waited = await Promise.race([
+        confirmSent(connection, early),
+        sleep(p.firstTryWaitMs ?? 8_000).then(() => null),
+      ]);
+      early.stop();
+      const a = toAttempt("try", waited ?? { signature: early.signature, landed: false, logs: [] }, early.programIds);
+      a.rungIndex = 0;
+      a.rungBps = order.rungsBps[0];
+      a.dueSlot = dueSlot;
+      if (waited?.landed && !waited.err) {
+        a.outcome = "filled";
+        result.filled = findEvent(waited.logs, "OrderFilled");
+        stop = true;
+      } else if (a.outcome === "order-filled") {
+        stop = true;
+      }
+      record(a);
+      // It landed (filled or refused): rung 0 is done. Otherwise send rung 0 the ordinary way below.
+      if (waited?.landed) continue;
+    }
 
     const instructions = [
       computeUnitLimitIx(cuLimit),
