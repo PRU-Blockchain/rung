@@ -398,6 +398,7 @@ On Nov 24, 2026, against a local fork of mainnet (no real SOL):
 - the program read back from the fork was byte for byte the build with sha256 `f29024e97072e82642f5bf0fc5b197b6fb0fd2e03f4c91b473b5827d35738acc`, which is also the build running on devnet (read back from devnet and compared the same way);
 - the deploy took 1.55569 fork SOL in total: a deposit of 1.55416 SOL, which comes back only if the program is closed (a closed program address cannot be used again), and the rest in fees;
 - a buy through the freshly deployed program then filled from a live PumpSwap pool on the 1% rung (185,204 compute units for the try).
+- closing the program (`solana program close`, signed by the upgrade authority) returned 1.55332684 SOL to the wallet. Of the 2 SOL the wallet started with, 1.99763188 SOL were back after deploy and close: the 0.00083312 SOL of the program account stay there and the fees are spent. The closed address then refused a new deploy, as the CLI warns. Closing while an order is open would strand that order's SOL in its vault, so it is only an option when no order is open.
 
 What this does not show: mainnet itself. The program is not deployed there.
 
