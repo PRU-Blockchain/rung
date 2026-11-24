@@ -112,6 +112,8 @@ Each failed try cost 6,000 lamports; one order, one buy. Both buys were sold bac
 
 **From the app.** The same evening the first mainnet buy went through the Android app, with Phantom as the wallet (CATE pool, Tight, 0.01 SOL): [one approval](https://explorer.solana.com/tx/5X1dpRNNF5zp4DhVW7WqmmvBLFV8YYQ6z3KH1jph94bkG8751KmTWbTVt2Z1JRGfbXK9ooYXk9LiJSEddfmT7L4e), the [1% rung filled](https://explorer.solana.com/tx/2hws1mQkKJsekvwNYgvRko3KGfukHqfukW5MJ5NeooSZNcW7123ANjpquQiKHiW8d3duBYQmR85D5qox1BYgqd64) at the price seen (40.795274 tokens), and the [unused fees came back](https://explorer.solana.com/tx/2ydWR4dKPf5wyNgERXXVQQAiPaRMLAakLu8BTvpi7ra3fAwGJPjNksoZP23shVEDK6pQLQuHUCgBf842ikD8gtRi). [Receipt screen](docs/shots/app-19-mainnet-bought.png).
 
+A second buy through the app later that evening, with the first try sent together with the order: [one approval](https://explorer.solana.com/tx/3qYNS2XSrWBWy8bv6GP8Lo34a98p2dQaRCHPqefiCovftyHifJ931Ay8dXi7x9UST1iLXTZUtfcVySvvvtYNcnrz) (a single Confirm sheet in Phantom), the [1% rung filled](https://explorer.solana.com/tx/3HAtsqWmr2gXKd6ywpYiWmJEiM7vej3gS7hwkALfCN955VB8AeXk7CtResvk6zyrDbvRdy5oY3CZ8xfSRkUsD6b3) two slots after the order, 40.376449 tokens at +0.01% of the price seen, [unused fees back](https://explorer.solana.com/tx/HaghX3Yha5tmb3JW7aVwt1GLqsDN7ya4keN5WKYdd3pJqmgatYUbaUeoJhRRdu1fTNriFx1ANKfFMRqfh3EY3Db).
+
 ### Devnet runs
 
 Real transactions on devnet (test SOL, pump's devnet deployment, a live devnet curve), sent with the script (`scripts/ladder.ts`, then named `devnet-ladder.ts`) on Nov 23, 2026. Tight mode (1% → 2% → 3%), 0.01 SOL, mint `B8fRBPHkEVfqE6FfUYsPKkyZvdjH3SxvQpYpyYRtG511`. The wallet signs one transaction (`open_order`); every try is signed by the one-time session key.
@@ -137,7 +139,7 @@ The app's own devnet buys (Phantom, Solflare, a not-bought run and its "Retry wi
 | On-chain order program (Anchor) | deployed on **devnet** at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet). Buys on pump.fun bonding curves and on PumpSwap pools. Reviewed twice by independent read-only passes, not audited |
 | Mainnet | the program is deployed at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio) since Nov 24, 2026 (same address and same build as on devnet). Two buys the same day, through the script: from a PumpSwap pool ([rung 1% filled](https://explorer.solana.com/tx/2ZNEtvVpsiTVdcpgxoiBXBnTeknSoo1VhMwCmjhw4vHd4w7cCfP75BuQw74yf2buTXfhBKcXY7qQwYJyWj4kNt5U)) and from a bonding curve ([rung 1% filled](https://explorer.solana.com/tx/GY6Y2LdzeJj1Zch3XFuTuXvvPVKroEGFAR2ZFqjEcsaCpCRuqHs8JAMuE1Fr2Tigrk1PQht6DH6L4KVgRRWwzQM)). The app and the web page still use devnet |
 | PumpSwap pools | in the program, the client, the command-line script and the Android app. Tested locally against a test double and the real PumpSwap program dumped from mainnet, on a local fork of mainnet, and with real buys on a devnet pool through the script and through the app (runs in [`app/README.md`](app/README.md#pumpswap-pools)), and with a real buy on a mainnet pool through the script ([Mainnet runs](#mainnet-runs)) |
-| Android app (`app/`) | works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. Built for mainnet (`EXPO_PUBLIC_CLUSTER=mainnet-beta`) it reads a live pool ([screen](docs/shots/app-18-mainnet-plan.png)) and has bought on mainnet with Phantom ([receipt](docs/shots/app-19-mainnet-bought.png)): one buy so far. Not tested: Custom mode, a real device, Seeker |
+| Android app (`app/`) | works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. Built for mainnet (`EXPO_PUBLIC_CLUSTER=mainnet-beta`) it reads a live pool ([screen](docs/shots/app-18-mainnet-plan.png)) and has bought on mainnet with Phantom ([receipt](docs/shots/app-19-mainnet-bought.png)): two buys so far. Not tested: Custom mode, a real device, Seeker |
 | APK | not yet |
 | Web page (`web/`) | live at https://rung-drab.vercel.app/; the counter is computed from the program's devnet events |
 | Measurement scripts (`measure/`) | in the repository; verified on a small slice, not re-run end to end |
@@ -230,12 +232,12 @@ The wallet signs one transaction per buy, the order. Every try after that is sig
 | wallet | sheets per buy | what the wallet added to the order | order fee |
 |---|---|---|---|
 | Solflare | one (after the first connect) | `SetComputeUnitLimit(200000)`, `SetComputeUnitPrice(100000)` | 25,000 lamports |
-| Phantom | two: its Connect sheet, then Confirm | `SetComputeUnitPrice(375000)`, `SetComputeUnitLimit(200000)` | 80,000 lamports |
+| Phantom | two: its Connect sheet, then Confirm (one since the app's identity is verified, see below) | `SetComputeUnitPrice(375000)`, `SetComputeUnitLimit(200000)` | 80,000 lamports |
 | Solana Mobile mock wallet | one | nothing | 5,000 lamports |
 
 Neither wallet added any other instruction, and the added ones did not break the order. The fee of the order transaction is set by the wallet, which is why the app shows it as a separate line; the fees of the tries are set by the app.
 
-Phantom asks to connect again before every buy because it declines the saved authorization of an app whose identity it has not verified. The app asks the wallet to sign and sends the signed order itself: with the wallet sending, Phantom's transaction never reached devnet and Solflare kept the app in the background while the order's time ran out. An approval that takes longer than about a minute fails with "Approval took too long" and nothing is sent.
+Phantom asked to connect again before every buy as long as it could not verify the app: it declines the saved authorization of an app whose identity it has not verified. Since Nov 24, 2026 the site the app names vouches for it: [`/.well-known/assetlinks.json`](https://rung-drab.vercel.app/.well-known/assetlinks.json) lists the app's package and signing certificate and is served as exactly `application/json` (the wallets' verifier rejects `application/json; charset=utf-8`). A buy in Phantom is now one Confirm sheet, seen on mainnet. The fingerprint in that file is the development build's; a signed release needs its own. On mainnet Phantom also put four instructions of its own guard program (`L2TEx…`) around the order, and the order still worked. The app asks the wallet to sign and sends the signed order itself: with the wallet sending, Phantom's transaction never reached devnet and Solflare kept the app in the background while the order's time ran out. An approval that takes longer than about a minute fails with "Approval took too long" and nothing is sent.
 
 ## Numbers
 
@@ -335,7 +337,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 - At most 0.5 SOL per order (`MAX_ORDER_LAMPORTS` in [`constants.rs`](programs/rung/src/constants.rs)); at least 0.001 SOL. The highest cap any order can set is 30%. Raising the per-order limit is a team decision.
 - Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
 - Android emulator; not tested on a real device or Seeker.
-- On mainnet: twelve buys and two not-bought runs so far: eleven through the script, one through the app.
+- On mainnet: thirteen buys and two not-bought runs so far: eleven through the script, two through the app.
 - Buys on pump.fun bonding curves and on a token's own (canonical) PumpSwap pool paired with SOL. Other pools and cashback pools: no.
 
 ## Architecture and program addresses
@@ -511,6 +513,8 @@ The event runs Nov 27–29, 2026. Everything in this repository so far was done 
 The program is an open building block; wallets and buying apps can connect to it. A small share is taken from buys that go through our own app and fill; no share is taken from a buy that does not fill. In the demo the share is zero. For comparison: pump.fun takes 0.45% per trade in its own app.
 
 Today the program has no fee field and takes no share (not yet).
+
+Planned: a bolder ladder for buyers who want to be sure to buy. Today the program caps a ladder at 30%. In the [replay](measure/replay/results/replay-2026-11-24.md), 15 → 25 → 35 → 50% filled as often as one buy at 25% (launches: 95.0% against 94.8%) with about half the room in the block where it fills (191 against 390 SOL). It needs a program change.
 
 ## Why we built this
 
