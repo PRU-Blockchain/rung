@@ -10,6 +10,8 @@ export * from "./budget";
 export * from "./ladder";
 export * from "./jito";
 export * from "./venue";
+export * from "./token-info";
+export * from "./usd";
 
 // The web3.js classes callers need, from the same copy this module uses.
 export {

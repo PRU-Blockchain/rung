@@ -317,6 +317,8 @@ The problem, the users and the money are here. Both properties that make the lad
 
 Supporting number: over three years, sandwiches in the "protected" flow numbered 28.0M on Solana, 30,607 on Ethereum and 1,889 on Base (arXiv 2609.28115, a preprint; it shares Bitquery's method, so it is not a second, independent measurement).
 
+**Token name, picture and dollar value in the app.** Next to the address, the app shows the token's name, symbol and picture. Name and symbol are read from the chain: from the mint itself for pump.fun's Token-2022 mints, from the Metaplex account for older ones. The picture's address comes from the metadata file the token's maker published; only `https` addresses are asked, and IPFS content goes through public gateways. All three are whatever the maker wrote, so the address stays on the screen. The dollar value under the amount comes from Pyth's SOL/USD price account on the chain, on mainnet only (devnet SOL has no price); a price written more than about five minutes ago is not shown. None of this is needed for a buy: when a read fails, the screen shows the address and SOL amounts as before.
+
 ## Security and limits
 
 **unaudited, use small amounts.** The program was reviewed twice by independent read-only passes (a separate agent that could only read the code: access control, PDAs and account ownership, overflow, every way SOL can leave the vault; the second pass after the PumpSwap path was added). Those are reviews, not an audit. Neither reported a critical or high finding. Fixed after it, each with a test written first: an upper limit on the SOL a buy may take from the vault, a consistency band between the two quotes the client supplies, a rent-exemption check on the fee budget, and the highest cap lowered to 30%. Deferred on purpose: reclaiming the rent of pump's volume account, rejecting at `open_order` curves that cannot fill (non-SOL pairs, cashback coins), and pinning the remaining pump accounts in the program.
@@ -416,7 +418,7 @@ anchor test        # builds the program and the test double, then runs `cargo te
 The tests load the built program into LiteSVM and load two test doubles, one at pump's address and one at PumpSwap's. 226 Rust tests: unit tests of the rung arithmetic, the ladder scenarios on both venues (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, the two references, events, the fixes after the two reviews, and security tests (wrong signer, substituted accounts, a pool that is not the token's own, a fake buy program, a buy program that delivers too few tokens, takes too much SOL or misuses the vault's signature, pre-funded accounts, a try that runs out of compute units, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
 
 ```bash
-cd client && npm install && npm test     # 146 client tests, including byte-for-byte vectors from the Rust program
+cd client && npm install && npm test     # 167 client tests, including byte-for-byte vectors from the Rust program
 ```
 
 ### Against the real pump program

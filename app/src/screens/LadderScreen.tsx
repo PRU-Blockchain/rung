@@ -4,10 +4,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { LadderEvent, findEvent } from "../../../client/src";
 
-import { bpsText, pctText, priceText, shortAddress } from "../flow/format";
+import { bpsText, pctText, priceText } from "../flow/format";
 import { Receipt } from "../flow/history";
 import { Running, paidAboveSeenPct, runOrder } from "../flow/ladder";
-import { Header, TxLinkText, colors, s } from "./ui";
+import { Header, TokenLine, TxLinkText, colors, s } from "./ui";
 
 type RungState =
   | { kind: "waiting" }
@@ -102,7 +102,7 @@ export function LadderScreen({ running, onDone }: { running: Running; onDone: (r
     <SafeAreaView style={s.screen}>
       <ScrollView contentContainerStyle={s.content}>
         <Header />
-        <Text style={s.body}>Token {shortAddress(p.mint)}</Text>
+        <TokenLine mint={p.mint} />
         <Text style={s.body}>Price you saw: {priceText(BigInt(p.amount), BigInt(p.expectedTokensSeen), p.decimals)}</Text>
         <View style={[s.box, { gap: 10 }]}>
           {order.map(({ bps, i }) => {
