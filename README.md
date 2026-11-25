@@ -418,7 +418,7 @@ anchor test        # builds the program and the test double, then runs `cargo te
 The tests load the built program into LiteSVM and load two test doubles, one at pump's address and one at PumpSwap's. 226 Rust tests: unit tests of the rung arithmetic, the ladder scenarios on both venues (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, the two references, events, the fixes after the two reviews, and security tests (wrong signer, substituted accounts, a pool that is not the token's own, a fake buy program, a buy program that delivers too few tokens, takes too much SOL or misuses the vault's signature, pre-funded accounts, a try that runs out of compute units, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
 
 ```bash
-cd client && npm install && npm test     # 167 client tests, including byte-for-byte vectors from the Rust program
+cd client && npm install && npm test     # 169 client tests, including byte-for-byte vectors from the Rust program
 ```
 
 ### Against the real pump program

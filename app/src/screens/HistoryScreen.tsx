@@ -3,17 +3,22 @@ import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { bpsText, priceText, sol } from "../flow/format";
-import { Receipt, loadHistory, venueName } from "../flow/history";
+import { Receipt, loadHistory, sortOldReceipts, venueName } from "../flow/history";
 import { TxLinks } from "./ReceiptScreen";
 import { Button, Header, Row, TokenRow, s } from "./ui";
 
 const MODE_NAMES: Record<string, string> = { tight: "Tight", normal: "Normal", fast: "Fast", launch: "Launch", custom: "Custom" };
 
-/** Reads only local storage: works without a network. */
+/** Reads only local storage: works without a network. (Old receipts are sorted by network once, when there is one.) */
 export function HistoryScreen({ onBack }: { onBack: () => void }) {
   const [list, setList] = useState<Receipt[] | null>(null);
   useEffect(() => {
-    loadHistory().then(setList);
+    let live = true;
+    const show = () => loadHistory().then((l) => live && setList(l));
+    void show().then(() => sortOldReceipts().then((changed) => changed && show()));
+    return () => {
+      live = false;
+    };
   }, []);
   return (
     <SafeAreaView style={s.screen}>

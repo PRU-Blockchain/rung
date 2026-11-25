@@ -1,6 +1,13 @@
 // Receipts, newest first, in AsyncStorage. Reading them never touches the network.
+// Each receipt carries the network it was written on; a build lists its own.
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { PublicKey } from "../../../client/src";
+
+import { NETWORK } from "../config";
+import { Cluster, legacyReceiptCluster, receiptShownOn } from "../network";
+import { connection } from "./connection";
 
 const HISTORY = "rung.history";
 
@@ -15,6 +22,8 @@ export interface TxLink {
 export interface Receipt {
   id: string;
   time: number;
+  /** The network of the buy; missing in receipts written before Nov 25, 2026 (see `sortOldReceipts`). */
+  cluster?: Cluster;
   mint: string;
   /** "Curve" or "PumpSwap"; missing in receipts written before pools were supported (all curve buys). */
   venue?: "Curve" | "PumpSwap";
@@ -50,7 +59,8 @@ export const accumulatorLabel = (r: Receipt) =>
 
 export const venueName = (r: Receipt) => (receiptVenue(r) === "PumpSwap" ? "PumpSwap pool" : "pump.fun bonding curve");
 
-export async function loadHistory(): Promise<Receipt[]> {
+/** Every stored receipt, of either network. */
+async function readAll(): Promise<Receipt[]> {
   try {
     const v = await AsyncStorage.getItem(HISTORY);
     return v ? (JSON.parse(v) as Receipt[]) : [];
@@ -59,7 +69,49 @@ export async function loadHistory(): Promise<Receipt[]> {
   }
 }
 
+/** The receipts of this build's network. */
+export async function loadHistory(): Promise<Receipt[]> {
+  return (await readAll()).filter((r) => receiptShownOn(r.cluster, NETWORK.cluster));
+}
+
 export async function addReceipt(r: Receipt): Promise<void> {
-  const list = await loadHistory();
-  await AsyncStorage.setItem(HISTORY, JSON.stringify([r, ...list].slice(0, 200)));
+  const list = await readAll();
+  await AsyncStorage.setItem(HISTORY, JSON.stringify([{ ...r, cluster: NETWORK.cluster }, ...list].slice(0, 200)));
+}
+
+/**
+ * Gives old receipts their network: asks this build's network once which of
+ * their tokens it has (`legacyReceiptCluster`), one request for all of them.
+ * Resolves true when a receipt was sorted, so the list can be read again.
+ * Without a network nothing changes and the old receipts stay listed.
+ */
+export async function sortOldReceipts(): Promise<boolean> {
+  try {
+    const old = (await readAll()).filter((r) => r.cluster === undefined);
+    if (old.length === 0) return false;
+    // getMultipleAccounts takes at most 100 addresses; the history holds at most 200 receipts.
+    const mints = [...new Set(old.map((r) => r.mint))];
+    const has = new Map<string, boolean>();
+    for (let i = 0; i < mints.length; i += 100) {
+      const part = mints.slice(i, i + 100);
+      const infos = await connection.getMultipleAccountsInfo(
+        part.map((m) => new PublicKey(m)),
+        { dataSlice: { offset: 0, length: 0 } },
+      );
+      part.forEach((m, k) => has.set(m, infos[k] !== null));
+    }
+    const sorted = new Map<string, Cluster>();
+    for (const r of old) {
+      const cluster = legacyReceiptCluster(NETWORK.cluster, has.get(r.mint) ?? null);
+      if (cluster) sorted.set(r.id, cluster);
+    }
+    if (sorted.size === 0) return false;
+    // Read again right before writing: a buy may have added a receipt meanwhile.
+    const list = (await readAll()).map((r) => (r.cluster === undefined && sorted.has(r.id) ? { ...r, cluster: sorted.get(r.id) } : r));
+    await AsyncStorage.setItem(HISTORY, JSON.stringify(list));
+    return true;
+  } catch (e) {
+    console.log(`RUNG old receipts not sorted: ${String((e as Error)?.message ?? e)}`);
+    return false;
+  }
 }
