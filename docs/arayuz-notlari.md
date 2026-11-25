@@ -151,10 +151,18 @@ Aynı toplantıda bir uyarı daha geldi: jüri "neden yalnız mobil, neden web'd
 
 Projenin bu konudaki sabiti: **sahte gösterim ve uydurma veri yok.** Yeniden oynatma yalnız gerçek, zincirde duran alımların verisini kullanır ve yeniden oynatma olduğunu söyler.
 
+### Buğra'nın kararları (25 Kasım akşamı; Merve'nin `merve/frontend` dalındaki `docs/on-yuz-notlari.md` notuna cevap)
+
+- **Gösterimin altındaki üç İngilizce cümle onaylandı.** "Replay of a real mainnet buy from the Android app, Nov 24, 2026: …" ile başlayan üç cümle ve senaryo düğmelerinin yazıları, notta yazıldıkları gibi kalır. İçerikleri README'deki emirlerle karşılaştırıldı, doğru.
+- **Site düzeni:** telefon en üstte; sayaç, son alımlar, modlar, terimler ve kaynaklar altında kalır. Yalnız telefon bırakılmayacak.
+- **Sayaç notundaki cümle:** "They include test runs where we moved the price on purpose." site mainnet'e çevrilirken çıkarılacak; bunu Buğra'nın ajanı yapar.
+- **Demodaki sayaç sayıları elle yazılmasın.** Demo "14 alındı, 1 henüz sonuçlanmadı, ortalama %2,07" diyordu; o okuma bir işlemi kaçırmış. Zincirde 25 Kasım akşamı: 17 emir, 15 alım, 2 alınamayan, açık emir yok, ortalama basamak %2,00. Sayılar sayfada canlı okunmalı.
+
 ## Projeden gelen sabitler (bu notlardan bağımsız)
 
 - **Ekrandaki İngilizce cümleler** devir metninden kelimesi kelimesine gelir ve testle denetlenir. Görünümleri, yerleri, boyutları değişebilir; sözleri değişecekse önce Buğra'ya sorulur.
 - **Mantık ve görünüm ayrı klasörlerde.** Görünüm `app/src/screens/` içinde (`ui.tsx` renkleri ve ölçüleri tutar). Alım akışı, cüzdan, merdiven ve hesaplar `app/src/flow/` ile `client/` içindedir; bunlara dokunmak gerekirse Buğra'nın geliştirici ajanına haber verilir.
-- **Denetim:** `client/` içinde `npm test` (131 test) ve `app/` içinde `npx tsc --noEmit` geçmelidir.
+- **Token adı, resmi ve dolar karşılığı hazır (25 Kasım).** Ekranda kullanmak için `app/src/screens/ui.tsx` içinde iki parça var: `<TokenLine mint={...} />` (resim, ad, sembol ve kısa adres; alım ekranında `fromNetwork` ile zincirden okur, öbür ekranlarda daha önce okunanı gösterir) ve geçmiş listesi için `<TokenRow mint={...} />`. Kendi görünümünü kurmak istersen veri `app/src/flow/tokenInfo.ts` içinde: `useTokenInfo(mint, fromNetwork)` → `{ name, symbol, imageUrls }` ya da `null`; `useSolUsd()` → SOL'un dolar fiyatı ya da `null`. Yazıya çevirmek için `tokenTitle`, `tokenInitials` (`app/src/tokenLabel.ts`), `usdText(lamportsToUsd(lamport, fiyat))` (`client/`). Üç kural: `imageUrls` sırayla denenecek adreslerdir (ilki açılmazsa sonraki; hiçbiri açılmazsa adın ilk iki harfi); ad ve resim token'ı çıkaranın yazdığıdır, o yüzden adres ekranda kalır; dolar karşılığı yalnız mainnet'te vardır, `null` gelince satır hiç gösterilmez (devnet SOL'ünün fiyatı yok).
+- **Denetim:** `client/` içinde `npm test` (169 test) ve `app/` içinde `npx tsc --noEmit` geçmelidir.
 - **Deneme:** öykünücüde devnet'te deneme cüzdanıyla; mainnet alımını Buğra kendisi onaylar. Geliştirme sunucusu `CI=1` olmadan başlatılmalı, yoksa uygulama eski paketi çalıştırır.
 - **Cüzdan onay penceresindeki ad ve simge** `app/src/config.ts` içindeki `APP_IDENTITY`'den ve sitenin `favicon.ico`'sundan gelir.

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Keyboard, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Mode, PublicKey, orderPda } from "../../../client/src";
+import { Mode, PublicKey, lamportsToUsd, orderPda, usdText } from "../../../client/src";
 
 import { connection } from "../flow/connection";
 import { walletIsShort } from "../funds";
@@ -20,7 +20,8 @@ import {
   parseCustomRungs,
   rungsForMode,
 } from "../flow/plan";
-import { Button, Header, colors, s } from "./ui";
+import { useSolUsd } from "../flow/tokenInfo";
+import { Button, Header, TokenLine, colors, s } from "./ui";
 
 const REFRESH_MS = 2500;
 const YOUNG_CURVE_SECONDS = 120;
@@ -48,6 +49,7 @@ export function BuyScreen(props: {
   const [balance, setBalance] = useState<bigint | null>(null);
   const [orderExists, setOrderExists] = useState(false);
   const [details, setDetails] = useState(false);
+  const usdPerSol = useSolUsd();
 
   // Load the token when the address changes.
   useEffect(() => {
@@ -206,7 +208,7 @@ export function BuyScreen(props: {
         {marketError && <Text style={s.error}>{marketError}</Text>}
         {market && (
           <View style={s.box}>
-            <Text style={s.body}>Token {shortAddress(market.mint.toBase58())}</Text>
+            <TokenLine mint={market.mint.toBase58()} fromNetwork />
             <Text style={s.small}>{venueText(market.venue)}</Text>
             {plan && (
               <>
@@ -268,6 +270,9 @@ export function BuyScreen(props: {
           placeholder="0.01"
           placeholderTextColor={colors.faint}
         />
+        {usdPerSol !== null && amount !== null && !amountProblem && (
+          <Text style={s.small}>≈ {usdText(lamportsToUsd(amount, usdPerSol))}</Text>
+        )}
 
         {plan && (
           <View style={{ gap: 2, marginTop: 6 }}>

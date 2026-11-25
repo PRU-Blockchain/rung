@@ -1,10 +1,10 @@
 import { ScrollView, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { pctText, shortAddress, sol } from "../flow/format";
+import { pctText, sol } from "../flow/format";
 import { Receipt } from "../flow/history";
 import { TxLinks } from "./ReceiptScreen";
-import { Button, Header, s } from "./ui";
+import { Button, Header, TokenLine, s } from "./ui";
 
 export const NOT_BOUGHT = "Price went above your cap. Not bought. Your SOL is back.";
 
@@ -23,7 +23,7 @@ export function NotBoughtScreen(props: {
     <SafeAreaView style={s.screen}>
       <ScrollView contentContainerStyle={s.content}>
         <Header />
-        <Text style={s.body}>Token {shortAddress(r.mint)}</Text>
+        <TokenLine mint={r.mint} />
         {r.outcome === "not-bought" && !r.transactions.some((t) => t.label.startsWith("try")) ? (
           <Text style={[s.body, { fontWeight: "600" }]}>
             The order ran out of time before any rung was tried. Not bought. Your SOL is back.

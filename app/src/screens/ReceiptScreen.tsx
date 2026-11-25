@@ -3,9 +3,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { bpsText, priceText, shortAddress, sol, tokens } from "../flow/format";
 import { Receipt, accumulatorLabel } from "../flow/history";
+import { useTokenInfo } from "../flow/tokenInfo";
 import { paidAboveSeenPct } from "../flow/ladder";
 import { signedPctText } from "../percent";
-import { Button, Header, Row, TxLinkText, s } from "./ui";
+import { Button, Header, Row, TokenLine, TxLinkText, s } from "./ui";
 
 /** The links of a receipt, approval first. */
 export function TxLinks({ r }: { r: Receipt }) {
@@ -24,10 +25,12 @@ export function ReceiptScreen({ r, onNew, onHistory }: { r: Receipt; onNew: () =
   const spent = BigInt(r.lamportsSpent ?? "0");
   const bought = BigInt(r.tokensBought ?? "0");
   const diff = bought > 0n ? paidAboveSeenPct(amount, seen, spent, bought) : 0;
+  const named = useTokenInfo(r.mint) !== null;
   return (
     <SafeAreaView style={s.screen}>
       <ScrollView contentContainerStyle={s.content}>
         <Header />
+        {named && <TokenLine mint={r.mint} hideAddress />}
         <Text style={[s.body, { fontWeight: "600" }]}>Bought {shortAddress(r.mint)}</Text>
         <View style={s.box}>
           <Row label="Price you saw" value={priceText(amount, seen, r.decimals)} />

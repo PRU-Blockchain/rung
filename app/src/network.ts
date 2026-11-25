@@ -53,6 +53,22 @@ export function networkConfig(cluster: string | undefined, rpcUrl?: string): Net
   return rpcUrl ? { ...base, rpcEndpoint: keylessRpc(rpcUrl) } : base;
 }
 
+/** Whether a receipt written on `receiptCluster` is listed in the build for `build`. Unknown (an old receipt) is listed. */
+export const receiptShownOn = (receiptCluster: Cluster | undefined, build: Cluster): boolean =>
+  receiptCluster === undefined || receiptCluster === build;
+
+/**
+ * The network of a receipt written before receipts carried one. `known` says
+ * whether this build's network has the receipt's token (null: no answer).
+ * A token mainnet does not have was not bought on mainnet, so it was bought
+ * on devnet; devnet can be reset, so "not there" on devnet decides nothing.
+ */
+export function legacyReceiptCluster(build: Cluster, known: boolean | null): Cluster | undefined {
+  if (known === true) return build;
+  if (known === false && build === "mainnet-beta") return "devnet";
+  return undefined;
+}
+
 export function explorerTxUrl(network: NetworkConfig, signature: string): string {
   const query = network.cluster === "mainnet-beta" ? "" : `?cluster=${network.cluster}`;
   return `https://explorer.solana.com/tx/${signature}${query}`;

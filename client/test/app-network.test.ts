@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { explorerTxUrl, networkConfig } from "../../app/src/network";
+import { explorerTxUrl, legacyReceiptCluster, networkConfig, receiptShownOn } from "../../app/src/network";
 
 test("without a setting the app is on devnet: real SOL only when asked for", () => {
   for (const value of [undefined, "", "devnet"]) {
@@ -58,4 +58,29 @@ test("another RPC can be set, but never one that carries a key", () => {
 test("explorer links carry the network", () => {
   assert.equal(explorerTxUrl(networkConfig("devnet"), "SIG"), "https://explorer.solana.com/tx/SIG?cluster=devnet");
   assert.equal(explorerTxUrl(networkConfig("mainnet-beta"), "SIG"), "https://explorer.solana.com/tx/SIG");
+});
+
+// The devnet and the mainnet build of the app share one install on the
+// emulator, and receipts used to carry no network: a devnet buy showed up in
+// the mainnet build's history with a link to the mainnet explorer.
+test("a receipt is listed only in the build of its own network", () => {
+  assert.equal(receiptShownOn("mainnet-beta", "mainnet-beta"), true);
+  assert.equal(receiptShownOn("devnet", "devnet"), true);
+  assert.equal(receiptShownOn("devnet", "mainnet-beta"), false);
+  assert.equal(receiptShownOn("mainnet-beta", "devnet"), false);
+  // An old receipt whose network is not known yet stays visible until it is sorted.
+  assert.equal(receiptShownOn(undefined, "mainnet-beta"), true);
+  assert.equal(receiptShownOn(undefined, "devnet"), true);
+});
+
+test("an old receipt is sorted by whether this build's network has its token", () => {
+  assert.equal(legacyReceiptCluster("mainnet-beta", true), "mainnet-beta");
+  assert.equal(legacyReceiptCluster("devnet", true), "devnet");
+  // A token mainnet does not have was not bought on mainnet.
+  assert.equal(legacyReceiptCluster("mainnet-beta", false), "devnet");
+  // Devnet can be reset, so "not there" on devnet decides nothing.
+  assert.equal(legacyReceiptCluster("devnet", false), undefined);
+  // No answer (offline, rate limit) decides nothing.
+  assert.equal(legacyReceiptCluster("mainnet-beta", null), undefined);
+  assert.equal(legacyReceiptCluster("devnet", null), undefined);
 });
