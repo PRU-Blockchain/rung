@@ -112,6 +112,8 @@ Each failed try cost 6,000 lamports; one order, one buy. Both buys were sold bac
 
 **From the app.** The same evening the first mainnet buy went through the Android app, with Phantom as the wallet (CATE pool, Tight, 0.01 SOL): [one approval](https://explorer.solana.com/tx/5X1dpRNNF5zp4DhVW7WqmmvBLFV8YYQ6z3KH1jph94bkG8751KmTWbTVt2Z1JRGfbXK9ooYXk9LiJSEddfmT7L4e), the [1% rung filled](https://explorer.solana.com/tx/2hws1mQkKJsekvwNYgvRko3KGfukHqfukW5MJ5NeooSZNcW7123ANjpquQiKHiW8d3duBYQmR85D5qox1BYgqd64) at the price seen (40.795274 tokens), and the [unused fees came back](https://explorer.solana.com/tx/2ydWR4dKPf5wyNgERXXVQQAiPaRMLAakLu8BTvpi7ra3fAwGJPjNksoZP23shVEDK6pQLQuHUCgBf842ikD8gtRi). [Receipt screen](docs/shots/app-19-mainnet-bought.png).
 
+**Through Jito.** On Nov 25, 2026 the script sent a buy with `--jito`: each try goes to Jito's block engine as a bundle of one transaction, so a try that would not fill does not land and pays no fee. One buy so far (0.01 SOL, Tight, a pump curve): [the order](https://explorer.solana.com/tx/55GyNXAyYih6NRuHZx3fruxmBwAfMUk5hwGkMrXzBevisasqVEXGHHcqUQmFJdjSqCMVLGUyHPGkxPQbB3VWyNoH) in slot 473808492, [the 1% rung filled](https://explorer.solana.com/tx/26qJcfacd5EdpcWRdtBcg9QuwWy1WGSVDWAhWVDBTPqej1qzCtktMec7LjXwhFzgXQLfnBL98rBdLnw5fiDrLJDZ) two slots later. That try carries a 3,991 lamport tip to a Jito tip account and the `jitodontfront` marker, on top of its 6,000 lamport fee. The first rung filled, so this run did not show a try that stays off the chain; that is still to measure. The app does not use this road yet.
+
 A second buy through the app later that evening, with the first try sent together with the order: [one approval](https://explorer.solana.com/tx/3qYNS2XSrWBWy8bv6GP8Lo34a98p2dQaRCHPqefiCovftyHifJ931Ay8dXi7x9UST1iLXTZUtfcVySvvvtYNcnrz) (a single Confirm sheet in Phantom), the [1% rung filled](https://explorer.solana.com/tx/3HAtsqWmr2gXKd6ywpYiWmJEiM7vej3gS7hwkALfCN955VB8AeXk7CtResvk6zyrDbvRdy5oY3CZ8xfSRkUsD6b3) two slots after the order, 40.376449 tokens at +0.01% of the price seen, [unused fees back](https://explorer.solana.com/tx/HaghX3Yha5tmb3JW7aVwt1GLqsDN7ya4keN5WKYdd3pJqmgatYUbaUeoJhRRdu1fTNriFx1ANKfFMRqfh3EY3Db).
 
 ### Devnet runs
@@ -337,7 +339,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 - At most 0.5 SOL per order (`MAX_ORDER_LAMPORTS` in [`constants.rs`](programs/rung/src/constants.rs)); at least 0.001 SOL. The highest cap any order can set is 30%. Raising the per-order limit is a team decision.
 - Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
 - Android emulator; not tested on a real device or Seeker.
-- On mainnet: thirteen buys and two not-bought runs so far: eleven through the script, two through the app.
+- On mainnet: fourteen buys and two not-bought runs so far: twelve through the script, two through the app.
 - Buys on pump.fun bonding curves and on a token's own (canonical) PumpSwap pool paired with SOL. Other pools and cashback pools: no.
 
 ## Architecture and program addresses
