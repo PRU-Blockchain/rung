@@ -121,6 +121,21 @@ export function mayOpenOrder(network: Network, flags: Flags): boolean {
   return true;
 }
 
+/**
+ * The allowances (basis points below the simulation) the sell of a test round
+ * trip is tried with. On a token that moves, a sell with 1% often fails; each
+ * new try simulates again and doubles the allowance, never above `maxBps`.
+ */
+export function sellSlippageSteps(firstBps: bigint, tries = 3, maxBps = 1_000n): bigint[] {
+  const steps: bigint[] = [];
+  let bps = firstBps;
+  for (let i = 0; i < tries; i++) {
+    steps.push(bps > maxBps ? maxBps : bps);
+    bps *= 2n;
+  }
+  return steps;
+}
+
 const clusterQuery = (network: Network) => (network === "mainnet" ? "" : `?cluster=${network}`);
 
 export function explorerTx(network: Network, signature: string): string {

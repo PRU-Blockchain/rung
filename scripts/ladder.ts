@@ -19,7 +19,8 @@
 //         whose price is not falling (rule in scripts/pick.ts). For test buys on a token that is moving.
 //       [--no-early-try]   send the first try only after the order is confirmed (the old way). By default
 //         the first try is sent together with the order and lands right behind it. Off with the push test aids.
-//       [--then-sell-all]   after a buy that filled: sell it back at once (as --sell-all does), wait for the
+//       [--then-sell-all]   after a buy that filled: sell it back at once (as --sell-all does; a sell the venue
+//         refuses is tried again up to twice, each time with a fresh simulation and twice the allowance), wait for the
 //         order's lifetime to end and close the order account. For test buys whose SOL should come back.
 //   npx tsx scripts/ladder.ts --sell-all --mint <MINT> [--slippage-bps 100] [--keypair ...]
 //       sells the wallet's whole balance of the token where it trades (curve or PumpSwap pool) and closes the emptied
@@ -131,7 +132,7 @@ import {
   runtimeFetch,
 } from "../client/src/jito";
 import { type CurveActivity, pickBusyCurve } from "./pick";
-import { type Network, checkMainnetRun, chooseNetwork, explorerTx, hideRpc, mayOpenOrder, rpcHost } from "./network";
+import { type Network, checkMainnetRun, chooseNetwork, explorerTx, hideRpc, mayOpenOrder, rpcHost, sellSlippageSteps } from "./network";
 
 const DEFAULT_RPC = "https://api.devnet.solana.com";
 const DEFAULT_KEYPAIR = "~/.config/solana/rung-devnet.json";
@@ -693,13 +694,21 @@ async function sellAndClose(connection: Connection, flags: Flags, mint: PublicKe
   }
   console.log("\n--then-sell-all: selling what the order bought.");
   let sellError: unknown;
-  try {
-    await sellAll(connection, flags, mint);
-  } catch (e) {
-    sellError = e;
-    console.log(`  the sell did not go through: ${e instanceof Error ? e.message : String(e)}`);
-    console.log("  the tokens are still in the wallet; run --sell-all again.");
+  // A sell with a fixed allowance fails when the price moves; simulate again and widen it.
+  const steps = sellSlippageSteps(int(flags, "slippage-bps", 100n));
+  for (let i = 0; i < steps.length; i++) {
+    try {
+      await sellAll(connection, flags, mint, steps[i]);
+      sellError = undefined;
+      break;
+    } catch (e) {
+      sellError = e;
+      console.log(`  the sell did not go through: ${e instanceof Error ? e.message : String(e)}`);
+      if (!(e instanceof SellRefused) || i === steps.length - 1) break;
+      console.log(`  trying again with a fresh simulation and ${steps[i + 1]} bps`);
+    }
   }
+  if (sellError) console.log("  the tokens are still in the wallet; run --sell-all again.");
   console.log(`\nwaiting for the order's lifetime to end (slot ${done.lastSlot}) to close the order account`);
   for (;;) {
     const slot = BigInt(await connection.getSlot("confirmed"));
@@ -1000,6 +1009,9 @@ async function refundOrCancel(connection: Connection, user: Keypair, kind: "refu
  * opened for the sell. The minimum it accepts is what a
  * simulation of the same sell returned just before, less `--slippage-bps`.
  */
+/** A sell that landed and was refused by the venue (the price moved below the minimum). */
+class SellRefused extends Error {}
+
 /**
  * The curve half of `--sell-all`: pump's `sell_v3` pays SOL straight to the
  * wallet, so the simulation is read from the wallet's own balance.
@@ -1070,7 +1082,7 @@ async function sellAllOnCurve(connection: Connection, flags: Flags, user: Keypai
   if (!landed.landed) throw new Error("the sell did not land (blockhash expired); nothing was sold");
   console.log(`\nsell ${landed.signature} slot ${landed.slot ?? "?"} fee ${landed.fee ?? "?"} CU ${landed.computeUnits ?? "?"}\n  ${explorer(landed.signature)}`);
   if (landed.err) {
-    throw new Error(`the sell failed and nothing was sold: ${describeFailure(classifyFailure(landed.err, landed.logs, ixs.map((i) => i.programId)))}`);
+    throw new SellRefused(`the sell failed and nothing was sold: ${describeFailure(classifyFailure(landed.err, landed.logs, ixs.map((i) => i.programId)))}`);
   }
   const balanceAfter = BigInt(await connection.getBalance(u, "confirmed"));
   const accAfter = await connection.getAccountInfo(accumulator, "confirmed");
@@ -1080,9 +1092,9 @@ async function sellAllOnCurve(connection: Connection, flags: Flags, user: Keypai
   }
 }
 
-async function sellAll(connection: Connection, flags: Flags, mint: PublicKey) {
+async function sellAll(connection: Connection, flags: Flags, mint: PublicKey, slippageOverride?: bigint) {
   guardMainnet(flags);
-  const slippageBps = int(flags, "slippage-bps", 100n);
+  const slippageBps = slippageOverride ?? int(flags, "slippage-bps", 100n);
   if (slippageBps < 1n || slippageBps > 1_000n) throw new Error("--slippage-bps must be between 1 and 1000; nothing was sent.");
   const user = loadKeypair(str(flags, "keypair") ?? DEFAULT_KEYPAIR);
   const u = user.publicKey;
@@ -1165,7 +1177,7 @@ async function sellAll(connection: Connection, flags: Flags, mint: PublicKey) {
   if (!landed.landed) throw new Error("the sell did not land (blockhash expired); nothing was sold");
   console.log(`\nsell ${landed.signature} slot ${landed.slot ?? "?"} fee ${landed.fee ?? "?"} CU ${landed.computeUnits ?? "?"}\n  ${explorer(landed.signature)}`);
   if (landed.err) {
-    throw new Error(`the sell failed and nothing was sold: ${describeFailure(classifyFailure(landed.err, landed.logs, ixs.map((i) => i.programId)))}`);
+    throw new SellRefused(`the sell failed and nothing was sold: ${describeFailure(classifyFailure(landed.err, landed.logs, ixs.map((i) => i.programId)))}`);
   }
   const balanceAfter = BigInt(await connection.getBalance(u, "confirmed"));
   const accAfter = await connection.getAccountInfo(accumulator, "confirmed");

@@ -12,6 +12,7 @@ import {
   explorerAddress,
   explorerTx,
   hideRpc,
+  sellSlippageSteps,
   mayOpenOrder,
   rpcHost,
 } from "../../scripts/network";
@@ -176,4 +177,11 @@ test("no refusal message quotes the RPC URL", () => {
       assert.ok(!(e as Error).message.includes("SECRET-VALUE"), (e as Error).message);
     }
   }
+});
+
+test("a sell that fails is tried again with a wider allowance, never above 10%", () => {
+  assert.deepEqual(sellSlippageSteps(100n), [100n, 200n, 400n]);
+  assert.deepEqual(sellSlippageSteps(300n), [300n, 600n, 1000n]);
+  assert.deepEqual(sellSlippageSteps(1000n), [1000n, 1000n, 1000n]);
+  assert.deepEqual(sellSlippageSteps(100n, 1), [100n]);
 });
