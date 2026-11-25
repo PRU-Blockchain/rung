@@ -516,7 +516,7 @@ Today the program has no fee field and takes no share (not yet).
 
 Planned, in this order:
 
-- **A fee field in the program.** A small share of a buy that fills, nothing from a buy that does not. This is what turns the building block into income: the share comes from every buy that goes through the program, whichever interface sent it.
+- **A fee field in the program.** A small share of a buy that fills, nothing from a buy that does not.
 - **A kit for other interfaces.** Small wallets, Telegram bots and trading terminals can offer the ladder without writing and auditing a program of their own. The TypeScript client in [`client/`](client/) already builds every instruction; planned are a published package and a short guide.
 - **The Solana dApp Store.** Rung is a native Android app; listing it there is the first place to meet buyers on mobile.
 - **A bolder ladder** for buyers who want to be sure to buy. Today the program caps a ladder at 30%. In the [replay](measure/replay/results/replay-2026-11-24.md), 15 → 25 → 35 → 50% filled as often as one buy at 25% (launches: 95.0% against 94.8%) with about half the room in the block where it fills (191 against 390 SOL). It needs a program change.
