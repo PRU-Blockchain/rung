@@ -125,6 +125,32 @@ Bu bölüm ekranlara bakarak değil, uygulamaların kendi yardım sayfaları, be
 - **Ön ayar katmanları (P1 / P2 / P3), öncelik ücreti ve tip alanları.** Rung bunları kullanıcı adına seçiyor; göstermek "tahmin etme" vaadiyle çelişir.
 - **Aynı ekranda alım ve satım sekmeleri.** Rung şu an yalnız alıyor.
 
+## Web sitesi: jüri uygulamayı indirmeyecek
+
+Bu bölüm diğerlerinden farklı: bir tasarım fikri değil, yarışmayı bilen birinin uyarısı. 25 Kasım 2026'daki Superteam Türkiye toplantısında Buğra'ya söylenen: **küresel jüri bütün mobil uygulamaları indirip denemez; APK koymak yetmez, depoya ve APK'ya bakmak uzun sürer ve büyük olasılıkla bakmazlar.** Önerilen: ana sitede uygulamanın kullanım videosu ve insanların tarayıcıda deneyebileceği, öykünücü gibi bir şey.
+
+Bunun anlamı: jüri için ürün, **site**. Uygulamanın ne yaptığı, sitenin ilk ekranında, hiçbir şey indirmeden anlaşılmalı.
+
+Sitede olması gerekenler:
+
+1. **Kullanım videosu, sayfanın en üstünde.** Gerçek uygulama, gerçek bir mainnet alımı, baştan sona: adresi yapıştır, modu seç, cüzdanda bir kez onayla, merdiven, makbuz. Kısa olmalı; sesi kapalı izlenince de anlaşılmalı (çekim ve seslendirme takımın işi).
+2. **Tarayıcıda denenebilen bir gösterim.** Seçenekler aşağıda.
+3. **Kanıt şeridi.** Mainnet alımları ve gezgin bağlantıları; sayfa şu an devnet sayacını gösteriyor, mainnet'e çevrilecek.
+
+"Öykünücü gibi bir şey" için üç yol ve bedelleri:
+
+| yol | ne olur | bedeli |
+|---|---|---|
+| **Gerçek bir alımın yeniden oynatılması** | Sayfada telefon çerçevesi içinde uygulamanın ekranları; ziyaretçi dokunarak ilerler. Gösterilen her sayı kaydedilmiş gerçek bir mainnet alımından gelir (fiyat, basamak, işlem imzaları, gezgin bağlantıları) ve ekranda "24 Kasım'daki gerçek bir alımın yeniden oynatılması" diye yazar. Cüzdan gerekmez. | En hızlısı. Canlı değil; bunun açıkça yazılması şart. |
+| **Web'den gerçek alım** | Tarayıcı cüzdanıyla (Phantom eklentisi) sitede gerçekten alım yapılır. | Gerçek ürün, ama en büyük iş: uygulamanın alım akışının web'e taşınması gerekir. Cüzdan uyarıları ("This domain is new") web'de de çıkar. Jürinin cüzdanında SOL olması gerekir. |
+| **Tarayıcıda çalışan Android öykünücüsü** | Gerçek APK bir hizmet üzerinden tarayıcıda açılır. | İçinde cüzdan uygulaması olmadığı için onay adımına kadar gidilebilir; alım tamamlanmaz. Bu hizmetlerin ücretini ve sınırlarını doğrulamadım. |
+
+Geliştirici ajanın önerisi ilki, videoyla birlikte: hızlı, dürüst ve jüri bir dakikada ürünü görmüş olur. Karar Buğra ve Merve'nin.
+
+Aynı toplantıda bir uyarı daha geldi: jüri "neden yalnız mobil, neden web'den alım yok?" diye sorabilir. Bu, tablodaki ikinci yolu (web'den gerçek alım) hackathon sonrası için de değerli kılıyor; şimdilik yeniden oynatma bu soruya "web'de görebilir ve deneyebilirsiniz" cevabını verir.
+
+Projenin bu konudaki sabiti: **sahte gösterim ve uydurma veri yok.** Yeniden oynatma yalnız gerçek, zincirde duran alımların verisini kullanır ve yeniden oynatma olduğunu söyler.
+
 ## Projeden gelen sabitler (bu notlardan bağımsız)
 
 - **Ekrandaki İngilizce cümleler** devir metninden kelimesi kelimesine gelir ve testle denetlenir. Görünümleri, yerleri, boyutları değişebilir; sözleri değişecekse önce Buğra'ya sorulur.
