@@ -65,6 +65,8 @@ export interface FeeBudget {
   sweep: bigint;
   /** The session key is a new account: it must hold at least this, or nothing. */
   rentExemptMinimum: bigint;
+  /** One Jito tip, when the tries go through Jito: only the try that lands pays it. */
+  tip: bigint;
   total: bigint;
 }
 
@@ -81,18 +83,20 @@ export function feeBudget(p: {
   cuPrice?: bigint;
   refundCuLimit?: number;
   venue?: Venue;
+  tipLamports?: bigint;
 }): FeeBudget {
   const cuPrice = p.cuPrice ?? DEFAULT_CU_PRICE;
   const tries = maxFeeLamports(p.rungCount, p.cuLimit ?? cuLimitFor(p.venue ?? "Curve"), cuPrice);
   const refund = refundFeeLamports(cuPrice, p.refundCuLimit ?? DEFAULT_REFUND_CU_LIMIT);
   const sweep = sweepFeeLamports();
-  const total = tries + refund + sweep + p.rentExemptMinimum;
+  const tip = p.tipLamports ?? 0n;
+  const total = tries + refund + sweep + p.rentExemptMinimum + tip;
   if (total > MAX_FEE_BUDGET_LAMPORTS) {
     throw new Error(
       `fee budget ${total} lamports is above the program's limit of ${MAX_FEE_BUDGET_LAMPORTS}: lower the compute unit price or limit, or use fewer rungs`,
     );
   }
-  return { tries, refund, sweep, rentExemptMinimum: p.rentExemptMinimum, total };
+  return { tries, refund, sweep, rentExemptMinimum: p.rentExemptMinimum, tip, total };
 }
 
 /** Token account size the ATA program creates for a mint of this token program. */

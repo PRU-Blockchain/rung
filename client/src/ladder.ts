@@ -17,6 +17,7 @@ import { DEFAULT_CU_PRICE, DEFAULT_REFUND_CU_LIMIT, cuLimitFor, sweepFeeLamports
 import { Failure, classifyFailure, describeFailure } from "./errors";
 import { OrderFilled, OrderRefunded, findEvent } from "./events";
 import { PoolAccounts, computeUnitLimitIx, computeUnitPriceIx, refundIx, tryRungIx } from "./instructions";
+import { JITO_HOSTS, JitoOptions, jitoTipIx, runtimeFetch, sendToJito } from "./jito";
 import { orderPda } from "./pdas";
 
 export type AttemptKind = "try" | "refund" | "sweep";
@@ -26,6 +27,7 @@ export type Outcome =
   | "order-filled" // Rung says the order already bought
   | "failed" // any other error
   | "not-landed" // blockhash expired before the transaction landed
+  | "dropped" // sent through Jito and never landed: it would not have filled (or no leader took it); costs nothing
   | "ok"; // refund or sweep succeeded
 
 export interface Attempt {
@@ -40,6 +42,10 @@ export interface Attempt {
   fee?: bigint;
   /** `meta.computeUnitsConsumed`. */
   computeUnits?: number;
+  /** The Jito tip this try paid (only a try that landed and filled pays it). */
+  tip?: bigint;
+  /** The road a try took. */
+  via?: "jito" | "rpc";
   outcome: Outcome;
   failure?: Failure;
   logs?: string[];
@@ -81,6 +87,14 @@ export interface LadderParams {
   firstTry?: EarlyTry;
   /** How long to wait for that early try before sending rung 0 the ordinary way. */
   firstTryWaitMs?: number;
+  /**
+   * Send the tries through Jito's block engine, each as a bundle of its own
+   * (see jito.ts). A try that would not fill then never lands and costs
+   * nothing, so the ladder moves to the next rung when that rung is due
+   * instead of waiting for a failure. If the block engine cannot be reached
+   * a try goes the ordinary road.
+   */
+  jito?: JitoOptions;
   onEvent?: (event: LadderEvent) => void;
 }
 
@@ -94,6 +108,8 @@ export interface LadderResult {
   sessionBalanceAfter: bigint;
   /** Sum of `meta.fee` over every landed transaction here. */
   totalFees: bigint;
+  /** Jito tips paid (at most one: the try that filled). */
+  totalTips: bigint;
 }
 
 // Present in every JavaScript runtime this module targets; declared here so
@@ -153,6 +169,11 @@ export async function confirmSent(
     // below like any other. Only real exceptions are rethrown.
     if (e instanceof Error) throw e;
   }
+  return readLanded(connection, signature);
+}
+
+/** Reads what a transaction that has landed did. */
+async function readLanded(connection: Connection, signature: string): Promise<Landed> {
   for (let i = 0; i < 20; i++) {
     const got = await connection.getTransaction(signature, {
       commitment: "confirmed",
@@ -183,6 +204,9 @@ export interface EarlyTry {
   lastValidBlockHeight: number;
   /** Programs of the transaction's instructions, in order, to read a failure. */
   programIds: PublicKey[];
+  /** Set when it went through Jito. */
+  via?: "jito" | "rpc";
+  tip?: bigint;
   /** Ends the re-sends. */
   stop: () => void;
 }
@@ -215,6 +239,8 @@ export async function sendFirstTryEarly(p: {
   resendMs?: number;
   /** How many times the same bytes are sent again (default 30, about six seconds). */
   resends?: number;
+  /** Send it through Jito, with a tip, as a bundle of its own (see jito.ts). */
+  jito?: JitoOptions;
 }): Promise<EarlyTry> {
   const session = p.sessionKeypair;
   const instructions = [
@@ -231,26 +257,65 @@ export async function sendFirstTryEarly(p: {
       pool: p.pool,
     }),
   ];
+  return sendTry({
+    connection: p.connection,
+    session,
+    instructions,
+    blockhash: p.blockhash,
+    lastValidBlockHeight: p.lastValidBlockHeight,
+    jito: p.jito,
+    resendMs: p.resendMs,
+    resends: p.resends,
+  });
+}
+
+/**
+ * Signs one try and keeps sending the same bytes until stopped: through Jito
+ * (with the tip added) when `jito` is given, otherwise through the connection.
+ * Throws when the very first send fails.
+ */
+async function sendTry(p: {
+  connection: Connection;
+  session: Keypair;
+  instructions: TransactionInstruction[];
+  blockhash: string;
+  lastValidBlockHeight: number;
+  jito?: JitoOptions;
+  resendMs?: number;
+  resends?: number;
+}): Promise<EarlyTry> {
+  const jito = p.jito;
+  const instructions = jito
+    ? [...p.instructions, jitoTipIx(p.session.publicKey, jito.tipAccount, jito.tipLamports)]
+    : p.instructions;
   const tx = new Transaction({
-    feePayer: session.publicKey,
+    feePayer: p.session.publicKey,
     blockhash: p.blockhash,
     lastValidBlockHeight: p.lastValidBlockHeight,
   }).add(...instructions);
-  tx.sign(session);
+  tx.sign(p.session);
   const raw = tx.serialize();
-  // maxRetries 0: the re-sends below are the retries, on our own clock.
-  const send = () => p.connection.sendRawTransaction(raw, { skipPreflight: true, maxRetries: 0 });
-  const signature = await send();
+  let send: (n: number) => Promise<string>;
+  if (jito) {
+    const fetchFn = jito.fetch ?? runtimeFetch();
+    const hosts = jito.hosts ?? JITO_HOSTS;
+    // One request per second per region without a key: take the hosts in turn.
+    send = (n) => sendToJito(fetchFn, hosts[n % hosts.length], raw);
+  } else {
+    // maxRetries 0: the re-sends below are the retries, on our own clock.
+    send = () => p.connection.sendRawTransaction(raw, { skipPreflight: true, maxRetries: 0 });
+  }
+  const signature = await send(0);
 
   let stopped = false;
-  const resends = p.resends ?? 30;
-  const resendMs = p.resendMs ?? 200;
+  const resends = p.resends ?? (jito ? 200 : 30);
+  const resendMs = p.resendMs ?? jito?.resendMs ?? (jito ? 300 : 200);
   void (async () => {
-    for (let i = 0; i < resends && !stopped; i++) {
+    for (let i = 1; i <= resends && !stopped; i++) {
       await sleep(resendMs);
       if (stopped) break;
       // "Already processed" and the like are expected once it has landed.
-      await send().catch(() => undefined);
+      await send(i).catch(() => undefined);
     }
   })();
 
@@ -259,6 +324,8 @@ export async function sendFirstTryEarly(p: {
     blockhash: p.blockhash,
     lastValidBlockHeight: p.lastValidBlockHeight,
     programIds: instructions.map((x) => x.programId),
+    via: jito ? "jito" : "rpc",
+    tip: jito?.tipLamports,
     stop: () => {
       stopped = true;
     },
@@ -276,7 +343,7 @@ export async function runLadder(p: LadderParams): Promise<LadderResult> {
   const cuPrice = p.cuPrice ?? DEFAULT_CU_PRICE;
   const pollMs = p.pollMs ?? 200;
   const attempts: Attempt[] = [];
-  const result: LadderResult = { attempts, sweptLamports: 0n, sessionBalanceAfter: 0n, totalFees: 0n };
+  const result: LadderResult = { attempts, sweptLamports: 0n, sessionBalanceAfter: 0n, totalFees: 0n, totalTips: 0n };
 
   const record = (a: Attempt) => {
     attempts.push(a);
@@ -310,16 +377,128 @@ export async function runLadder(p: LadderParams): Promise<LadderResult> {
   if (order.venue === "PumpSwap" && !p.pool) throw new Error("a PumpSwap order needs the pool's accounts");
   const cuLimit = p.cuLimit ?? cuLimitFor(order.venue);
 
+  const tryInstructions = (rungIndex: number) => [
+    computeUnitLimitIx(cuLimit),
+    computeUnitPriceIx(cuPrice),
+    tryRungIx({
+      sessionKey: session.publicKey,
+      user,
+      mint: p.mint,
+      tokenProgram: p.tokenProgram,
+      buybackRecipient: p.buybackRecipient,
+      rungIndex,
+      venue: order.venue,
+      pool: p.pool,
+    }),
+  ];
+
+  // --- The Jito road. A try sent there leaves no trace unless it lands, so every
+  // try stays "in flight" and is looked at again while later rungs run.
+  interface InFlight extends EarlyTry {
+    rungIndex: number;
+    dueSlot: bigint;
+    settled: boolean;
+  }
+  const inFlight: InFlight[] = [];
+  /** Reads every Jito try that has landed since the last look. True once the order has bought. */
+  const settle = async (): Promise<boolean> => {
+    const open = inFlight.filter((f) => !f.settled);
+    if (open.length === 0) return false;
+    const statuses = (await connection.getSignatureStatuses(open.map((f) => f.signature))).value;
+    let bought = false;
+    for (let k = 0; k < open.length; k++) {
+      const status = statuses[k];
+      if (!status || (status.confirmationStatus !== "confirmed" && status.confirmationStatus !== "finalized")) continue;
+      const f = open[k];
+      f.settled = true;
+      f.stop();
+      const landed = await readLanded(connection, f.signature);
+      const a = toAttempt("try", landed, f.programIds);
+      a.rungIndex = f.rungIndex;
+      a.rungBps = order.rungsBps[f.rungIndex];
+      a.dueSlot = f.dueSlot;
+      a.via = "jito";
+      if (!landed.err) {
+        a.outcome = "filled";
+        a.tip = f.tip;
+        result.totalTips += f.tip ?? 0n;
+        result.filled = findEvent(landed.logs, "OrderFilled");
+        bought = true;
+      } else if (a.outcome === "order-filled") {
+        bought = true;
+      }
+      record(a);
+    }
+    if (bought) inFlight.forEach((f) => f.stop());
+    return bought;
+  };
+
   let stop = false;
   for (let i = 0; i < order.rungCount && !stop; i++) {
     const dueSlot = rungDueSlot(order, i);
     let slot = BigInt(await connection.getSlot("processed"));
     while (slot < dueSlot) {
+      // A Jito try of an earlier rung can still land while this one waits.
+      if (await settle()) {
+        stop = true;
+        break;
+      }
       p.onEvent?.({ type: "waiting", rungIndex: i, dueSlot, slot });
       await sleep(pollMs);
       slot = BigInt(await connection.getSlot("processed"));
     }
+    if (stop) break;
     if (slot >= order.lastSlot) break; // expired: only a refund is left
+
+    if (p.jito) {
+      let flight: EarlyTry | undefined;
+      if (i === 0 && p.firstTry?.via === "jito") {
+        flight = p.firstTry;
+      } else if (!(i === 0 && p.firstTry)) {
+        try {
+          const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash("confirmed");
+          flight = await sendTry({
+            connection,
+            session,
+            instructions: tryInstructions(i),
+            blockhash,
+            lastValidBlockHeight,
+            jito: p.jito,
+          });
+        } catch {
+          flight = undefined; // the block engine cannot be reached: this rung goes the ordinary road below
+        }
+      }
+      if (flight) {
+        p.onEvent?.({ type: "sent", kind: "try", rungIndex: i, signature: flight.signature });
+        const f: InFlight = { ...flight, rungIndex: i, dueSlot, settled: false };
+        inFlight.push(f);
+        // This rung has the road to itself until the next one is due (the last: until the order expires).
+        const until = i + 1 < order.rungCount ? rungDueSlot(order, i + 1) : order.lastSlot;
+        for (;;) {
+          if (await settle()) {
+            stop = true;
+            break;
+          }
+          if (f.settled) break; // it landed and was refused on chain: this rung is done
+          if (BigInt(await connection.getSlot("processed")) >= until) break;
+          await sleep(pollMs);
+        }
+        f.stop();
+        if (!f.settled) {
+          record({
+            kind: "try",
+            rungIndex: i,
+            rungBps: order.rungsBps[i],
+            dueSlot,
+            signature: f.signature,
+            outcome: "dropped",
+            via: "jito",
+          });
+        }
+        continue;
+      }
+    }
 
     if (i === 0 && p.firstTry) {
       const early = p.firstTry;
@@ -333,6 +512,7 @@ export async function runLadder(p: LadderParams): Promise<LadderResult> {
       a.rungIndex = 0;
       a.rungBps = order.rungsBps[0];
       a.dueSlot = dueSlot;
+      a.via = "rpc";
       if (waited?.landed && !waited.err) {
         a.outcome = "filled";
         result.filled = findEvent(waited.logs, "OrderFilled");
@@ -345,20 +525,7 @@ export async function runLadder(p: LadderParams): Promise<LadderResult> {
       if (waited?.landed) continue;
     }
 
-    const instructions = [
-      computeUnitLimitIx(cuLimit),
-      computeUnitPriceIx(cuPrice),
-      tryRungIx({
-        sessionKey: session.publicKey,
-        user,
-        mint: p.mint,
-        tokenProgram: p.tokenProgram,
-        buybackRecipient: p.buybackRecipient,
-        rungIndex: i,
-        venue: order.venue,
-        pool: p.pool,
-      }),
-    ];
+    const instructions = tryInstructions(i);
     const landed = await sendAndConfirm(connection, instructions, session, (signature) =>
       p.onEvent?.({ type: "sent", kind: "try", rungIndex: i, signature }),
     );
@@ -366,6 +533,7 @@ export async function runLadder(p: LadderParams): Promise<LadderResult> {
     a.rungIndex = i;
     a.rungBps = order.rungsBps[i];
     a.dueSlot = dueSlot;
+    a.via = "rpc";
     if (landed.landed && !landed.err) {
       a.outcome = "filled";
       result.filled = findEvent(landed.logs, "OrderFilled");
@@ -375,6 +543,10 @@ export async function runLadder(p: LadderParams): Promise<LadderResult> {
     }
     record(a);
   }
+
+  // A Jito try can land a moment after its window closed.
+  if (!stop) await settle();
+  inFlight.forEach((f) => f.stop());
 
   const filled = attempts.some((a) => a.outcome === "filled" || a.outcome === "order-filled");
   if (!filled) {
@@ -390,6 +562,8 @@ export async function runLadder(p: LadderParams): Promise<LadderResult> {
       const a = toAttempt("refund", landed, instructions.map((x) => x.programId));
       result.refunded = findEvent(landed.logs, "OrderRefunded");
       record(a);
+      // The refund was refused because the order had bought after all: find the try that did it.
+      if (a.outcome === "order-filled") await settle();
     } catch (e) {
       record({ kind: "refund", signature: "", outcome: "failed", failure: { kind: "other", raw: String(e) } });
     }

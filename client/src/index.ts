@@ -8,6 +8,7 @@ export * from "./events";
 export * from "./errors";
 export * from "./budget";
 export * from "./ladder";
+export * from "./jito";
 export * from "./venue";
 
 // The web3.js classes callers need, from the same copy this module uses.

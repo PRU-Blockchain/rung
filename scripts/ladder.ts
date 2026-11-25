@@ -5,6 +5,8 @@
 //       [--venue auto|curve|pool] (auto: the curve while it is open, then the canonical PumpSwap pool)
 //       [--rungs 100,300] [--cu-price 5000] [--cu-limit <venue default>] [--window 4] [--lifetime 150]
 //       [--keypair ~/.config/solana/rung-devnet.json] [--rpc <url>] [--dry-run]
+//       [--jito [--jito-tip <lamports>]]   mainnet only: each try goes to Jito's block engine as a
+//         bundle of one transaction, so a try that would not fill never lands and costs nothing
 //       [--push-after-open <SOL> | --push-pct <PERCENT>]   TEST AID: the wallet buys on the venue
 //         right after open_order, so the price the rungs meet is higher than the one quoted
 //   npx tsx scripts/ladder.ts --push-only --mint <MINT> --push-pct 4.5 [--wait-order <USER>] [--venue ...]
@@ -119,6 +121,15 @@ import {
   wrapSolIxs,
   wsolAta,
 } from "../client/src/index";
+import {
+  JITO_HOSTS,
+  JITO_MIN_TIP_LAMPORTS,
+  type JitoOptions,
+  chooseJitoTip,
+  fetchJitoTipAccounts,
+  fetchJitoTipFloor,
+  runtimeFetch,
+} from "../client/src/jito";
 import { type CurveActivity, pickBusyCurve } from "./pick";
 import { type Network, checkMainnetRun, chooseNetwork, explorerTx, hideRpc, mayOpenOrder, rpcHost } from "./network";
 
@@ -356,6 +367,8 @@ interface Plan {
   budget: ReturnType<typeof feeBudget>;
   openFee: bigint;
   orderRent: bigint;
+  /** Set with --jito: how the tries are sent. */
+  jito?: JitoOptions;
 }
 
 function chooseRungs(flags: Flags): { mode: Mode; rungs: number[] } {
@@ -377,6 +390,38 @@ function checkRungs(rungs: number[]) {
     previous = r;
   }
   if (previous > MAX_CAP_BPS) throw new Error(`the cap (last rung) may be at most ${MAX_CAP_BPS} bps`);
+}
+
+/** The script's own ceiling for --jito-tip: the tip is a cost to the user. */
+const JITO_TIP_FLAG_MAX = 100_000n;
+
+/**
+ * --jito: one of Jito's tip accounts and the tip to pay. Both are read from
+ * Jito; nothing is sent. The tip accounts are asked from the last host of the
+ * list, so the first send (to the first host) is not held up by the limit of
+ * one request per second per region.
+ */
+async function chooseJito(flags: Flags): Promise<JitoOptions | undefined> {
+  if (flags.jito === undefined) return undefined;
+  if (network !== "mainnet") throw new Error("--jito works on mainnet only: Jito's block engine does not serve this network");
+  const fetchFn = runtimeFetch();
+  const accounts = await fetchJitoTipAccounts(fetchFn, JITO_HOSTS[JITO_HOSTS.length - 1]);
+  const tipAccount = accounts[Math.floor(Math.random() * accounts.length)];
+  const asked = str(flags, "jito-tip");
+  let tipLamports: bigint;
+  if (asked !== undefined) {
+    tipLamports = int(flags, "jito-tip", 0n);
+    if (tipLamports < JITO_MIN_TIP_LAMPORTS || tipLamports > JITO_TIP_FLAG_MAX) {
+      throw new Error(`--jito-tip must be between ${JITO_MIN_TIP_LAMPORTS} and ${JITO_TIP_FLAG_MAX} lamports`);
+    }
+  } else {
+    const floor = await fetchJitoTipFloor(fetchFn).catch((e: Error) => {
+      console.log(`(Jito's tip levels could not be read: ${e.message}; using the minimum tip)`);
+      return undefined;
+    });
+    tipLamports = chooseJitoTip(floor);
+  }
+  return { tipAccount, tipLamports };
 }
 
 async function makePlan(connection: Connection, flags: Flags, mint: PublicKey): Promise<Plan> {
@@ -405,7 +450,14 @@ async function makePlan(connection: Connection, flags: Flags, mint: PublicKey): 
     return rentCache.get(len)!;
   };
   const reserve = await rentReserve(rentFor, market.tokenProgram, undefined, market.venue);
-  const budget = feeBudget({ rungCount: rungs.length, rentExemptMinimum: await rentFor(0), cuLimit, cuPrice });
+  const jito = await chooseJito(flags);
+  const budget = feeBudget({
+    rungCount: rungs.length,
+    rentExemptMinimum: await rentFor(0),
+    cuLimit,
+    cuPrice,
+    tipLamports: jito?.tipLamports,
+  });
   return {
     market,
     mode,
@@ -420,6 +472,7 @@ async function makePlan(connection: Connection, flags: Flags, mint: PublicKey): 
     budget,
     openFee: txFeeLamports(),
     orderRent: await rentFor(ORDER_ACCOUNT_LEN),
+    jito,
   };
 }
 
@@ -456,7 +509,12 @@ function printPlan(p: Plan, user?: PublicKey, userBalance?: bigint, orderExists?
   const wsolPart = p.reserve.vaultWsolAccount ? `, vault wrapped-SOL account ${sol(p.reserve.vaultWsolAccount)}` : "";
   const accName = m.venue === "Curve" ? "pump" : "PumpSwap";
   console.log(`  rent reserve    ${sol(p.reserve.total)} (your token account ${sol(p.reserve.userTokenAccount)}, vault token account ${sol(p.reserve.vaultTokenAccount)}${wsolPart}, ${accName} volume account ${sol(p.reserve.accumulator)}, margin ${sol(p.reserve.margin)}); unspent comes back`);
-  console.log(`  fee budget      ${sol(p.budget.total)} to the session key (includes ${sol(p.budget.rentExemptMinimum)} rent-exempt minimum); unspent comes back`);
+  if (p.jito) {
+    console.log(`  Jito            each try is a bundle of one transaction: a try that would not fill does not land and pays no fee`);
+    console.log(`    tip           ${p.jito.tipLamports} lamports to ${p.jito.tipAccount.toBase58()}, paid only by the try that buys`);
+    console.log(`    the max fee above is what the tries cost if Jito cannot be reached and they go the ordinary road`);
+  }
+  console.log(`  fee budget      ${sol(p.budget.total)} to the session key (includes ${sol(p.budget.rentExemptMinimum)} rent-exempt minimum${p.jito ? " and one Jito tip" : ""}); unspent comes back`);
   console.log(`  order account   ${orderExists ? "exists, reused" : `${sol(p.orderRent)} rent, returned when the order account is closed`}`);
   const leaving = p.amount + p.reserve.total + p.budget.total + (orderExists ? 0n : p.orderRent) + p.openFee;
   console.log(`  leaves wallet   ${sol(leaving)} when the order opens`);
@@ -558,6 +616,7 @@ async function run(connection: Connection, flags: Flags, mint: PublicKey): Promi
       lastValidBlockHeight: earlyBlockhash.lastValidBlockHeight,
       cuLimit: plan.cuLimit,
       cuPrice: plan.cuPrice,
+      jito: plan.jito,
     }).catch(() => undefined);
   });
   const firstTry = await earlyTry;
@@ -584,6 +643,7 @@ async function run(connection: Connection, flags: Flags, mint: PublicKey): Promi
     firstTry,
     cuLimit: plan.cuLimit,
     cuPrice: plan.cuPrice,
+    jito: plan.jito,
     onEvent: (e) => {
       if (e.type === "sent") console.log(`  sent ${e.kind}${e.rungIndex !== undefined ? ` ${e.rungIndex}` : ""}: ${e.signature}`);
       if (e.type === "result") console.log(`  ${e.text}`);
@@ -841,7 +901,7 @@ function printReceipt(r: {
   }
 
   console.log("  transactions");
-  type Row = { what: string; signature: string; slot?: number; fee?: bigint; cu?: number; outcome: string };
+  type Row = { what: string; signature: string; slot?: number; fee?: bigint; cu?: number; outcome: string; landed?: boolean };
   const rows: Row[] = [
     { what: "open_order (wallet)", signature: r.opened.signature, slot: r.opened.slot, fee: r.opened.fee, cu: r.opened.computeUnits, outcome: "ok" },
   ];
@@ -856,17 +916,22 @@ function printReceipt(r: {
       slot: a.slot,
       fee: a.fee,
       cu: a.computeUnits,
-      outcome: a.failure ? `${a.outcome}: ${describeFailure(a.failure)}` : a.outcome,
+      outcome:
+        (a.failure ? `${a.outcome}: ${describeFailure(a.failure)}` : a.outcome) +
+        (a.via === "jito" ? ` (Jito${a.tip ? `, tip ${a.tip}` : ""})` : "") +
+        (a.outcome === "dropped" ? ": never landed, no fee" : ""),
+      landed: a.outcome !== "dropped",
     })),
   );
   for (const row of rows) {
     console.log(
       `    ${row.what.padEnd(24)} slot ${String(row.slot ?? "-").padEnd(10)} fee ${String(row.fee ?? "-").padEnd(7)} CU ${String(row.cu ?? "-").padEnd(7)} ${row.outcome}`,
     );
-    if (row.signature) console.log(`      ${explorer(row.signature)}`);
+    if (row.signature && row.landed !== false) console.log(`      ${explorer(row.signature)}`);
   }
   const totalFees = r.opened.fee + result.totalFees;
   console.log(`  total fees      ${sol(totalFees)}`);
+  if (plan.jito) console.log(`  Jito tip        ${sol(result.totalTips)}`);
   console.log(`  session key     ${result.sessionBalanceAfter === 0n ? "emptied (0 lamports)" : `still holds ${result.sessionBalanceAfter} lamports`}`);
 
   const delta = r.balanceAfter - r.balanceBefore;
@@ -874,6 +939,7 @@ function printReceipt(r: {
   console.log(`  wallet SOL      before ${sol(r.balanceBefore)}, after ${sol(r.balanceAfter)}, change ${sol(delta)}`);
   console.log(`    buy           ${sol(-spent)}`);
   console.log(`    fees          ${sol(-totalFees)}`);
+  if (result.totalTips) console.log(`    Jito tip      ${sol(-result.totalTips)}`);
   if (r.rents.userTokenAccount) console.log(`    rent kept     ${sol(-r.rents.userTokenAccount)} your new token account`);
   if (r.rents.accumulator) {
     const owner = plan.market.venue === "Curve" ? "pump" : "PumpSwap";
@@ -885,7 +951,7 @@ function printReceipt(r: {
   if (r.rents.orderReturned) {
     console.log(`    rent back     ${sol(r.rents.orderReturned)} order account of an earlier order, closed by this refund`);
   }
-  const rest = delta + spent + totalFees + rents + pushCost - r.rents.orderReturned;
+  const rest = delta + spent + totalFees + result.totalTips + rents + pushCost - r.rents.orderReturned;
   if (rest !== 0n) console.log(`    unexplained   ${sol(rest)}`);
 }
 
