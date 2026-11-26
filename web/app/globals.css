@@ -1,49 +1,300 @@
+/* The site: dark only (Buğra, Nov 25: "definitely dark"). First screen: the title, one sentence, two buttons and the
+   phone; the three numbers in their own band; details in sections that open. The words come from lib/copy.ts. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --muted: #555555;
-  --border: #e2e2e2;
-  --chip: #ececec;
-  --link: #0b57d0;
-  --warn: #a4262c;
-  color-scheme: light;
+  --bg: #0B0D10;
+  --surface: #13161B;
+  --raise: #1A1E24;
+  --line: #242931;
+  --fg: #ECEFF2;
+  --muted: #96A0AB;
+  --accent: #FFC233;
+  --on-accent: #17130A;
+  --good: #46CF86;
+  --sol-a: #9945FF;
+  --sol-b: #14F195;
+  /* Self-hosted by next/font (app/layout.tsx); the fallbacks are system fonts. */
+  --f-display: var(--font-archivo), var(--font-roboto), system-ui, sans-serif;
+  --f-body: var(--font-roboto), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+html, body { background: var(--bg); color: var(--fg); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body { margin: 0; overflow-x: clip; font-family: var(--f-body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+a { color: var(--fg); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--fg); outline-offset: 3px; border-radius: 8px; }
+
+.wrap { max-width: 1140px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+
+.nav { position: relative; z-index: 3; }
+.nav .wrap { display: flex; align-items: center; gap: 14px; padding-block: 14px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 9px; font-family: var(--f-display); font-stretch: 112%; font-weight: 780; font-size: 22px; letter-spacing: -0.01em; text-decoration: none; }
+.brand svg { width: 22px; height: 22px; }
+.pill { display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12.5px; font-weight: 500; background: rgba(70, 207, 134, 0.14); color: var(--good); }
+.pill i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 3px rgba(70, 207, 134, 0.22); }
+.nav-links { margin-left: auto; display: flex; gap: 22px; font-size: 14.5px; }
+.nav-links a { color: var(--muted); text-decoration: none; }
+.nav-links a:hover { color: var(--fg); }
+
+/* First screen: on the left the title, one sentence and the buttons, centred on the phone's height; on the right
+   the phone. The title shrinks with both the width and the height so a low window does not squeeze the phone
+   (Buğra, Nov 26). */
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) calc(380px * var(--pz, 1)); gap: 64px; align-items: center; padding-block: 16px 56px; }
+.hero h1 { margin: 0; font-family: var(--f-display); font-stretch: 115%; font-weight: 780; font-size: clamp(34px, min(4.6vw, 7.4vh), 60px); line-height: 1.02; letter-spacing: -0.028em; text-wrap: balance; }
+.hero h1 span { color: var(--muted); }
+.lead { margin: 22px 0 0; font-size: 19px; line-height: 1.5; color: var(--muted); max-width: 46ch; }
+
+/* Three big numbers, right under the first screen in their own band. The words are the hand-off's; only the
+   layout changed. */
+.band .wrap { padding-block: 0 56px; }
+.strip { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.strip li { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding: 22px 24px 22px 0; }
+.strip li + li { padding-left: 24px; border-left: 1px solid var(--line); }
+.strip b { font-family: var(--f-display); font-stretch: 106%; font-weight: 760; font-size: clamp(30px, 3.4vw, 46px); line-height: 1; letter-spacing: -0.02em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.strip span { font-size: 15px; line-height: 1.45; max-width: 30ch; }
+.strip small { font-family: var(--f-mono); font-size: 12px; line-height: 1.4; color: var(--muted); }
+
+.cta { margin-top: 28px; display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 18px; border-radius: 14px; font-size: 15px; font-weight: 600; text-decoration: none; border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
+.btn svg { width: 18px; height: 18px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary:hover { filter: brightness(1.06); }
+.meta-line { margin: 16px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 13.5px; color: var(--muted); }
+.meta-line a { color: var(--fg); }
+
+/* A transparent, very faint picture behind the title (the area Buğra marked). */
+.hero { overflow-x: clip; }
+.hero-copy { position: relative; z-index: 2; isolation: isolate; min-width: 0; }
+.hero-copy::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -110px -80px -70px -180px;
+  background: url("/site/hero-ladder.jpg") center / cover no-repeat;
+  opacity: 0.16;
+  -webkit-mask-image: radial-gradient(ellipse 68% 62% at 48% 46%, #000 25%, transparent 74%);
+  mask-image: radial-gradient(ellipse 68% 62% at 48% 46%, #000 25%, transparent 74%);
+  pointer-events: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f0f10;
-    --foreground: #ededed;
-    --muted: #a8a8a8;
-    --border: #2c2c2e;
-    --chip: #2a2a2c;
-    --link: #8ab4f8;
-    --warn: #f28b82;
-    color-scheme: dark;
-  }
+/* In front, the upright phone (the app); behind it a Seeker in the air, its back turned.
+   The phone column makes no stacking context of its own (no z-index, no isolation) so the black of the video behind
+   blends away into the page background. The layers stack in page order instead of negative z-index (a negative value
+   would put them behind the body's background): purple glow, Solana bars, Seeker video, the phone in front. */
+.phone-col { zoom: var(--pz, 1); position: relative; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+/* The Seeker behind: a Flow video (Veo, Nov 26, played in reverse). In the video the phone glides in from the left;
+   every frame was shifted so the phone stays on the same spot of the frame (73.5% across, 50% down). The page gives
+   the path and the spin: the phone comes in from outside the left edge of the screen, turns twice, and slows into
+   place (Merve, Nov 26). No sparkles, particles or light sweeps.
+   Its place: behind the phone in front, its height about 85% of that phone's, about 17° off upright; outside it
+   only the top right corner and the edge show. Pure black background; the "screen" blend makes the black disappear.
+   It plays once and stays on the last frame. */
+.seeker-back {
+  position: absolute;
+  --sb-o: 0.7;
+  --sb-r: -19deg;
+  top: -34px;
+  left: -818px;
+  width: 1500px;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  max-width: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  user-select: none;
+  transform-origin: 73.52% 50.07%;
+  rotate: var(--sb-r);
+  transition: opacity 0.4s ease;
+}
+.seeker-back.on { opacity: var(--sb-o); }
+/* The entrance. The start offset (--sb-dx, --sb-dy) is set by the script from the width of the page. Speed: eases in
+   over the first 22%, moves and turns at an even middle speed, eases out over the last 35% (peak speed 1.4 times the
+   average; Merve: "not too fast, not too slow, smooth"). A browser without linear() uses the ease-in-out above.
+   The 0.8 s delay keeps it from starting before the page shows: the phone comes from outside the screen. */
+.seeker-back.spin {
+  animation: sb-move 6s cubic-bezier(0.42, 0, 0.58, 1) 0.8s both, sb-turn 6s cubic-bezier(0.42, 0, 0.58, 1) 0.8s both;
+  animation-timing-function: linear(0, 0.0004 2.5%, 0.0029 5%, 0.0095 7.5%, 0.0215 10%, 0.0396 12.5%, 0.0637 15%, 0.0930 17.5%, 0.1261 20%, 0.1608 22.5%, 0.1958 25%, 0.2308 27.5%, 0.2657 30%, 0.3007 32.5%, 0.3357 35%, 0.3706 37.5%, 0.4056 40%, 0.4406 42.5%, 0.4755 45%, 0.5105 47.5%, 0.5455 50%, 0.5804 52.5%, 0.6154 55%, 0.6503 57.5%, 0.6853 60%, 0.7203 62.5%, 0.7552 65%, 0.7901 67.5%, 0.8240 70%, 0.8563 72.5%, 0.8861 75%, 0.9129 77.5%, 0.9361 80%, 0.9555 82.5%, 0.9711 85%, 0.9828 87.5%, 0.9910 90%, 0.9961 92.5%, 0.9988 95%, 0.9999 97.5%, 1);
+}
+@keyframes sb-move { from { translate: var(--sb-dx, -1400px) var(--sb-dy, 40px); } to { translate: 0 0; } }
+@keyframes sb-turn { from { rotate: calc(var(--sb-r, 0deg) - 720deg); } to { rotate: var(--sb-r, 0deg); } }
+@media (max-width: 1199px) { .seeker-back { display: none; } }
+.phone-col::before { content: ""; position: absolute; inset: -40px -60px 60px; background: radial-gradient(closest-side, rgba(153, 69, 255, 0.14), transparent 75%); pointer-events: none; }
+.device.seeker {
+  position: relative;
+  padding: 9px;
+  border-radius: 50px;
+  background: linear-gradient(150deg, #4a4e55 0%, #1c1e22 22%, #101114 50%, #26292e 78%, #4c5057 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 0 0 3px #0b0c0e,
+    0 0 0 1px rgba(0, 0, 0, 0.7),
+    0 60px 90px -45px rgba(0, 0, 0, 0.85);
+}
+.device.seeker::before, .device.seeker::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  width: 4px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(90deg, #24272b, #5c6168);
+}
+.device.seeker::before { top: 150px; height: 92px; }
+.device.seeker::after { top: 268px; height: 58px; }
+.device.seeker .app { border-radius: 41px; }
+.device.seeker .app::after {
+  content: "";
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  width: 11px;
+  height: 11px;
+  margin-left: -5.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #2c3242 0 22%, #050506 48%);
+  box-shadow: 0 0 0 1.5px #000;
+  z-index: 40;
+  pointer-events: none;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+/* Slanted bars behind the phone that recall Solana; they light up when a rung is tried. As the Seeker comes in from
+   the left, the bars appear one by one from the left too (Merve: life in the background), then keep drifting. */
+.sol-field { position: absolute; inset: -30px -96px 70px -96px; pointer-events: none; }
+.sol-field i {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: var(--h, 16px);
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--sol-a), var(--sol-b));
+  opacity: var(--o);
+  box-shadow: 0 0 28px rgba(153, 69, 255, 0.28);
+  transform: skewX(-28deg);
+  animation: sol-in 2.2s cubic-bezier(0.2, 0.7, 0.2, 1) var(--in, 0s) backwards, sol-drift var(--d) ease-in-out var(--delay, 0s) infinite alternate;
+  transition: opacity 0.3s, filter 0.3s;
 }
+@keyframes sol-in { from { opacity: 0; translate: -120px 0; } to { opacity: var(--o); translate: 0 0; } }
+.sol-field.pulse i { opacity: calc(var(--o) * 2.2); filter: brightness(1.25); }
+.sol-field.good i { opacity: calc(var(--o) * 2.2); filter: hue-rotate(40deg) brightness(1.2); }
+@keyframes sol-drift { from { transform: translateY(18px) skewX(-28deg); } to { transform: translateY(-30px) skewX(-28deg); } }
+.replay { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.chips button { font: inherit; font-size: 13px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; }
+.chips button:hover { color: var(--fg); }
+.chips button[aria-pressed="true"] { border-color: var(--accent); color: var(--fg); }
+.replay p { margin: 0; text-align: center; font-size: 13px; line-height: 1.5; color: var(--muted); text-wrap: balance; }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+section.block .wrap { padding-block: 56px; border-top: 1px solid var(--line); }
+.block h2 { margin: 0 0 22px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-family: var(--f-display); font-stretch: 110%; font-weight: 740; font-size: clamp(26px, 3vw, 34px); letter-spacing: -0.02em; }
+.block h3 { margin: 34px 0 14px; font-family: var(--f-display); font-stretch: 106%; font-weight: 700; font-size: 19px; }
+.block p { margin: 0 0 12px; max-width: 68ch; }
+.small { font-size: 13.5px; color: var(--muted); }
+.intro { font-size: 18px; color: var(--muted); }
+
+.video { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); background: var(--surface); }
+.video video, .video iframe { display: block; width: 100%; height: 100%; border: 0; }
+
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tile { padding: 18px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.tile .v { font-family: var(--f-display); font-stretch: 106%; font-weight: 700; font-size: 44px; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.tile .k { font-size: 13.5px; color: var(--muted); line-height: 1.4; }
+.block .caveat { margin: 14px 0 0; font-size: 14px; color: var(--muted); }
+.block .warn { color: #F28B82; }
+.stats { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+.stats div { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.stats dt { color: var(--muted); }
+.stats dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+th { text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); padding: 0 16px 10px 0; border-bottom: 1px solid var(--line); }
+td, tbody th { padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; text-transform: none; letter-spacing: 0; font-size: 14.5px; color: var(--fg); }
+tbody th { font-weight: 600; }
+.num { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--f-mono); font-size: 13px; }
+.recent td:first-child { white-space: nowrap; color: var(--muted); }
+.block .more-link { margin-top: 14px; }
+.block .gap-top { margin-top: 14px; }
+
+/* Sections that open: the title shows, the details open on a click. */
+summary { list-style: none; cursor: pointer; }
+summary::-webkit-details-marker { display: none; }
+.fold { margin-top: 22px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.fold + .fold { margin-top: 0; border-top: 0; }
+.fold > summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 17px 2px; font-family: var(--f-display); font-stretch: 106%; font-weight: 700; font-size: 18px; }
+.fold > summary::after, .gets summary::after { content: ""; flex: none; width: 8px; height: 8px; margin-right: 4px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: translateY(-2px) rotate(45deg); transition: transform 0.2s; }
+.fold[open] > summary::after, .gets details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
+.fold > summary:hover::after, .gets summary:hover::after { border-color: var(--fg); }
+.fold-body { padding: 0 0 24px; }
+.block .fold-body h3 { margin-top: 24px; font-size: 16px; }
+
+.gets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: start; }
+.gets details { border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.gets summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; font-size: 15.5px; font-weight: 600; }
+.gets summary .n { color: var(--muted); font-weight: 500; margin-right: 4px; }
+.block .gets p { margin: 0; padding: 0 18px 16px; font-size: 15px; line-height: 1.55; color: var(--muted); }
+
+.terms { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 40px; }
+.block .terms p { margin: 0; font-size: 16px; }
+.terms em, .note em { font-style: normal; font-weight: 600; color: var(--fg); }
+.modes { min-width: 560px; }
+.block .note { margin-top: 16px; color: var(--muted); }
+.src { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.src a { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); font-size: 13.5px; text-decoration: none; }
+.src a:hover { border-color: var(--muted); }
+.src a span { color: var(--muted); }
+.links-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14.5px; }
+.links-list a { overflow-wrap: anywhere; }
+
+.foot .wrap { padding-block: 36px 56px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--muted); }
+.foot p { margin: 0; }
+.foot a { color: var(--muted); }
+
+@media (max-width: 900px) {
+  .hero .wrap { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  /* Someone on a phone sees the app first (Buğra, Nov 25): the phone above the text. */
+  .phone-col { order: -1; }
+  .sol-field { inset: -20px -24px 70px -24px; }
+  .terms, .gets { grid-template-columns: minmax(0, 1fr); }
 }
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
+@media (max-width: 900px) and (min-width: 600px) {
+  .seeker-back { display: block; --sb-o: 0.6; --sb-r: 0deg; top: -154px; left: -442px; width: 1032px; }
 }
-
-a {
-  color: var(--link);
-  text-decoration: underline;
-  text-underline-offset: 2px;
+/* Phone screens: only the brand at the top, then straight to the app in its Seeker frame. */
+@media (max-width: 600px) {
+  .nav .wrap { padding-block: 12px; }
+  .nav-links { display: none; }
+  .hero .wrap { padding-block: 0 48px; gap: 36px; }
+  .phone-col { padding-top: 64px; }
+  .device.seeker { height: clamp(560px, calc(100svh - 140px), 760px); padding: 7px; border-radius: 42px; }
+  .device.seeker::before { top: 120px; height: 70px; }
+  .device.seeker::after { top: 206px; height: 46px; }
+  .device.seeker .app { border-radius: 35px; outline: none; }
+  .seeker-back { display: block; --sb-o: 0.75; --sb-r: 0deg; width: 658px; top: -75px; left: calc(100% - 618px); }
+  .lead { font-size: 17.5px; }
+  .strip { grid-template-columns: minmax(0, 1fr); }
+  .strip li { padding: 14px 0; }
+  .strip li + li { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); }
+}
+/* On narrow phones the app's top bar must not overflow. */
+@media (max-width: 440px) {
+  .wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .device.seeker { width: 100%; }
+}
+/* In low desktop windows (most Windows laptops) the top tightens so the phone fits the first screen large. */
+@media (max-height: 760px) and (min-width: 601px) {
+  .nav .wrap { padding-block: 10px; }
+  .hero .wrap { padding-block: 10px 48px; }
+  .lead { margin-top: 16px; font-size: 17.5px; }
+  .cta { margin-top: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sol-field i { animation: none; }
+  .seeker-back { transition: none; }
+}
+@media (max-width: 640px) {
+  .tiles { grid-template-columns: minmax(0, 1fr); }
+  .stats { grid-template-columns: minmax(0, 1fr); }
+  .tile .v { font-size: 38px; }
 }

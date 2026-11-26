@@ -19,6 +19,12 @@ export const STATUS = {
   devices: "Android emulator; not tested on a real device or Seeker", // verbatim
   /** `null` until an APK is published. */
   apkUrl: null as string | null,
+  /**
+   * `null` until the demo video is published (README: "Demo video: not yet").
+   * Once set, the first screen shows "Watch the video" and the page embeds it:
+   * a video file (.mp4, .webm) plays in a <video>, anything else in an <iframe>.
+   */
+  videoUrl: null as string | null,
   repoUrl: "https://github.com/PRU-Blockchain/rung",
   license: "MIT",
 } as const;

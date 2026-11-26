@@ -2,30 +2,58 @@
 // Lines marked `// verbatim` are copied from section 10 of the hand-off
 // prompt (devir-promptu-rung.md); `*x*` is the prompt's own italic markup and
 // is rendered as <em>. Do not edit those lines; scripts/check-verbatim.mjs
-// compares each one with the prompt character by character.
+// compares each one with the prompt character by character. Where the page
+// lays a prompt sentence out in pieces (the first screen, the band of three
+// numbers), each piece is its own verbatim line: an exact part of the prompt.
 // Unmarked lines are connecting text written for this page; they add no new
 // number or claim.
 
 export const COPY = {
   // --- 1. First screen (README first screen) --------------------------------
   title: "Rung — stop guessing slippage. Stop feeding sandwich bots.", // verbatim
-  intro:
-    "On Solana, set slippage too wide and a sandwich bot takes the gap; set it too tight and your buy fails. Rung finds the lowest slippage that fills: it tries 1% first, climbs only to your cap, and buys once. One approval.", // verbatim
-  bullets: [
-    "2 out of 3 manual buys set more than 5× the slippage they needed (median typed 20%, needed 1.1%).", // verbatim
-    "1 in 4 manual buys had no slippage protection at all.", // verbatim
-    "On established tokens, 97% of buys fill on the first 1% try.", // verbatim
-  ],
-  statusHeading: "Status",
+  // The intro's two sentences: the answer is the first screen's one sentence,
+  // the problem opens "How it works".
+  answer:
+    "Rung finds the lowest slippage that fills: it tries 1% first, climbs only to your cap, and buys once. One approval.", // verbatim
+  problem:
+    "On Solana, set slippage too wide and a sandwich bot takes the gap; set it too tight and your buy fails.", // verbatim
+  watchVideo: "Watch the video",
+  repository: "Repository",
 
-  // --- 2. Terms -------------------------------------------------------------
-  termsHeading: "Two terms",
-  terms: [
-    "*Slippage* is the most you accept paying above the price you saw; if the price moves past it, the buy fails and only the fee is spent.", // verbatim
-    "A *sandwich bot* buys right before you, pushes the price up to your slippage limit, and sells right after you: it can take at most your slippage.", // verbatim
+  // The three bullets as a band: the number big, the rest of the sentence, and
+  // the bracket or the lead-in small.
+  bandLabel: "Slippage in numbers",
+  band: [
+    {
+      big: "2 out of 3", // verbatim
+      text: "manual buys set more than 5× the slippage they needed", // verbatim
+      small: "median typed 20%, needed 1.1%", // verbatim
+    },
+    {
+      big: "1 in 4", // verbatim
+      text: "manual buys had no slippage protection at all", // verbatim
+      small: null,
+    },
+    {
+      big: "97%", // verbatim
+      text: "of buys fill on the first 1% try", // verbatim
+      small: "on established tokens", // the prompt's "On established tokens," in lower case
+    },
   ],
 
-  // --- 3. Four pluses -------------------------------------------------------
+  // --- 2. The phone on the first screen: a replay of real orders -------------
+  replayLabel: "Replay",
+  replayNotes: {
+    app: "Replay of a real mainnet buy from the Android app, Nov 24, 2026: CATE, Tight, 0.01 SOL. Tap Buy once; every step links to its transaction.",
+    climb:
+      "Replay of a real mainnet order, Nov 24, 2026, sent with the command-line script (same program): the 1% rung missed, the 2% rung bought.",
+    nobuy:
+      "Replay of a real mainnet order, Nov 24, 2026, sent with the command-line script (same program): every rung missed and the SOL came back.",
+  },
+
+  // --- 3. How it works ---------------------------------------------------------
+  howHeading: "How it works",
+
   plusesHeading: "What you get",
   pluses: [
     "(1) *No guessing.* Even if you don't know what to type, you buy at the right slippage: Rung starts tightest and climbs only as needed.", // verbatim
@@ -34,7 +62,6 @@ export const COPY = {
     "(4) *One approval, one buy.* Every try is covered by one wallet approval; the program allows at most one buy; if nothing fills, your SOL comes back.", // verbatim
   ],
 
-  // --- 4. Modes ---------------------------------------------------------------
   modesHeading: "Modes",
   modeHeader: ["mode", "rungs", "for", "fills (3 windows)"], // verbatim
   modes: [
@@ -47,7 +74,12 @@ export const COPY = {
   modesNote:
     "At launch, Tight fills 80–81% of buys; the rest are buys where the price ran above 3%. Rung shows them as *not bought, your SOL is back*. If you must get in at launch, pick Launch.", // verbatim
 
-  // --- 5. Where the numbers come from ---------------------------------------
+  termsHeading: "Two terms",
+  terms: [
+    "*Slippage* is the most you accept paying above the price you saw; if the price moves past it, the buy fails and only the fee is spent.", // verbatim
+    "A *sandwich bot* buys right before you, pushes the price up to your slippage limit, and sells right after you: it can take at most your slippage.", // verbatim
+  ],
+
   numbersHeading: "Where the numbers come from",
   numbers: [
     "On a typical buy the price doesn't change; Rung makes the difference during attacks and spikes.", // verbatim
@@ -64,8 +96,21 @@ export const COPY = {
     "https://github.com/pump-fun/pump-public-docs", // verbatim
     "https://pump.fun/docs/fees", // verbatim
   ],
+  // Short names for the source links above, in the same order: [name, what it is].
+  sourceNames: [
+    ["Bitquery", "Solana sandwich attacks"],
+    ["CryptoSlate", "sandwich bots took $29.7M"],
+    ["TokenPost", ""],
+    ["Jupiter docs", "slippage"],
+    ["OKX DEX FAQ", ""],
+    ["pump.fun public docs", ""],
+    ["pump.fun fees", ""],
+  ],
 
-  // --- 6. How to try ----------------------------------------------------------
+  // --- 4. Video (shown once STATUS.videoUrl is set) ---------------------------
+  videoLabel: "Video",
+
+  // --- 5. How to try ----------------------------------------------------------
   tryHeading: "How to try",
   apkNotYet: "Android APK: not yet.",
   apkReady: "Android APK:",
@@ -75,35 +120,17 @@ export const COPY = {
     { label: "Setup", anchor: "setup" },
     { label: "Tests", anchor: "tests" },
     { label: "Devnet runs", anchor: "devnet-runs" },
-  ],
-  shotsIntro:
-    "Screenshots from the app on an Android emulator, taken during real buys on devnet:",
-  shots: [
-    {
-      src: "/shots/app-1-buy.png",
-      alt: "Rung buy screen: token, price you saw, five modes with Tight selected, amount 0.01 SOL, max fee line and the Buy once button",
-      caption:
-        "Before a real buy on devnet: Tight mode, 0.01 SOL, and the most the tries can cost in fees, shown before the wallet approval.",
-    },
-    {
-      src: "/shots/app-7-climb.png",
-      alt: "Rung ladder: try 1% price was above this rung, try 2% bought 1.48% above the price you saw, try 3% not needed",
-      caption:
-        "A real buy on devnet: the 1% rung missed, the 2% rung bought. The price was moved on purpose by a buy from our own wallet right after the order opened; that push is a test aid, not part of the product.",
-    },
-    {
-      src: "/shots/app-5-not-bought.png",
-      alt: "Rung not-bought screen: Price went above your cap. Not bought. Your SOL is back. Fees and explorer links, Retry with Launch mode button",
-      caption:
-        "A real order on devnet that did not buy: the price was pushed on purpose above the 3% cap by a buy from our own wallet, all three rungs failed, and the SOL came back.",
-    },
+    { label: "Mainnet runs", anchor: "mainnet-runs" },
   ],
 
-  // --- 7. Counter -------------------------------------------------------------
+  // --- 6. Counter -------------------------------------------------------------
   counterHeading: "Counter",
   counterLoading: "Reading the program's transactions…",
   counterNote:
-    "Computed from the program's on-chain events. These are the team's own test buys: small sample; tokens chosen by the team. They include test runs where we moved the price on purpose.",
+    "Computed from the program's on-chain events. These are the team's own test buys: small sample; tokens chosen by the team.",
+  /** True on devnet only: there the team moved the price on purpose in some runs. */
+  counterNoteDevnet: "They include test runs where we moved the price on purpose.",
+  counterMore: "Fees, rungs and failed tries",
   counterUnavailable: "counter unavailable right now",
   lastRead: "Last successful read:",
   neverRead: "no successful read yet on this server",
@@ -132,17 +159,20 @@ export const COPY = {
   failedTriesLine: (slippage: number, orderFilled: number, other: number) =>
     `Failed tries: ${slippage} on slippage (pump error 6042 or PumpSwap error 6040), ${orderFilled} refused because the order had already bought (Rung error 6012), ${other} other.`,
 
-  // --- 8. Recent buys -------------------------------------------------------
+  // --- 7. Recent buys ---------------------------------------------------------
   recentHeading: "Recent buys",
   recentEmpty: "No bought or not-bought orders in the transactions read.",
   recentHeader: ["time (UTC)", "result", "transaction"],
   notBought: "not bought",
   boughtOn: (rung: number, slippage: string) => `bought on rung ${rung} (${slippage})`,
   explorer: "explorer",
+  explorerAll: "All transactions on Solana Explorer",
 
-  // --- 9. Footer ------------------------------------------------------------
+  // --- 8. Footer ------------------------------------------------------------
   footerOpenSource: "Open source",
   footerLicense: "License:",
   footerRepo: "Repository",
   footerProgram: "Program",
+  footerSeeker: "Seeker image:",
+  footerPressKit: "Solana Mobile press kit",
 } as const;
