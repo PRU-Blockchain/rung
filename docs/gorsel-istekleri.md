@@ -317,7 +317,7 @@ Dosyalar gelince: `app/src/config.ts` içindeki `APP_IDENTITY.icon` satırı PNG
   - içi altın ışıklı buzlu cam basamaklar
   - camgöbeği üstünde parlak altın basamak çubuğu
 - **Paylaşılan:** Flow ekranından alınmış iki toplu görüntü: `rung-demo/simge-taslak/`. Görseller indirilmedi.
-- **Durum:** Merve'nin seçimi bekleniyor. Seçilen yön indirilip belgedeki 8 dosyaya çevrilecek.
+- **Durum:** Kullanılmadı; Merve eski işarette karar kıldı (aşağıda, "Simge: eski işaret").
 
 ### 26 Kasım 2026 · Video F'e dönüş ve yeni yer (kredi yok)
 
@@ -371,3 +371,24 @@ Dosyalar gelince: `app/src/config.ts` içindeki `APP_IDENTITY.icon` satırı PNG
 - Merve son hali (sade site taslağının 11. sürümü) onayladı ("onaylıyoruz"); tasarım `web/` içine taşındı. Video `web/public/site/seeker-in.mp4`, posteri `web/public/site/seeker-poster.webp`; yerleşim ve giriş `web/app/globals.css` (`.seeker-back`) ve `web/app/phone-stage.tsx` içinde.
 - **Depoda olan kaynaklar** (`kaynak/seeker/`): Gemini görseli `seeker-source.jpg`, 16:9 kareler `seeker-source-16x9.png` ve `seeker-start-16x9.png`, kullanılan video `seeker-f.mp4` ve onu siteye çeviren `stabilize.py`.
 - Denenip kullanılmayan videolar (A, C, D, E, G; toplam 15 MB) depoya girmedi; Merve'nin bilgisayarında `kaynak/seeker/` altında duruyor.
+
+### 26 Kasım 2026 · Simge: eski işaret
+
+- **Merve'nin kararı:** "Simge eski hali olsun." Yeni taslaklar (kodla çizilen A–D, Nano Banana) kullanılmadı.
+- **İşaret:** Sitenin üst çubuğundaki ve uygulamadaki Rung işaretinin aynısı. `#0B0D10` zeminde iki açık ray (`#ECEFF2`), iki açık basamak ve en altta sarı basamak (`#FFC233`). Küçük boyda okunsun diye çizgiler kalın.
+- **Üretim:** Kodla çizildi, `kaynak/icon/render.py` (numpy; üretilmiş görsel yok). Kredi harcanmadı. Komut: depo kökünden `python3 kaynak/icon/render.py`.
+- **Dosyalar:**
+
+| Dosya | Boyut |
+|---|---|
+| `web/app/favicon.ico` | 16, 32, 48 (tek dosyada) |
+| `web/app/icon.png` | 512×512 |
+| `web/app/apple-icon.png` | 180×180 |
+| `web/public/rung-icon.png` | 256×256 |
+| `web/public/rung-icon.svg` | SVG kaynağı |
+| `app/assets/icon.png` | 1024×1024 |
+| `app/assets/adaptive-icon.png` | 1024×1024, saydam zemin; işaret yatayda %31–68, dikeyde %24–76 arasında (güvenli alan %17–83) |
+| `app/assets/favicon.png` | 48×48 |
+
+- **Denetim:** Boyutlar doğru. Site derlendi; sayfanın başlığında favicon, 512 px simge ve Apple simgesi bağlantıları var. `/favicon.ico`, `/icon.png`, `/apple-icon.png`, `/rung-icon.png` ve `/rung-icon.svg` yerel sunucudan 200 döndü.
+- **Sonrası Buğra'nın ajanında** (belgedeki gibi): `app/src/config.ts` içindeki `APP_IDENTITY.icon` PNG'ye (`https://rungbot.xyz/rung-icon.png`), `app/app.json` içindeki beyaz zemin renkleri (`#ffffff`) koyuya; sonra Phantom ve Solflare'de öykünücüde bakılır.
