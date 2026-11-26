@@ -15,6 +15,7 @@ import {
   type RungIx,
   type Venue,
 } from "./rung-events";
+import { rpcIsOnNetwork } from "./cluster";
 import { STATUS } from "./status";
 
 /** Newest signatures read per refresh. */
@@ -305,6 +306,11 @@ interface OrderState {
 
 async function readCounter(signal: AbortSignal): Promise<CounterData> {
   const programId = STATUS.programId;
+  // The endpoint must be on the network this page names; otherwise nothing is counted.
+  const genesis = await rpc<string>("getGenesisHash", [], signal);
+  if (!rpcIsOnNetwork(STATUS.network, genesis)) {
+    throw new Error(`the RPC endpoint is not on ${STATUS.network}`);
+  }
   const sigs = await readSignatures(programId, signal);
   const { results, skipped } = await readTransactions(sigs, programId, signal);
 

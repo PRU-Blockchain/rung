@@ -16,9 +16,10 @@ export const CHAIN_IDENTIFIER = NETWORK.chain;
 
 // MWA identity. Phantom declines signing without an HTTPS `uri`
 // ("identityUri is not defined ... sign request declined", -3). `icon` is
-// relative to `uri`.
+// relative to `uri`: a PNG at a fixed address (web/public/rung-icon.png).
+// With favicon.ico Solflare showed no icon at all.
 export const APP_IDENTITY = {
   name: "Rung",
   uri: "https://rungbot.xyz",
-  icon: "favicon.ico",
+  icon: "rung-icon.png",
 };

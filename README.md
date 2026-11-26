@@ -6,7 +6,7 @@ On Solana, set slippage too wide and a sandwich bot takes the gap; set it too ti
 - 1 in 4 manual buys had no slippage protection at all.
 - On established tokens, 97% of buys fill on the first 1% try.
 
-**Live web page:** https://rungbot.xyz/ (its counter reads devnet)<br>
+**Live web page:** https://rungbot.xyz/ (the phone on it replays three real mainnet orders; its counter reads devnet)<br>
 **Program address (devnet):** [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet) · **mainnet:** [same address](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio), deployed Nov 24, 2026; first buys the same day<br>
 **Demo video:** not yet
 
@@ -50,7 +50,7 @@ The app and the web page run on **devnet** (test SOL). The program is deployed o
 | Install the APK | not yet: no APK is published |
 | Build the Android app from source and run it on an emulator | works on an Android 15 emulator with Phantom, Solflare or Solana Mobile's mock wallet, set to devnet. Steps in [`app/README.md`](app/README.md) |
 | Run the ladder from the command line | works: [`scripts/ladder.ts`](scripts/ladder.ts) opens an order and tries the rungs on devnet, see below |
-| No Android at hand | the [web page](https://rungbot.xyz/) shows the counter of the program's devnet transactions, and the explorer links below show real devnet runs |
+| No Android at hand | the [web page](https://rungbot.xyz/) replays three real mainnet orders on a phone, step by step and with their explorer links, and shows the counter of the program's devnet transactions; the explorer links below show real devnet runs |
 
 ### Command line (devnet unless told otherwise)
 
@@ -143,7 +143,7 @@ The app's own devnet buys (Phantom, Solflare, a not-bought run and its "Retry wi
 | PumpSwap pools | in the program, the client, the command-line script and the Android app. Tested locally against a test double and the real PumpSwap program dumped from mainnet, on a local fork of mainnet, and with real buys on a devnet pool through the script and through the app (runs in [`app/README.md`](app/README.md#pumpswap-pools)), and with a real buy on a mainnet pool through the script ([Mainnet runs](#mainnet-runs)) |
 | Android app (`app/`) | works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. Built for mainnet (`EXPO_PUBLIC_CLUSTER=mainnet-beta`) it reads a live pool ([screen](docs/shots/app-18-mainnet-plan.png)) and has bought on mainnet with Phantom ([receipt](docs/shots/app-19-mainnet-bought.png)): two buys so far. Not tested: Custom mode, a real device, Seeker |
 | APK | not yet |
-| Web page (`web/`) | live at https://rungbot.xyz/; the counter is computed from the program's devnet events |
+| Web page (`web/`) | live at https://rungbot.xyz/; the phone on the first screen replays three mainnet orders of Nov 24, 2026 (recorded, not live); the counter is computed from the program's devnet events |
 | Measurement scripts (`measure/`) | in the repository; verified on a small slice, not re-run end to end |
 | Demo video | not yet |
 | Team's own mainnet buys | not yet |
@@ -372,6 +372,7 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 | `scripts/` | Helper scripts: `ladder.ts` (the ladder from the command line) with `network.ts` (which network it may talk to), `fetch-pump-fixtures.mjs` and `fetch-pumpswap-fixtures.mjs` (read-only mainnet snapshots for tests), `set-rpc-url.sh` (stores the RPC URL in the git-ignored `.env.local`) |
 | `docs/pump-arayuz.md` | Extract of pump's public IDL and docs that the buy call is written from (Turkish notes, English quotes) |
 | `docs/shots/` | Screenshots of real devnet buys from the emulator |
+| `kaynak/` | Sources of the site's pictures: the Seeker clip behind the phone (generated with Google's Gemini and Flow from the Solana Mobile press-kit photo; log in `docs/gorsel-istekleri.md`) and the script that draws the icon |
 | `docs/is-listesi.md` | Work list (Turkish), kept in step with the code |
 
 ## Setup
@@ -418,7 +419,7 @@ anchor test        # builds the program and the test double, then runs `cargo te
 The tests load the built program into LiteSVM and load two test doubles, one at pump's address and one at PumpSwap's. 226 Rust tests: unit tests of the rung arithmetic, the ladder scenarios on both venues (a tight rung fails and a later one fills, at most one buy, timing, cap, expiry, refund, cancel), input limits, the two references, events, the fixes after the two reviews, and security tests (wrong signer, substituted accounts, a pool that is not the token's own, a fake buy program, a buy program that delivers too few tokens, takes too much SOL or misuses the vault's signature, pre-funded accounts, a try that runs out of compute units, replayed and late calls). Rejections are checked by exact error code, and balances are checked to the lamport.
 
 ```bash
-cd client && npm install && npm test     # 177 client tests, including byte-for-byte vectors from the Rust program
+cd client && npm install && npm test     # 181 client tests, including byte-for-byte vectors from the Rust program
 ```
 
 ### Against the real pump program

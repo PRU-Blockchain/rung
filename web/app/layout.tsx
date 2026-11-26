@@ -12,9 +12,13 @@ const archivo = Archivo({ subsets: ["latin"], axes: ["wdth"], variable: "--font-
 const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"], variable: "--font-roboto", display: "swap" });
 const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-plex-mono", display: "swap" });
 
+// The link preview (chat apps, X) takes its title and text from here; the picture is the Rung mark.
 export const metadata: Metadata = {
+  metadataBase: new URL("https://rungbot.xyz"),
   title: "Rung",
   description: COPY.title,
+  openGraph: { type: "website", url: "/", siteName: "Rung", title: "Rung", description: COPY.title, images: ["/icon.png"] },
+  twitter: { card: "summary", title: "Rung", description: COPY.title, images: ["/icon.png"] },
 };
 
 export const viewport: Viewport = {

@@ -51,3 +51,22 @@ test("the document sits on the site the app names as its identity", () => {
   // web/ is what is deployed there.
   assert.ok(read("web/vercel.json").includes("nextjs"));
 });
+
+// The wallet draws the app's icon from the site: `APP_IDENTITY.icon`, a path
+// relative to `uri`. With the default favicon.ico Phantom showed Next.js's "N"
+// and Solflare showed no icon at all (Nov 26, 2026).
+test("the icon the app names is a PNG the site serves at a fixed address", () => {
+  const config = read("app/src/config.ts");
+  const icon = /icon:\s*"([^"]+)"/.exec(config)?.[1];
+  assert.equal(icon, "rung-icon.png");
+  // Relative to the identity uri, as the Mobile Wallet Adapter asks: no scheme, no leading slash.
+  assert.doesNotMatch(icon!, /^(https?:|\/)/);
+  const file = readFileSync(new URL(`web/public/${icon}`, root));
+  assert.deepEqual([...file.subarray(0, 8)], [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+});
+
+test("the Android icon's background is the dark one its light mark was drawn for", () => {
+  const expo = JSON.parse(read("app/app.json")).expo;
+  assert.equal(expo.android.adaptiveIcon.backgroundColor, "#0B0D10");
+  assert.equal(expo.splash.backgroundColor, "#0B0D10");
+});
