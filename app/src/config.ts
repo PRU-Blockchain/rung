@@ -19,6 +19,6 @@ export const CHAIN_IDENTIFIER = NETWORK.chain;
 // relative to `uri`.
 export const APP_IDENTITY = {
   name: "Rung",
-  uri: "https://rung-drab.vercel.app",
+  uri: "https://rungbot.xyz",
   icon: "favicon.ico",
 };

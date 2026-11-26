@@ -6,7 +6,7 @@ On Solana, set slippage too wide and a sandwich bot takes the gap; set it too ti
 - 1 in 4 manual buys had no slippage protection at all.
 - On established tokens, 97% of buys fill on the first 1% try.
 
-**Live web page:** https://rung-drab.vercel.app/ (its counter reads devnet)<br>
+**Live web page:** https://rungbot.xyz/ (its counter reads devnet)<br>
 **Program address (devnet):** [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet) · **mainnet:** [same address](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio), deployed Nov 24, 2026; first buys the same day<br>
 **Demo video:** not yet
 
@@ -50,7 +50,7 @@ The app and the web page run on **devnet** (test SOL). The program is deployed o
 | Install the APK | not yet: no APK is published |
 | Build the Android app from source and run it on an emulator | works on an Android 15 emulator with Phantom, Solflare or Solana Mobile's mock wallet, set to devnet. Steps in [`app/README.md`](app/README.md) |
 | Run the ladder from the command line | works: [`scripts/ladder.ts`](scripts/ladder.ts) opens an order and tries the rungs on devnet, see below |
-| No Android at hand | the [web page](https://rung-drab.vercel.app/) shows the counter of the program's devnet transactions, and the explorer links below show real devnet runs |
+| No Android at hand | the [web page](https://rungbot.xyz/) shows the counter of the program's devnet transactions, and the explorer links below show real devnet runs |
 
 ### Command line (devnet unless told otherwise)
 
@@ -143,7 +143,7 @@ The app's own devnet buys (Phantom, Solflare, a not-bought run and its "Retry wi
 | PumpSwap pools | in the program, the client, the command-line script and the Android app. Tested locally against a test double and the real PumpSwap program dumped from mainnet, on a local fork of mainnet, and with real buys on a devnet pool through the script and through the app (runs in [`app/README.md`](app/README.md#pumpswap-pools)), and with a real buy on a mainnet pool through the script ([Mainnet runs](#mainnet-runs)) |
 | Android app (`app/`) | works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. Built for mainnet (`EXPO_PUBLIC_CLUSTER=mainnet-beta`) it reads a live pool ([screen](docs/shots/app-18-mainnet-plan.png)) and has bought on mainnet with Phantom ([receipt](docs/shots/app-19-mainnet-bought.png)): two buys so far. Not tested: Custom mode, a real device, Seeker |
 | APK | not yet |
-| Web page (`web/`) | live at https://rung-drab.vercel.app/; the counter is computed from the program's devnet events |
+| Web page (`web/`) | live at https://rungbot.xyz/; the counter is computed from the program's devnet events |
 | Measurement scripts (`measure/`) | in the repository; verified on a small slice, not re-run end to end |
 | Demo video | not yet |
 | Team's own mainnet buys | not yet |
@@ -239,7 +239,7 @@ The wallet signs one transaction per buy, the order. Every try after that is sig
 
 Neither wallet added any other instruction, and the added ones did not break the order. The fee of the order transaction is set by the wallet, which is why the app shows it as a separate line; the fees of the tries are set by the app.
 
-Phantom asked to connect again before every buy as long as it could not verify the app: it declines the saved authorization of an app whose identity it has not verified. Since Nov 24, 2026 the site the app names vouches for it: [`/.well-known/assetlinks.json`](https://rung-drab.vercel.app/.well-known/assetlinks.json) lists the app's package and signing certificate and is served as exactly `application/json` (the wallets' verifier rejects `application/json; charset=utf-8`). A buy in Phantom is now one Confirm sheet, seen on mainnet. The fingerprint in that file is the development build's; a signed release needs its own. On mainnet Phantom also put four instructions of its own guard program (`L2TEx…`) around the order, and the order still worked. The app asks the wallet to sign and sends the signed order itself: with the wallet sending, Phantom's transaction never reached devnet and Solflare kept the app in the background while the order's time ran out. An approval that takes longer than about a minute fails with "Approval took too long" and nothing is sent.
+Phantom asked to connect again before every buy as long as it could not verify the app: it declines the saved authorization of an app whose identity it has not verified. Since Nov 24, 2026 the site the app names vouches for it: [`/.well-known/assetlinks.json`](https://rungbot.xyz/.well-known/assetlinks.json) lists the app's package and signing certificate and is served as exactly `application/json` (the wallets' verifier rejects `application/json; charset=utf-8`). A buy in Phantom is now one Confirm sheet, seen on mainnet. The fingerprint in that file is the development build's; a signed release needs its own. On mainnet Phantom also put four instructions of its own guard program (`L2TEx…`) around the order, and the order still worked. The app asks the wallet to sign and sends the signed order itself: with the wallet sending, Phantom's transaction never reached devnet and Solflare kept the app in the background while the order's time ran out. An approval that takes longer than about a minute fails with "Approval took too long" and nothing is sent.
 
 ## Numbers
 
@@ -256,7 +256,7 @@ Phantom asked to connect again before every buy as long as it could not verify t
 | Failed slippage try: median $0.00041 across all; manual-like median $0.016, p90 $0.56; priority fee is charged, Jito tip is not | 135,217 failed (manual-like 362); 35 transactions as direct evidence | Manual-like group small; depends on fee settings. The priority-fee / Jito-tip evidence (35 transactions) is in the method notes, not in the result tables |
 | Team's own buys during event week: not yet (mainnet) | mainnet, event week | Small sample; tokens chosen by the team (to be filled from real data) |
 
-*Devnet test buys, not part of this table:* the [web page](https://rung-drab.vercel.app/) counts the program's devnet transactions. It is a small sample of the team's own test buys and includes runs where we pushed the price on purpose.
+*Devnet test buys, not part of this table:* the [web page](https://rungbot.xyz/) counts the program's devnet transactions. It is a small sample of the team's own test buys and includes runs where we pushed the price on purpose.
 
 The numbers about typed and needed slippage come from our own measurement of three 13-minute windows of mainnet blocks. The scripts are in [`measure/`](measure/README.md), with the tables they produced on Nov 22, 2026 in [`measure/results/`](measure/results/), and the method (in Turkish) in [`measure/docs/rapor-ikinci-olcum.md`](measure/docs/rapor-ikinci-olcum.md). [`measure/README.md`](measure/README.md#numbers--script) maps every row above to the script and output that produced it. They use public RPC endpoints only; the raw blocks are not in the repository and are downloaded again by the scripts (about 20 to 25 minutes per window). After being cleaned up for this repository the scripts were verified on a small slice against the original ones, not re-run end to end.
 
