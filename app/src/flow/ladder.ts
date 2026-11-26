@@ -27,6 +27,7 @@ import {
 
 import { connection } from "./connection";
 import { bpsText } from "./format";
+import { orderDepositPaid } from "../funds";
 import { Receipt, addReceipt } from "./history";
 import { reservesNow } from "./market";
 import {
@@ -224,7 +225,11 @@ export async function runOrder(run: Running, onEvent: (e: LadderEvent) => void):
     approvalFee,
     userTokenAccountDeposit: String(!p.existed.userTokenAccount && after[1] ? after[1].lamports : 0),
     accumulatorDeposit: String(!p.existed.accumulator && after[2] ? after[2].lamports : 0),
-    orderDeposit: String(after[0] ? after[0].lamports : 0),
+    orderDeposit: orderDepositPaid(
+      p.existed.order,
+      BigInt(p.earlierOrderLamports ?? "0"),
+      after[0] ? BigInt(after[0].lamports) : null,
+    ).toString(),
     transactions: [
       ...(p.openSignature ? [{ label: "approval", signature: p.openSignature, fee: approvalFee, outcome: "ok" }] : []),
       ...attempts,

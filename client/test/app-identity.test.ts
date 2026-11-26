@@ -47,7 +47,7 @@ test("the document is answered by a route that sets the bare content type itself
 test("the document sits on the site the app names as its identity", () => {
   const config = read("app/src/config.ts");
   const uri = /uri:\s*"(https:\/\/[^"]+)"/.exec(config)?.[1];
-  assert.equal(uri, "https://rung-drab.vercel.app");
+  assert.equal(uri, "https://rungbot.xyz");
   // web/ is what is deployed there.
   assert.ok(read("web/vercel.json").includes("nextjs"));
 });
