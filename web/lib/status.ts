@@ -7,14 +7,11 @@ export type Network = "devnet" | "mainnet-beta";
 
 export const STATUS = {
   /** Cluster the counter reads and the explorer links point at. */
-  network: "devnet" as Network,
+  network: "mainnet-beta" as Network,
   /** Rung program on that cluster. */
   programId: "Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio",
   /** Public endpoint used when the server-side `RPC_URL` is not set. */
-  publicRpc: "https://api.devnet.solana.com",
-  /** Short line under the intro. */
-  networkLine:
-    "The program is deployed on devnet and on mainnet. This page and the app read devnet (test SOL); the first two mainnet buys were made on Nov 24, 2026, through the command-line script.",
+  publicRpc: "https://api.mainnet-beta.solana.com",
   audit: "unaudited, use small amounts", // verbatim
   devices: "Android emulator; not tested on a real device or Seeker", // verbatim
   /** `null` until an APK is published. */
