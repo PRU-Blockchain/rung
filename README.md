@@ -11,11 +11,11 @@ On Solana, set slippage too wide and a sandwich bot takes the gap; set it too ti
 **Demo video:** not yet
 
 <p>
-  <img src="docs/shots/app-1-buy.png" width="260" alt="Rung buy screen on devnet: token, price you saw, five modes with Tight selected, amount 0.01 SOL, the max fee line and the single buy button">
-  <img src="docs/shots/app-7-climb.png" width="260" alt="Rung ladder on devnet: try 1% failed because the price was above the rung, try 2% bought 1.48% above the price you saw, try 3% not needed">
+  <img src="docs/shots/app-24-buy-dark-devnet.png" width="260" alt="Rung buy screen on devnet: the token card, the mode chip with Tight selected, the amount 0.01 SOL with four presets and a keypad, the max fee line and the Buy once button">
+  <img src="docs/shots/app-25-climb-dark.png" width="260" alt="Rung ladder on devnet: try 1% missed, try 2% bought 1.49% above the price you saw, try 3% not needed">
 </p>
 
-*Left: the buy screen. Right: a ladder that climbed — the 1% try missed, the 2% try bought 1.48% above the price you saw, the 3% try was not needed. Both are screenshots of real transactions on **devnet** (test SOL) from the Android emulator. In the right-hand run the price was pushed up on purpose by a buy from our own second wallet, as a test aid, so that the first rung would miss.*
+*Left: the buy screen. Right: a ladder that climbed — the 1% try missed, the 2% try bought 1.49% above the price you saw, the 3% try was not needed. Both are screenshots of one real order on **devnet** (test SOL) from the Android emulator, Nov 27, 2026: [the order](https://explorer.solana.com/tx/63AGFwRQzoiCF6hZ1TkU6ZDmP8xGhwkU7MGRx163h8PG4rVftqRnKADeT91dgWdpvk4cjrHUTXjcNYgt8Mrbafw6?cluster=devnet), [the 1% try](https://explorer.solana.com/tx/4DEQA3EJ4FadzxtYsMTUPpojQC2czmfZFwCz8kJcoizDM1vrpxpGUPnPeALWELxt8TrbtmD9kamKmWs1tMLK2PdY?cluster=devnet), [the 2% try](https://explorer.solana.com/tx/3dCd9ZsyhwG884DGhNVN3ZdFtd9JDqR152YHEa7FuCLBbsBgo6LRfvuxVUzSQ1yHLfjTbqMFUy8XYGxYkAVNJEm1?cluster=devnet). In this run the price was pushed up on purpose by [a buy from our own second wallet](https://explorer.solana.com/tx/27QekSdqQKPYTUKT1uo4dpAmzWDG94cRkPDTKeinAD1eSjXG79KjUQGLQMoUs7csBE4wUnBi1yB4nz1qVex9YMw4?cluster=devnet), as a test aid, so that the first rung would miss.*
 
 ---
 
@@ -132,7 +132,7 @@ A buy from a PumpSwap pool, same script, Nov 24, 2026 (mint `CSyeF5X2hcMVMDiGPRm
 
 Measured on devnet in these runs: a `try_rung` that buys used about 123,000 compute units, one that fails on slippage about 94,000, the refund about 9,000. With a compute-unit limit of 200,000 and a price of 5,000 micro-lamports each try cost 6,000 lamports whether it bought or not.
 
-The app's own devnet buys (Phantom, Solflare, a not-bought run and its "Retry with Launch mode") are listed with their signatures in [`app/README.md`](app/README.md#known-issues--wallet-notes). Screenshots: [buy](docs/shots/app-1-buy.png), [wallet approval](docs/shots/app-2-approval.png), [ladder](docs/shots/app-3-ladder.png), [receipt](docs/shots/app-4-receipt.png), [not bought](docs/shots/app-5-not-bought.png), [retry](docs/shots/app-6-retry.png), [climb](docs/shots/app-7-climb.png), [history offline](docs/shots/app-8-history-offline.png).
+The app's own devnet buys (Phantom, Solflare, a not-bought run and its "Retry with Launch mode") are listed with their signatures in [`app/README.md`](app/README.md#known-issues--wallet-notes). The screens were redrawn on Nov 27, 2026; how they look now: [buy](docs/shots/app-21-buy-dark.png), [mode list](docs/shots/app-22-mode-sheet.png), [ladder](docs/shots/app-25-climb-dark.png), [receipt](docs/shots/app-26-receipt-climb-dark.png), [history](docs/shots/app-23-history-dark.png). Screenshots of those earlier runs, in the first layout: [buy](docs/shots/app-1-buy.png), [wallet approval](docs/shots/app-2-approval.png), [ladder](docs/shots/app-3-ladder.png), [receipt](docs/shots/app-4-receipt.png), [not bought](docs/shots/app-5-not-bought.png), [retry](docs/shots/app-6-retry.png), [climb](docs/shots/app-7-climb.png), [history offline](docs/shots/app-8-history-offline.png).
 
 ## Status
 
