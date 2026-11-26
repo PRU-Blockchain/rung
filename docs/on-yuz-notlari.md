@@ -38,3 +38,14 @@
 - **Yeni, işaretsiz sözler:** "Watch the video", "How it works", "Fees, rungs and failed tries", "All transactions on Solana Explorer", kaynakların kısa adları (Bitquery, CryptoSlate …), "README: Mainnet runs", "Seeker image: Solana Mobile press kit", tekrar notları ve düğmeleri, "on established tokens" (devir metnindeki "On established tokens" küçük harfle).
 - **Sayaç notu:** "They include test runs where we moved the price on purpose." yalnız ağ devnet iken görünüyor.
 - **Kaldırılanlar:** Eski sitedeki ekran görüntüleri bölümü (yerini telefon aldı; dosyalar `web/public/shots/` içinde duruyor) ve ilk ekrandaki `networkLine` cümlesi. "Recent buys" ilk 5 satırı gösteriyor; tamamı Solana Explorer bağlantısında.
+
+## Açık işler (26 Kasım gecesi, Merve işin kalanını Buğra'ya bıraktı)
+
+Not, şart değil; sırası Buğra'nın.
+
+- **Ana dala birleştirme:** `merve/frontend` → `main`. `main` dalın içinde; birleştirme ileri sarma olur.
+- **Ağ:** Site bugün devnet okuyor ve öyle yazıyor. Mainnet'e geçmek: `web/lib/status.ts`'de `network` ve `publicRpc`, README'deki "the web page runs on devnet" cümleleri.
+- **Video:** Demo videosu çıkınca `web/lib/status.ts`'de `videoUrl`; "Watch the video" düğmesi ve bölüm kendiliğinden görünür.
+- **Simge, uygulama tarafı:** `app/src/config.ts`'de `APP_IDENTITY.icon` → `https://rungbot.xyz/rung-icon.png`; `app/app.json`'daki beyaz zeminler koyuya; sonra Phantom ve Solflare'de bakılır (`docs/gorsel-istekleri.md`, bölüm 2).
+- **Uygulamanın yeni düzeni:** Gerçek uygulama hâlâ ilk halinde; sitedeki telefonun düzenine çevirme önerisi `docs/uygulama-sade-onerisi.md` içinde (uygulanmadı; altı yeni ya da kısalan söz ve beş açık karar orada).
+- **Söz denetimi:** `web/scripts/check-verbatim.mjs` devir dosyasıyla bir kez çalıştırılmalı; Merve'nin bilgisayarında devir dosyası yok.
