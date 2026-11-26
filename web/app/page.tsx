@@ -80,6 +80,11 @@ export default function Home() {
       <main id="top">
         <section className="hero">
           <div className="wrap">
+            {/* Phone screens only: the title, small, above the app, so a first look says what this is. The
+                heading itself is the h1 below the phone; this copy is for the eye only. */}
+            <p className="hero-mini" aria-hidden="true">
+              {name} <span>—</span> {claim}
+            </p>
             <div className="hero-copy">
               <h1>
                 {name} <span>—</span> {claim}

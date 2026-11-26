@@ -43,6 +43,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) calc(380px * var(--pz, 1)); gap: 64px; align-items: center; padding-block: 16px 56px; }
 .hero h1 { margin: 0; font-family: var(--f-display); font-stretch: 115%; font-weight: 780; font-size: clamp(34px, min(4.6vw, 7.4vh), 60px); line-height: 1.02; letter-spacing: -0.028em; text-wrap: balance; }
 .hero h1 span { color: var(--muted); }
+/* The title again, small, shown on phone screens only (see the 600px rule). */
+.hero-mini { display: none; }
 .lead { margin: 22px 0 0; font-size: 19px; line-height: 1.5; color: var(--muted); max-width: 46ch; }
 
 /* Three big numbers, right under the first screen in their own band. The words are the hand-off's; only the
@@ -266,8 +268,15 @@ summary::-webkit-details-marker { display: none; }
   .nav .wrap { padding-block: 12px; }
   .nav-links { display: none; }
   .hero .wrap { padding-block: 0 48px; gap: 36px; }
-  .phone-col { padding-top: 64px; }
-  .device.seeker { height: clamp(560px, calc(100svh - 140px), 760px); padding: 7px; border-radius: 42px; }
+  /* The app stays first and fills the screen; the title sits above it in two small lines (Buğra, Nov 27). */
+  .hero-mini {
+    display: block; order: -2; position: relative; z-index: 3; margin: 10px 0 -16px;
+    font-family: var(--f-display); font-stretch: 115%; font-weight: 760; font-size: 17px; line-height: 1.16;
+    letter-spacing: -0.012em; text-wrap: balance; color: var(--fg);
+  }
+  .hero-mini span { color: var(--muted); }
+  .phone-col { padding-top: 16px; }
+  .device.seeker { height: clamp(560px, calc(100svh - 148px), 760px); padding: 7px; border-radius: 42px; }
   .device.seeker::before { top: 120px; height: 70px; }
   .device.seeker::after { top: 206px; height: 46px; }
   .device.seeker .app { border-radius: 35px; outline: none; }
