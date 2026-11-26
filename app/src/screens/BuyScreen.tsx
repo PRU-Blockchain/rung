@@ -1,13 +1,13 @@
 import * as Clipboard from "expo-clipboard";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Keyboard, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Mode, PublicKey, lamportsToUsd, orderPda, usdText } from "../../../client/src";
 
 import { connection } from "../flow/connection";
 import { walletIsShort } from "../funds";
-import { bpsText, parseSol, priceText, shortAddress, sol, tokens } from "../flow/format";
+import { bpsText, parseSol, priceText, shortAddress, sol } from "../flow/format";
 import { Market, MarketError, curveAgeSeconds, loadMarket, parseMint, priceKeys, venueText, withPrice } from "../flow/market";
 import {
   MODE_OPTIONS,
@@ -20,8 +20,39 @@ import {
   parseCustomRungs,
   rungsForMode,
 } from "../flow/plan";
-import { useSolUsd } from "../flow/tokenInfo";
-import { Button, Header, TokenLine, colors, s } from "./ui";
+import { useSolUsd, useTokenInfo } from "../flow/tokenInfo";
+import { pressKey } from "./amountKeys";
+import { Keypad } from "./Keypad";
+import { tokShort, wholeTokens } from "./tokShort";
+import {
+  Button,
+  Chevron,
+  ClipboardIcon,
+  ClockIcon,
+  CrossIcon,
+  Footer,
+  Header,
+  IconButton,
+  LinkButton,
+  Sheet,
+  TokenLineView,
+  WalletWaitSheet,
+  colors,
+  s,
+} from "./ui";
+
+const PRESETS = ["0.01", "0.05", "0.1", "0.5"];
+
+/** What each mode is for: the README's mode table, as on the site. */
+const MODE_FOR: Record<Mode, string> = {
+  tight: "established tokens",
+  normal: "established tokens, everyday buys",
+  fast: "most-traded, fast-moving pools",
+  launch: "a token's first two minutes",
+  custom: "you choose 1–5 rungs and the cap",
+};
+
+const SUGGESTED = "suggested for a token's first two minutes";
 
 const REFRESH_MS = 2500;
 const YOUNG_CURVE_SECONDS = 120;
@@ -181,145 +212,348 @@ export function BuyScreen(props: {
     (!plan ? "Getting a quote…" : null) ??
     (walletIsShort(!!props.user, balance, cost?.total ?? null) ? "Not enough SOL in the wallet for this buy." : null);
 
+  // Presentation only from here on.
+  const [modeSheet, setModeSheet] = useState(false);
+  const [walletSheet, setWalletSheet] = useState(false);
+  const addressRef = useRef<TextInput>(null);
+  const mintKey = market ? market.mint.toBase58() : null;
+  const info = useTokenInfo(mintKey, true);
+  const noToken = mintText.trim() === "";
+  const shortOfSol = walletIsShort(!!props.user, balance, cost?.total ?? null);
+  const paste = async () => setMintText((await Clipboard.getStringAsync()).trim());
+  const chipLabel = MODE_OPTIONS.find((o) => o.mode === mode)?.label ?? "";
+  const launchLabel = MODE_OPTIONS.find((o) => o.mode === "launch")?.label ?? "";
+  const customError = mode === "custom" && "error" in custom ? custom.error : null;
+  const wideFirst = mode === "custom" && "rungs" in custom && custom.rungs[0] >= 2000;
+
+  // The line under the amount: its error, the quote's error, the token count, or "Getting a quote…".
+  let amountSub: { text: string; error: boolean } | null = null;
+  if (amountProblem) amountSub = { text: amountProblem, error: true };
+  else if (planError) amountSub = { text: planError, error: true };
+  else if (plan && market) {
+    const count = tokShort(wholeTokens(plan.quote.expectedTokensSeen, market.decimals));
+    amountSub = { text: `≈ ${count} ${info?.symbol || "tokens"}`, error: false };
+  } else if (market && rungs) amountSub = { text: "Getting a quote…", error: false };
+
+  const detailLines: string[] = [];
+  if (capBps !== null) detailLines.push(`Price jumped above your ${bpsText(capBps)} cap? Rung doesn't buy. Your SOL comes back.`);
+  if (plan) detailLines.push(`If no rung fills, max fee: ${sol(maxFeeIfNoFill(plan))} + approval fee set by your wallet`);
+  detailLines.push("one wallet approval covers every try");
+  if (market) {
+    detailLines.push(
+      venueText(market.venue) +
+        (plan ? ` · Price you saw: ${priceText(plan.amount, plan.quote.expectedTokensSeen, market.decimals)}` : ""),
+    );
+  }
+  if (plan && cost) {
+    detailLines.push(
+      `Leaves your wallet when the order opens: ${sol(cost.total)} + approval fee`,
+      `buy: ${sol(cost.buy)}`,
+      `rent share for the accounts a buy creates: ${sol(cost.rentShare)} (unused part comes back)`,
+      `fee share for the tries: ${sol(cost.feeShare)} (unused part comes back)`,
+      `order record deposit: ${cost.orderDeposit > 0n ? sol(cost.orderDeposit) : "none, your earlier order record is reused"}`,
+      `rungs: ${plan.rungs.map(bpsText).join(" → ")}`,
+    );
+  }
+
   return (
     <SafeAreaView style={s.screen}>
-      <ScrollView ref={scrollRef} contentContainerStyle={s.content} keyboardShouldPersistTaps="handled">
-        <Header
-          right={
-            <Pressable onPress={props.onHistory} accessibilityRole="button">
-              <Text style={[s.body, { color: colors.link, marginTop: 8 }]}>History</Text>
-            </Pressable>
-          }
-        />
+      <Header
+        right={
+          <>
+            {props.user && (
+              <Pressable accessibilityRole="button" onPress={() => setWalletSheet(true)} style={st.walletChip}>
+                <Text style={st.walletChipText}>{shortAddress(props.user.toBase58())}</Text>
+              </Pressable>
+            )}
+            <IconButton label="History" onPress={props.onHistory}>
+              <ClockIcon />
+            </IconButton>
+          </>
+        }
+      />
 
-        <Text style={s.h2}>Token address</Text>
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          <TextInput
-            style={[s.input, { flex: 1 }]}
-            value={mintText}
-            onChangeText={setMintText}
-            placeholder="pump.fun token address"
-            placeholderTextColor={colors.faint}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <Button label="Paste" kind="secondary" onPress={async () => setMintText((await Clipboard.getStringAsync()).trim())} />
-        </View>
-        {marketError && <Text style={s.error}>{marketError}</Text>}
-        {market && (
-          <View style={s.box}>
-            <TokenLine mint={market.mint.toBase58()} fromNetwork />
-            <Text style={s.small}>{venueText(market.venue)}</Text>
-            {plan && (
-              <>
-                <Text style={s.body}>
-                  Price you saw: {priceText(plan.amount, plan.quote.expectedTokensSeen, market.decimals)}
+      <ScrollView
+        ref={scrollRef}
+        style={{ flex: 1 }}
+        contentContainerStyle={[s.content, { flexGrow: 1 }]}
+        keyboardShouldPersistTaps="handled"
+      >
+        {market && mintKey ? (
+          <View style={st.tokenCard}>
+            <View style={{ flex: 1 }}>
+              <TokenLineView mint={mintKey} info={info} size={44} />
+            </View>
+            <IconButton label="Clear" onPress={() => setMintText("")}>
+              <CrossIcon />
+            </IconButton>
+          </View>
+        ) : (
+          <Pressable style={st.tokenEmpty} onPress={() => addressRef.current?.focus()}>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={st.tokenEmptyLabel}>Token address</Text>
+              <TextInput
+                ref={addressRef}
+                style={st.addressInput}
+                value={mintText}
+                onChangeText={setMintText}
+                placeholder="pump.fun token address"
+                placeholderTextColor={colors.faint}
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+            </View>
+            {noToken ? (
+              <IconButton label="Paste" onPress={paste}>
+                <ClipboardIcon />
+              </IconButton>
+            ) : (
+              <IconButton label="Clear" onPress={() => setMintText("")}>
+                <CrossIcon />
+              </IconButton>
+            )}
+          </Pressable>
+        )}
+        {marketError && <Text style={[s.error, st.under]}>{marketError}</Text>}
+
+        <View style={[{ gap: 14, flexGrow: 1 }, !market && { opacity: 0.4 }]}>
+          <View style={{ gap: 7 }}>
+            <Pressable accessibilityRole="button" onPress={() => setModeSheet(true)} style={st.modeChip}>
+              <Text style={st.modeChipKey}>Mode</Text>
+              <Text style={st.modeChipValue}>{chipLabel}</Text>
+              <Chevron />
+            </Pressable>
+            {customError && <Text style={[s.error, st.under]}>{customError}</Text>}
+            {wideFirst && <Text style={[s.error, st.under]}>{WIDE_FIRST_RUNG}</Text>}
+            {young && (
+              <Pressable accessibilityRole="button" onPress={() => setMode("launch")}>
+                <Text style={[s.small, st.under, { color: colors.text }]}>
+                  {launchLabel} · {SUGGESTED}
                 </Text>
-                <Text style={s.small}>
-                  {sol(plan.amount)} buys about {tokens(plan.quote.expectedTokensSeen, market.decimals)} tokens now
-                </Text>
-              </>
+              </Pressable>
             )}
           </View>
-        )}
 
-        <Text style={s.h2}>Mode</Text>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+          <View style={st.amount} accessible accessibilityLabel="Amount (SOL)" accessibilityValue={{ text: `${amountText || "0"} SOL` }}>
+            <Text style={[st.amountNum, !amountText && { color: colors.faint }]} numberOfLines={1} adjustsFontSizeToFit>
+              {amountText || "0"}
+              <Text style={st.amountUnit}> SOL</Text>
+            </Text>
+            {usdPerSol !== null && amount !== null && !amountProblem && (
+              <Text style={st.usd}>≈ {usdText(lamportsToUsd(amount, usdPerSol))}</Text>
+            )}
+            {amountSub && <Text style={[st.amountSub, amountSub.error && { color: colors.bad }]}>{amountSub.text}</Text>}
+            {shortOfSol && plan && <Text style={[st.amountSub, { color: colors.bad }]}>Not enough SOL in the wallet for this buy.</Text>}
+          </View>
+
+          <View style={st.presets}>
+            {PRESETS.map((p) => {
+              const on = amount !== null && parseSol(p) === amount;
+              return (
+                <Pressable
+                  key={p}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: on }}
+                  onPress={() => setAmountText(p)}
+                  style={[st.preset, on && st.presetOn]}
+                >
+                  <Text style={st.presetText}>{p}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <Keypad onKey={(k) => setAmountText((t) => pressKey(t, k))} />
+        </View>
+      </ScrollView>
+
+      <Footer>
+        {props.error && <Text style={s.error}>{props.error}</Text>}
+        {plan && market && (
+          <View style={st.feeRow}>
+            <Text style={st.feeText}>
+              Max fee <Text style={st.feeValue}>{sol(maxFeeIfNoFill(plan))}</Text>
+            </Text>
+            <LinkButton label="Details" onPress={() => setDetails(true)} />
+          </View>
+        )}
+        <Button
+          label={noToken ? "Paste" : "Buy once"}
+          onPress={noToken ? () => void paste() : () => plan && props.onBuy(plan)}
+          disabled={noToken ? props.busy : !!reason || props.busy}
+        />
+        {!props.user && <Text style={[s.small, { textAlign: "center" }]}>The button connects your wallet first.</Text>}
+      </Footer>
+
+      <Sheet visible={modeSheet} onClose={() => setModeSheet(false)} title="Mode" avoidKeyboard>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: 2 }}>
           {MODE_OPTIONS.map((o) => {
             const on = mode === o.mode;
-            const suggested = o.mode === "launch" && young;
             return (
               <Pressable
                 key={o.mode}
-                accessibilityRole="button"
-                onPress={() => setMode(o.mode)}
-                style={[s.button, { width: "48%", paddingVertical: 9, paddingHorizontal: 10 }, on ? s.primary : s.secondary]}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: on }}
+                onPress={() => {
+                  setMode(o.mode);
+                  if (o.mode !== "custom") setModeSheet(false);
+                }}
+                style={[st.modeRow, on && { backgroundColor: colors.raise }]}
               >
-                <Text style={[s.buttonText, on ? s.primaryText : s.secondaryText]}>{o.label}</Text>
-                {suggested && (
-                  <Text style={[s.small, { color: on ? "#dddddd" : colors.muted, textAlign: "center" }]}>
-                    suggested for a token's first two minutes
-                  </Text>
-                )}
+                <View style={{ flex: 1, gap: 3 }}>
+                  <Text style={st.modeRowLabel}>{o.label}</Text>
+                  <Text style={s.small}>{MODE_FOR[o.mode]}</Text>
+                  {o.mode === "launch" && young && <Text style={[s.small, { color: colors.text }]}>{SUGGESTED}</Text>}
+                </View>
+                <View style={[st.radio, on && st.radioOn]} />
               </Pressable>
             );
           })}
-        </View>
-        {mode === "custom" && (
-          <View style={{ gap: 6 }}>
-            <Text style={s.small}>Rungs in percent, increasing; the last one is your cap (at most 30%).</Text>
-            <TextInput
-              style={s.input}
-              value={customText}
-              onChangeText={setCustomText}
-              placeholder="1, 2, 3"
-              placeholderTextColor={colors.faint}
-              keyboardType="numbers-and-punctuation"
-            />
-            {"error" in custom && <Text style={s.error}>{custom.error}</Text>}
-            {"rungs" in custom && custom.rungs[0] >= 2000 && <Text style={s.error}>{WIDE_FIRST_RUNG}</Text>}
-          </View>
-        )}
+          {mode === "custom" && (
+            <View style={{ gap: 8, paddingHorizontal: 12, paddingTop: 6, paddingBottom: 4 }}>
+              <Text style={s.small}>Rungs in percent, increasing; the last one is your cap (at most 30%).</Text>
+              <TextInput
+                style={st.customInput}
+                value={customText}
+                onChangeText={setCustomText}
+                placeholder="1, 2, 3"
+                placeholderTextColor={colors.faint}
+                keyboardType="numbers-and-punctuation"
+                accessibilityLabel="Custom"
+              />
+              {"error" in custom && <Text style={s.error}>{custom.error}</Text>}
+              {"rungs" in custom && custom.rungs[0] >= 2000 && <Text style={s.error}>{WIDE_FIRST_RUNG}</Text>}
+            </View>
+          )}
+        </ScrollView>
+      </Sheet>
 
-        <Text style={s.h2}>Amount (SOL)</Text>
-        <TextInput
-          style={s.input}
-          value={amountText}
-          onChangeText={setAmountText}
-          keyboardType="decimal-pad"
-          placeholder="0.01"
-          placeholderTextColor={colors.faint}
-        />
-        {usdPerSol !== null && amount !== null && !amountProblem && (
-          <Text style={s.small}>≈ {usdText(lamportsToUsd(amount, usdPerSol))}</Text>
-        )}
-
-        {plan && (
-          <View style={{ gap: 2, marginTop: 6 }}>
-            <Text style={s.body}>If no rung fills, max fee: {sol(maxFeeIfNoFill(plan))}</Text>
-            <Text style={s.small}>+ approval fee set by your wallet</Text>
-            <Pressable onPress={() => setDetails(!details)} accessibilityRole="button">
-              <Text style={[s.small, { color: colors.link, paddingVertical: 4 }]}>{details ? "Hide details" : "Details"}</Text>
-            </Pressable>
-            {details && cost && (
-              <View style={s.box}>
-                <Text style={s.small}>Leaves your wallet when the order opens: {sol(cost.total)} + approval fee</Text>
-                <Text style={s.small}>buy: {sol(cost.buy)}</Text>
-                <Text style={s.small}>rent share for the accounts a buy creates: {sol(cost.rentShare)} (unused part comes back)</Text>
-                <Text style={s.small}>fee share for the tries: {sol(cost.feeShare)} (unused part comes back)</Text>
-                <Text style={s.small}>
-                  order record deposit: {cost.orderDeposit > 0n ? sol(cost.orderDeposit) : "none, your earlier order record is reused"}
-                </Text>
-                <Text style={s.small}>rungs: {plan.rungs.map(bpsText).join(" → ")}</Text>
-              </View>
-            )}
-          </View>
-        )}
-
-        <Button
-          label="Buy once · one wallet approval covers every try"
-          onPress={() => plan && props.onBuy(plan)}
-          disabled={!!reason || props.busy}
-        />
-        {capBps !== null && (
-          <Text style={s.small}>
-            Price jumped above your {bpsText(capBps)} cap? Rung doesn't buy. Your SOL comes back.
-          </Text>
-        )}
-        {reason && !props.busy && <Text style={s.small}>{reason}</Text>}
-        {props.busy && <Text style={s.small}>Waiting for your wallet…</Text>}
-        {props.error && <Text style={s.error}>{props.error}</Text>}
-        {!props.user && <Text style={s.small}>The button connects your wallet first.</Text>}
-        {props.user && (
-          <Text style={[s.small, { marginTop: 12 }]}>
-            Wallet {shortAddress(props.user.toBase58())}
-            {balance !== null ? ` · ${sol(balance)}` : ""} ·{" "}
-            <Text style={{ color: colors.link }} onPress={props.onDisconnect}>
-              Disconnect
+      <Sheet visible={details} onClose={() => setDetails(false)} title="Details">
+        <ScrollView contentContainerStyle={{ gap: 9 }}>
+          {detailLines.map((t, i) => (
+            <Text key={i} style={i === 0 ? st.detailFirst : st.detail}>
+              {t}
             </Text>
-          </Text>
+          ))}
+        </ScrollView>
+      </Sheet>
+
+      <Sheet visible={walletSheet && !!props.user} onClose={() => setWalletSheet(false)}>
+        {props.user && (
+          <View style={{ gap: 10 }}>
+            <Text style={st.walletFull}>
+              Wallet {shortAddress(props.user.toBase58())}
+              {balance !== null ? ` · ${sol(balance)}` : ""}
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => {
+                setWalletSheet(false);
+                props.onDisconnect();
+              }}
+              style={{ paddingVertical: 8 }}
+            >
+              <Text style={st.disconnect}>Disconnect</Text>
+            </Pressable>
+          </View>
         )}
-      </ScrollView>
+      </Sheet>
+
+      <WalletWaitSheet visible={props.busy} />
     </SafeAreaView>
   );
 }
+
+const st = StyleSheet.create({
+  walletChip: {
+    height: 34,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.line,
+    justifyContent: "center",
+  },
+  walletChipText: { fontSize: 12, color: colors.text, fontFamily: "monospace" },
+  tokenCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 12,
+    paddingLeft: 12,
+    paddingRight: 4,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: 18,
+  },
+  tokenEmpty: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 12,
+    paddingLeft: 16,
+    paddingRight: 8,
+    borderWidth: 1.5,
+    borderStyle: "dashed",
+    borderColor: colors.faint,
+    borderRadius: 18,
+  },
+  tokenEmptyLabel: { fontSize: 12, color: colors.muted },
+  addressInput: { fontSize: 16, color: colors.text, padding: 0, margin: 0 },
+  under: { paddingLeft: 4, marginTop: -6 },
+  modeChip: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    minHeight: 44,
+    paddingLeft: 14,
+    paddingRight: 12,
+    borderRadius: 999,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.line,
+  },
+  modeChipKey: { fontSize: 12, color: colors.muted },
+  modeChipValue: { fontSize: 14, fontWeight: "500", color: colors.text },
+  amount: { alignItems: "center", gap: 5, paddingTop: 2 },
+  amountNum: { fontSize: 54, fontWeight: "600", color: colors.text, letterSpacing: -1, fontVariant: ["tabular-nums"] },
+  amountUnit: { fontSize: 20, fontWeight: "600", color: colors.muted, letterSpacing: 0 },
+  usd: { fontSize: 14, fontWeight: "500", color: colors.text, fontVariant: ["tabular-nums"] },
+  amountSub: { minHeight: 18, fontSize: 12.5, color: colors.muted, textAlign: "center", fontVariant: ["tabular-nums"] },
+  presets: { flexDirection: "row", gap: 8 },
+  preset: {
+    flex: 1,
+    minHeight: 44,
+    borderRadius: 14,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.line,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  presetOn: { borderColor: colors.text, backgroundColor: colors.raise },
+  presetText: { fontSize: 14.5, fontWeight: "600", color: colors.text, fontVariant: ["tabular-nums"] },
+  feeRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+  feeText: { flexShrink: 1, fontSize: 13.5, color: colors.muted },
+  feeValue: { fontWeight: "600", color: colors.text },
+  modeRow: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 16 },
+  modeRowLabel: { fontSize: 15, fontWeight: "600", color: colors.text },
+  radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: colors.faint },
+  radioOn: { borderColor: colors.text, backgroundColor: colors.raise, borderWidth: 6 },
+  customInput: {
+    fontSize: 16,
+    color: colors.text,
+    backgroundColor: colors.bg,
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  detailFirst: { fontSize: 13, lineHeight: 18, color: colors.text, fontWeight: "500" },
+  detail: { fontSize: 13, lineHeight: 18, color: colors.muted },
+  walletFull: { fontSize: 13, color: colors.muted, fontFamily: "monospace" },
+  disconnect: { fontSize: 15, fontWeight: "600", color: colors.bad },
+});

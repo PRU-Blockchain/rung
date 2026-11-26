@@ -126,7 +126,7 @@ function Main() {
   switch (screen.name) {
     case "start":
       return (
-        <View style={{ flex: 1, justifyContent: "center", backgroundColor: "#ffffff" }}>
+        <View style={{ flex: 1, justifyContent: "center", backgroundColor: "#0B0D10" }}>
           <ActivityIndicator />
         </View>
       );
@@ -176,7 +176,7 @@ export default function App() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <Main />
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
       </QueryClientProvider>
     </SafeAreaProvider>
   );
