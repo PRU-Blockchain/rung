@@ -10,6 +10,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { PublicKey } from "../client/src";
 
 import { BuyError, inForeground, openBuy } from "./src/flow/buy";
+import { walletProblemText } from "./src/sendFailure";
 import { Receipt } from "./src/flow/history";
 import { Running, findUnfinished } from "./src/flow/ladder";
 import { loadMarket } from "./src/flow/market";
@@ -36,13 +37,15 @@ type Screen =
   | { name: "not-bought"; r: Receipt }
   | { name: "history"; back: Screen };
 
-// With the network off, a buy only showed "Something went wrong: Network request failed".
-const message = (e: unknown) =>
-  e instanceof BuyError
-    ? e.message
-    : /Network request failed/i.test(String((e as Error)?.message ?? e))
-      ? "No network connection. Check it and try again."
-      : `Something went wrong: ${(e as Error)?.message ?? e}`;
+// With the network off, a buy only showed "Something went wrong: Network request failed";
+// with the wallet locked, the name of a Java exception. Connecting fails here too,
+// before a buy exists, so the wallet's errors are worded in this place as well.
+const message = (e: unknown) => {
+  if (e instanceof BuyError) return e.message;
+  const text = String((e as Error)?.message ?? e);
+  if (/Network request failed/i.test(text)) return "No network connection. Check it and try again.";
+  return walletProblemText((e as { code?: unknown })?.code, text) ?? `Something went wrong: ${text}`;
+};
 
 function Main() {
   const { selectedAccount } = useAuthorization();

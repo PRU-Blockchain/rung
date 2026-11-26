@@ -34,7 +34,7 @@ import {
 
 import { AppState } from "react-native";
 
-import { TOO_SLOW, sendFailureText } from "../sendFailure";
+import { TOO_SLOW, sendFailureText, walletProblemText } from "../sendFailure";
 import { connection } from "./connection";
 import { LIFETIME_SLOTS, Plan, WINDOW_SLOTS } from "./plan";
 import { PendingOrder, endSession, saveSessionKey, savePending } from "./session";
@@ -70,10 +70,7 @@ export { TOO_SLOW };
 function walletErrorText(e: unknown): string {
   const code = (e as { code?: unknown })?.code;
   const text = String((e as Error)?.message ?? e);
-  if (code === -3 || /declin|not signed|reject/i.test(text)) return "The wallet did not approve the buy. Nothing was sent.";
-  if (/CancellationException|cancel/i.test(text)) return "The wallet closed before approving. Nothing was sent.";
-  if (/WRONG_ACCOUNT/.test(text)) return "The wallet approved with a different account. Nothing was sent.";
-  return `The wallet returned an error: ${text}`;
+  return walletProblemText(code, text) ?? `The wallet returned an error: ${text}`;
 }
 
 const COMPUTE_BUDGET = COMPUTE_BUDGET_PROGRAM_ID.toBase58();
