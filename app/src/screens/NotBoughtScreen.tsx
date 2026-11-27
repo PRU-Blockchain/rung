@@ -131,7 +131,7 @@ export function NotBoughtScreen(props: {
         {props.error && <Text style={s.error}>{props.error}</Text>}
         <Button label="Retry" onPress={() => setRetry(true)} disabled={props.busy} />
         <View style={{ flexDirection: "row", gap: 8 }}>
-          <Button label="New buy" kind="secondary" onPress={props.onNew} style={{ flex: 1 }} />
+          <Button label="Go to home" kind="secondary" onPress={props.onNew} style={{ flex: 1 }} />
           <Button label="History" kind="secondary" onPress={props.onHistory} style={{ flex: 1 }} />
         </View>
       </Footer>

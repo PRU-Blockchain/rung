@@ -282,7 +282,7 @@ function template(): string {
     '<dl class="rows" data-r="rc-deposits" hidden><div><dt>Price you saw</dt><dd>0.0002451 SOL per token</dd></div><div><dt>Price you paid</dt><dd>0.0002451 SOL per token</dd></div><div><dt>Difference</dt><dd>0%</dd></div><div><dt>Fees for the tries</dt><dd>0.0000113 SOL</dd></div><div><dt>approval fee (set by your wallet)</dt><dd>0.00008 SOL</dd></div><div><dt>your token account deposit</dt><dd>0.00151384 SOL</dd></div><div><dt>PumpSwap volume account (one time)</dt><dd>0.0013462 SOL</dd></div><div><dt>order record deposit (returns when the order closes)</dt><dd>0.0016256 SOL</dd></div></dl>' +
     '<div class="links" data-r="rc-links"></div>' +
     "</div>" +
-    '<div class="footer"><button type="button" class="primary" data-act="new"><span class="p1">New buy</span></button><button type="button" class="secondary" data-act="history">History</button></div>' +
+    '<div class="footer"><button type="button" class="primary" data-act="new"><span class="p1">Go to home</span></button><button type="button" class="secondary" data-act="history">History</button></div>' +
     "</section>" +
     // Not bought (Nov 24, 5Z7j…pump, Tight)
     '<section class="screen" data-screen="nobuy" aria-label="Not bought" hidden>' +
@@ -299,7 +299,7 @@ function template(): string {
     '<dl class="rows"><div><dt>Back in your wallet</dt><dd>0.01 SOL</dd></div><div><dt>Fees</dt><dd>0.00003325 SOL</dd></div></dl>' +
     '<button type="button" class="link-btn" data-r="nb-details">Details</button>' +
     "</div>" +
-    '<div class="footer"><button type="button" class="primary" data-act="retry"><span class="p1">Retry</span></button><div class="row2"><button type="button" class="secondary" data-act="new">New buy</button><button type="button" class="secondary" data-act="history">History</button></div></div>' +
+    '<div class="footer"><button type="button" class="primary" data-act="retry"><span class="p1">Retry</span></button><div class="row2"><button type="button" class="secondary" data-act="new">Go to home</button><button type="button" class="secondary" data-act="history">History</button></div></div>' +
     "</section>" +
     // History
     '<section class="screen" data-screen="history" aria-label="History" hidden>' +

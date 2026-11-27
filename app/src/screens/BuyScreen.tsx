@@ -24,6 +24,7 @@ import {
 import { useSolUsd, useTokenInfo } from "../flow/tokenInfo";
 import { pressKey } from "./amountKeys";
 import { BUY_PREFS_KEY, DEFAULT_BUY_PREFS, readBuyPrefs, writeBuyPrefs } from "./buyPrefs";
+import { CustomRungs } from "./CustomRungs";
 import { Keypad } from "./Keypad";
 import { addressInText } from "./pasteAddress";
 import { tokShort, wholeTokens } from "./tokShort";
@@ -473,17 +474,12 @@ export function BuyScreen(props: {
           {mode === "custom" && (
             <View style={{ gap: 8, paddingHorizontal: 12, paddingTop: 6, paddingBottom: 4 }}>
               <Text style={s.small}>Rungs in percent, increasing; the last one is your cap (at most 30%).</Text>
-              <TextInput
-                style={st.customInput}
-                value={customText}
-                onChangeText={(t) => {
+              <CustomRungs
+                text={customText}
+                onChange={(t) => {
                   touched.current = true;
                   setCustomText(t);
                 }}
-                placeholder="1, 2, 3"
-                placeholderTextColor={colors.faint}
-                keyboardType="numbers-and-punctuation"
-                accessibilityLabel="Custom"
               />
               {"error" in custom && <Text style={s.error}>{custom.error}</Text>}
               {"rungs" in custom && custom.rungs[0] >= 2000 && <Text style={s.error}>{WIDE_FIRST_RUNG}</Text>}

@@ -105,7 +105,7 @@ export function ReceiptScreen({ r, onNew, onHistory }: { r: Receipt; onNew: () =
         <TxLinks r={r} />
       </ScrollView>
       <Footer>
-        <Button label="New buy" onPress={onNew} />
+        <Button label="Go to home" onPress={onNew} />
         <Button label="History" kind="secondary" onPress={onHistory} />
       </Footer>
     </SafeAreaView>
