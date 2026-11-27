@@ -418,13 +418,18 @@ function TokenPicture({ info, size }: { info: TokenInfo; size: number }) {
   useEffect(() => setAt(0), [urls.join(" ")]);
   const box = { width: size, height: size, borderRadius: size / 2 };
   if (at < urls.length) {
+    // Many token pictures are a coin on a white square that stops a little short of the edge; cut as a plain
+    // circle, a white rim shows. Drawn 10% larger inside the circle, the cut falls inside the coin (Buğra,
+    // Nov 27; the page's phone does the same).
     return (
-      <Image
-        source={{ uri: urls[at] }}
-        style={[s.tokenPicture, box]}
-        onError={() => setAt(at + 1)}
-        accessibilityIgnoresInvertColors
-      />
+      <View style={[s.tokenPicture, box, { overflow: "hidden" }]}>
+        <Image
+          source={{ uri: urls[at] }}
+          style={{ width: size, height: size, transform: [{ scale: 1.1 }] }}
+          onError={() => setAt(at + 1)}
+          accessibilityIgnoresInvertColors
+        />
+      </View>
     );
   }
   return (

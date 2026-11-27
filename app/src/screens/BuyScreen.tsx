@@ -23,6 +23,7 @@ import {
 import { useSolUsd, useTokenInfo } from "../flow/tokenInfo";
 import { pressKey } from "./amountKeys";
 import { Keypad } from "./Keypad";
+import { addressInText } from "./pasteAddress";
 import { tokShort, wholeTokens } from "./tokShort";
 import {
   Button,
@@ -220,7 +221,31 @@ export function BuyScreen(props: {
   const info = useTokenInfo(mintKey, true);
   const noToken = mintText.trim() === "";
   const shortOfSol = walletIsShort(!!props.user, balance, cost?.total ?? null);
-  const paste = async () => setMintText((await Clipboard.getStringAsync()).trim());
+  // The clipboard is read only when the user asks for it: the Paste button, or a tap on the empty token box.
+  // An address inside a copied link or message is taken out of it.
+  const paste = async () => {
+    const text = await Clipboard.getStringAsync();
+    setMintText(addressInText(text) ?? text.trim());
+  };
+  // A tap on the empty token box: when the clipboard holds a token address it goes straight in, one tap less
+  // (Buğra, Nov 27); otherwise the box opens for typing as before.
+  const pasteIfAddress = async (): Promise<boolean> => {
+    try {
+      const found = addressInText(await Clipboard.getStringAsync());
+      if (!found) return false;
+      setMintText(found);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  const tapTokenBox = async () => {
+    if (noToken && (await pasteIfAddress())) return;
+    addressRef.current?.focus();
+  };
+  const focusTokenBox = async () => {
+    if (noToken && (await pasteIfAddress())) addressRef.current?.blur();
+  };
   const chipLabel = MODE_OPTIONS.find((o) => o.mode === mode)?.label ?? "";
   const launchLabel = MODE_OPTIONS.find((o) => o.mode === "launch")?.label ?? "";
   const customError = mode === "custom" && "error" in custom ? custom.error : null;
@@ -289,7 +314,7 @@ export function BuyScreen(props: {
             </IconButton>
           </View>
         ) : (
-          <Pressable style={st.tokenEmpty} onPress={() => addressRef.current?.focus()}>
+          <Pressable style={st.tokenEmpty} onPress={() => void tapTokenBox()}>
             <View style={{ flex: 1, gap: 2 }}>
               <Text style={st.tokenEmptyLabel}>Token address</Text>
               <TextInput
@@ -297,6 +322,7 @@ export function BuyScreen(props: {
                 style={st.addressInput}
                 value={mintText}
                 onChangeText={setMintText}
+                onFocus={() => void focusTokenBox()}
                 placeholder="pump.fun token address"
                 placeholderTextColor={colors.faint}
                 autoCapitalize="none"
@@ -517,7 +543,9 @@ const st = StyleSheet.create({
   },
   modeChipKey: { fontSize: 12, color: colors.muted },
   modeChipValue: { fontSize: 14, fontWeight: "500", color: colors.text },
-  amount: { alignItems: "center", gap: 5, paddingTop: 2 },
+  // On a tall screen the room left over is shared: half opens up the amount, half goes to the keys
+  // (Buğra, Nov 27; before, the keys took all of it).
+  amount: { flexGrow: 1, alignItems: "center", justifyContent: "center", gap: 5, paddingVertical: 6 },
   amountNum: { fontSize: 54, fontWeight: "600", color: colors.text, letterSpacing: -1, fontVariant: ["tabular-nums"] },
   amountUnit: { fontSize: 20, fontWeight: "600", color: colors.muted, letterSpacing: 0 },
   usd: { fontSize: 14, fontWeight: "500", color: colors.text, fontVariant: ["tabular-nums"] },
