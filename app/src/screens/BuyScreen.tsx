@@ -42,6 +42,7 @@ import { addressInText } from "./pasteAddress";
 import { tokShort, wholeTokens } from "./tokShort";
 import {
   Button,
+  BuySellTabs,
   Chevron,
   ClipboardIcon,
   ClockIcon,
@@ -79,6 +80,7 @@ export function BuyScreen(props: {
   error: string | null;
   onBuy: (plan: Plan) => void;
   onHistory: () => void;
+  onTokens: () => void;
   onDisconnect: () => void;
 }) {
   const [mintText, setMintText] = useState("");
@@ -354,6 +356,8 @@ export function BuyScreen(props: {
           </>
         }
       />
+
+      <BuySellTabs active="buy" onBuy={() => undefined} onSell={props.onTokens} />
 
       <ScrollView
         ref={scrollRef}

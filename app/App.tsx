@@ -22,6 +22,7 @@ import { HistoryScreen } from "./src/screens/HistoryScreen";
 import { LadderScreen } from "./src/screens/LadderScreen";
 import { NotBoughtScreen } from "./src/screens/NotBoughtScreen";
 import { ReceiptScreen } from "./src/screens/ReceiptScreen";
+import { TokensScreen } from "./src/screens/TokensScreen";
 import { useAuthorization } from "./src/utils/useAuthorization";
 import { useMobileWallet } from "./src/utils/useMobileWallet";
 
@@ -37,7 +38,8 @@ type Screen =
   | { name: "ladder"; running: Running }
   | { name: "receipt"; r: Receipt }
   | { name: "not-bought"; r: Receipt }
-  | { name: "history"; back: Screen };
+  | { name: "history"; back: Screen }
+  | { name: "tokens"; back: Screen; sellMint?: string };
 
 // With the network off, a buy only showed "Something went wrong: Network request failed";
 // with the wallet locked, the name of a Java exception. Connecting fails here too,
@@ -51,7 +53,7 @@ const message = (e: unknown) => {
 
 function Main() {
   const { selectedAccount } = useAuthorization();
-  const { connect, disconnect, signOpen } = useMobileWallet();
+  const { connect, disconnect, signOpen, signTxs } = useMobileWallet();
   const [screen, setScreen] = useState<Screen>({ name: "start" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -123,6 +125,9 @@ function Main() {
         case "history":
           go(screen.back);
           return true;
+        case "tokens":
+          go({ name: "buy" });
+          return true;
         case "receipt":
         case "not-bought":
           go({ name: "buy" });
@@ -152,6 +157,7 @@ function Main() {
           error={error}
           onBuy={(plan) => buy(async () => plan)}
           onHistory={() => go({ name: "history", back: screen })}
+          onTokens={() => go({ name: "tokens", back: screen })}
           onDisconnect={() => disconnect().catch(() => undefined)}
         />
       );
@@ -168,7 +174,14 @@ function Main() {
         />
       );
     case "receipt":
-      return <ReceiptScreen r={screen.r} onNew={() => go({ name: "buy" })} onHistory={() => go({ name: "history", back: screen })} />;
+      return (
+        <ReceiptScreen
+          r={screen.r}
+          onNew={() => go({ name: "buy" })}
+          onHistory={() => go({ name: "history", back: screen })}
+          onSell={selectedAccount ? () => go({ name: "tokens", back: screen, sellMint: screen.r.mint }) : undefined}
+        />
+      );
     case "not-bought":
       return (
         <NotBoughtScreen
@@ -182,6 +195,24 @@ function Main() {
       );
     case "history":
       return <HistoryScreen onBack={() => go(screen.back)} />;
+    case "tokens":
+      return (
+        <TokensScreen
+          user={selectedAccount?.publicKey ?? null}
+          signTxs={signTxs}
+          sellMint={screen.sellMint}
+          onBuy={() => go({ name: "buy" })}
+          connecting={busy}
+          connectError={error}
+          onConnect={() => {
+            setBusy(true);
+            setError(null);
+            connect()
+              .catch((e) => setError(message(e)))
+              .finally(() => setBusy(false));
+          }}
+        />
+      );
   }
 }
 

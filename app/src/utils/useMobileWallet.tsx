@@ -7,6 +7,7 @@ import { useCallback, useMemo } from "react";
 
 import type { SignOpen, WalletResult } from "../flow/buy";
 import { LIFETIME_WHEN_APP_SENDS, LIFETIME_WHEN_WALLET_SENDS } from "../flow/buy";
+import type { LadderSigned, SignTxs } from "../flow/sell";
 import { Account, useAuthorization } from "./useAuthorization";
 
 export function useMobileWallet() {
@@ -64,5 +65,39 @@ export function useMobileWallet() {
     [authorizeSession]
   );
 
-  return useMemo(() => ({ connect, disconnect, signOpen }), [connect, disconnect, signOpen]);
+  /**
+   * One wallet window for a ladder of sales: authorize, then sign every transaction in the same approval. The app
+   * sends them one at a time. A wallet that cannot sign without sending, or that takes fewer transactions per
+   * request, gets only the last one (the widest) and sends it itself.
+   */
+  const signTxs: SignTxs = useCallback(
+    async (user: PublicKey, txs: VersionedTransaction[], minContextSlot: number) =>
+      await transact(async (wallet): Promise<LadderSigned> => {
+        const account = await authorizeSession(wallet);
+        if (!account.publicKey.equals(user)) throw new Error("WRONG_ACCOUNT");
+        let caps: Record<string, unknown> | null = null;
+        try {
+          caps = (await wallet.getCapabilities()) as unknown as Record<string, unknown>;
+        } catch {
+          // an older wallet: signTransactions is mandatory there
+        }
+        const features = Array.isArray(caps?.features) ? (caps!.features as string[]) : [];
+        const canSignOnly =
+          caps == null ||
+          caps.supports_sign_transactions === true ||
+          features.includes("solana:signTransactions") ||
+          (caps.features === undefined && caps.supports_sign_transactions === undefined);
+        const perRequest = typeof caps?.max_transactions_per_request === "number" ? caps.max_transactions_per_request : txs.length;
+        if (canSignOnly) {
+          const batch = perRequest >= txs.length ? txs : [txs[txs.length - 1]];
+          const signed = await wallet.signTransactions({ transactions: batch });
+          return { kind: "signed", txs: signed as VersionedTransaction[] };
+        }
+        const [signature] = await wallet.signAndSendTransactions({ transactions: [txs[txs.length - 1]], minContextSlot });
+        return { kind: "sent", signature };
+      }),
+    [authorizeSession]
+  );
+
+  return useMemo(() => ({ connect, disconnect, signOpen, signTxs }), [connect, disconnect, signOpen, signTxs]);
 }

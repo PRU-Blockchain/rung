@@ -42,7 +42,18 @@ function GapLine({ neededBps }: { neededBps: number }) {
   );
 }
 
-export function ReceiptScreen({ r, onNew, onHistory }: { r: Receipt; onNew: () => void; onHistory: () => void }) {
+export function ReceiptScreen({
+  r,
+  onNew,
+  onHistory,
+  onSell,
+}: {
+  r: Receipt;
+  onNew: () => void;
+  onHistory: () => void;
+  /** Opens the sale of what was just bought; absent when no wallet is connected. */
+  onSell?: () => void;
+}) {
   const amount = BigInt(r.amount);
   const seen = BigInt(r.expectedTokensSeen);
   const spent = BigInt(r.lamportsSpent ?? "0");
@@ -106,7 +117,10 @@ export function ReceiptScreen({ r, onNew, onHistory }: { r: Receipt; onNew: () =
       </ScrollView>
       <Footer>
         <Button label="Go to home" onPress={onNew} />
-        <Button label="History" kind="secondary" onPress={onHistory} />
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          {onSell && <Button label="Sell" kind="secondary" onPress={onSell} style={{ flex: 1 }} />}
+          <Button label="History" kind="secondary" onPress={onHistory} style={{ flex: 1 }} />
+        </View>
       </Footer>
     </SafeAreaView>
   );

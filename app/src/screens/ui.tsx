@@ -269,6 +269,29 @@ export function Header({ right }: { right?: ReactNode }) {
   );
 }
 
+/**
+ * Buy | Sell, right under the header on both sides of the app, so selling is one tap from the first screen
+ * (it used to sit behind the wallet's address; Buğra, Nov 27).
+ */
+export function BuySellTabs({ active, onBuy, onSell }: { active: "buy" | "sell"; onBuy: () => void; onSell: () => void }) {
+  const tab = (key: "buy" | "sell", label: string, onPress: () => void) => (
+    <Pressable
+      accessibilityRole="tab"
+      accessibilityState={{ selected: active === key }}
+      onPress={onPress}
+      style={[s.tab, active === key && s.tabOn]}
+    >
+      <Text style={[s.tabText, active === key && { color: colors.text }]}>{label}</Text>
+    </Pressable>
+  );
+  return (
+    <View style={s.tabs} accessibilityRole="tablist">
+      {tab("buy", "Buy", onBuy)}
+      {tab("sell", "Sell", onSell)}
+    </View>
+  );
+}
+
 export function IconButton({ label, onPress, children }: { label: string; onPress: () => void; children: ReactNode }) {
   return (
     <Pressable
@@ -510,6 +533,10 @@ export function Row({ label, value, last = false }: { label: string; value: stri
 
 export const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.bg },
+  tabs: { flexDirection: "row", gap: 4, marginHorizontal: 16, marginBottom: 10, padding: 4, borderRadius: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line },
+  tab: { flex: 1, minHeight: 36, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  tabOn: { backgroundColor: colors.raise },
+  tabText: { fontSize: 14, fontWeight: "600", color: colors.muted },
   content: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 14, gap: 14 },
 
   topbar: { flexDirection: "row", alignItems: "center", gap: 8, minHeight: 54, paddingLeft: 16, paddingRight: 10, paddingTop: 6, paddingBottom: 4 },

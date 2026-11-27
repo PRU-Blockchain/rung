@@ -108,7 +108,7 @@ export function inForeground(): Promise<void> {
  * Sends the signed bytes, retrying while the network is not back yet right
  * after the wallet hands over ("Network request failed" was seen there).
  */
-async function sendSigned(bytes: Uint8Array): Promise<string> {
+export async function sendSigned(bytes: Uint8Array): Promise<string> {
   await inForeground();
   for (let attempt = 1; ; attempt++) {
     try {
@@ -123,7 +123,7 @@ async function sendSigned(bytes: Uint8Array): Promise<string> {
 }
 
 /** Polls until the signature is confirmed; false once the blockhash can no longer land. */
-async function waitConfirmed(signature: string, lastValidBlockHeight: number): Promise<boolean> {
+export async function waitConfirmed(signature: string, lastValidBlockHeight: number): Promise<boolean> {
   for (;;) {
     const st = await connection
       .getSignatureStatuses([signature], { searchTransactionHistory: true })
