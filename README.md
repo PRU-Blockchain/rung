@@ -43,11 +43,11 @@ At launch, Tight fills 80–81% of buys; the rest are buys where the price ran a
 
 ## How to try
 
-The app is built for **devnet** (test SOL) unless it is told otherwise; built for mainnet, it has bought there as well. The web page reads mainnet. The program is deployed on both (on mainnet since Nov 24, 2026): see [Mainnet runs](#mainnet-runs).
+The app is built for **devnet** (test SOL) unless it is told otherwise; built for mainnet, it has bought there as well, and the published APK is that mainnet build. The web page reads mainnet. The program is deployed on both (on mainnet since Nov 24, 2026): see [Mainnet runs](#mainnet-runs).
 
 | way | state |
 |---|---|
-| Install the APK | not yet: no APK is published |
+| Install the APK | [`rung-0.1.0-mainnet.apk`](https://github.com/PRU-Blockchain/rung/releases/download/v0.1.0/rung-0.1.0-mainnet.apk) ([release v0.1.0](https://github.com/PRU-Blockchain/rung/releases/tag/v0.1.0), Nov 27, 2026): the mainnet build, real SOL. Needs an Android phone with a 64-bit ARM processor and a Solana wallet app (tried with Solflare and Phantom). Signed with Rung's release key; its certificate is the one [rungbot.xyz/.well-known/assetlinks.json](https://rungbot.xyz/.well-known/assetlinks.json) lists |
 | Build the Android app from source and run it on an emulator | works on an Android 15 emulator with Phantom, Solflare or Solana Mobile's mock wallet, set to devnet. Steps in [`app/README.md`](app/README.md) |
 | Run the ladder from the command line | works: [`scripts/ladder.ts`](scripts/ladder.ts) opens an order and tries the rungs on devnet, see below |
 | No Android at hand | the [web page](https://rungbot.xyz/) replays three real mainnet orders on a phone, step by step and with their explorer links, and shows the counter of the program's mainnet transactions; the explorer links below show real mainnet and devnet runs |
@@ -141,8 +141,8 @@ The app's own devnet buys (Phantom, Solflare, a not-bought run and its "Retry wi
 | On-chain order program (Anchor) | deployed on **devnet** at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio?cluster=devnet). Buys on pump.fun bonding curves and on PumpSwap pools. Reviewed twice by independent read-only passes, not audited |
 | Mainnet | the program is deployed at [`Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio`](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio) since Nov 24, 2026 (same address and same build as on devnet). Two buys the same day, through the script: from a PumpSwap pool ([rung 1% filled](https://explorer.solana.com/tx/2ZNEtvVpsiTVdcpgxoiBXBnTeknSoo1VhMwCmjhw4vHd4w7cCfP75BuQw74yf2buTXfhBKcXY7qQwYJyWj4kNt5U)) and from a bonding curve ([rung 1% filled](https://explorer.solana.com/tx/GY6Y2LdzeJj1Zch3XFuTuXvvPVKroEGFAR2ZFqjEcsaCpCRuqHs8JAMuE1Fr2Tigrk1PQht6DH6L4KVgRRWwzQM)). The app and the web page still use devnet |
 | PumpSwap pools | in the program, the client, the command-line script and the Android app. Tested locally against a test double and the real PumpSwap program dumped from mainnet, on a local fork of mainnet, and with real buys on a devnet pool through the script and through the app (runs in [`app/README.md`](app/README.md#pumpswap-pools)), and with a real buy on a mainnet pool through the script ([Mainnet runs](#mainnet-runs)) |
-| Android app (`app/`) | works on **devnet** on an Android 15 emulator: paste a token, pick a mode, one wallet approval, live ladder, receipt, not-bought screen with retry, history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. Built for mainnet (`EXPO_PUBLIC_CLUSTER=mainnet-beta`) it reads a live pool ([screen](docs/shots/app-18-mainnet-plan.png)) and has bought on mainnet with Phantom ([receipt](docs/shots/app-19-mainnet-bought.png)): two buys so far. Not tested: Custom mode, a real device, Seeker |
-| APK | not yet |
+| Android app (`app/`) | works on **mainnet** on an Android 16 phone with Solflare, and on an Android 15 emulator on devnet and mainnet: paste a token (also from a copied link), pick a mode, one wallet approval, live ladder, receipt, not-bought screen with a retry in the mode you pick, selling with the same ladder ([screen](docs/shots/app-33-sell-ladder.png)), history that opens offline. Buys filled with Phantom, Solflare and Solana Mobile's mock wallet. On mainnet: seven buys through the app so far, five of them on the phone, and one order that did not buy and was retried in Launch mode ([an earlier receipt](docs/shots/app-19-mainnet-bought.png)). Not tested: Seeker, a second wallet app on the phone |
+| APK | [release v0.1.0](https://github.com/PRU-Blockchain/rung/releases/tag/v0.1.0): the mainnet build, signed with Rung's release key |
 | Web page (`web/`) | live at https://rungbot.xyz/; the phone on the first screen replays three mainnet orders of Nov 24, 2026 (recorded, not live); the counter is computed from the program's mainnet events |
 | Measurement scripts (`measure/`) | in the repository; verified on a small slice, not re-run end to end |
 | Demo video | not yet |
@@ -340,8 +340,8 @@ Supporting number: over three years, sandwiches in the "protected" flow numbered
 - unaudited, use small amounts.
 - At most 0.5 SOL per order (`MAX_ORDER_LAMPORTS` in [`constants.rs`](programs/rung/src/constants.rs)); at least 0.001 SOL. The highest cap any order can set is 30%. Raising the per-order limit is a team decision.
 - Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
-- Android emulator; not tested on a real device or Seeker.
-- On mainnet: fifteen buys and two not-bought runs so far: thirteen through the script, two through the app.
+- Tried on one Android phone (Android 16) and on the Android emulator; not tested on Seeker.
+- On mainnet (counted Nov 27, 2026; the page's counter is live): twenty buys and three not-bought runs so far. Thirteen buys through the script, seven through the app.
 - Buys on pump.fun bonding curves and on a token's own (canonical) PumpSwap pool paired with SOL. Other pools and cashback pools: no.
 
 ## Architecture and program addresses

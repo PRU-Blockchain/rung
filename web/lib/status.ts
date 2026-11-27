@@ -13,9 +13,11 @@ export const STATUS = {
   /** Public endpoint used when the server-side `RPC_URL` is not set. */
   publicRpc: "https://api.mainnet-beta.solana.com",
   audit: "unaudited, use small amounts", // verbatim
-  devices: "Android emulator; not tested on a real device or Seeker", // verbatim
-  /** `null` until an APK is published. */
-  apkUrl: null as string | null,
+  // The hand-off's line was "Android emulator; not tested on a real device or Seeker"; since Nov 27, 2026 the
+  // app has been used on a real phone, so the line says what is true now.
+  devices: "Tried on one Android phone (Android 16) and on the Android emulator; not tested on Seeker",
+  /** The published APK (release v0.1.0, Nov 27, 2026: mainnet build, signed with Rung's release key). */
+  apkUrl: "https://github.com/PRU-Blockchain/rung/releases/download/v0.1.0/rung-0.1.0-mainnet.apk" as string | null,
   /**
    * `null` until the demo video is published (README: "Demo video: not yet").
    * Once set, the first screen shows "Watch the video" and the page embeds it:
