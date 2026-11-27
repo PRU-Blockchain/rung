@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { BALANCE_SLACK_LAMPORTS, orderDepositPaid, walletIsShort } from "../../app/src/funds";
+import { BALANCE_SLACK_LAMPORTS, orderDepositPaid, returnsAtLeast, walletIsShort, walletLine } from "../../app/src/funds";
 
 const TOTAL = 10_000_000n;
 
@@ -52,4 +52,26 @@ test("only what this order added counts, and never less than nothing", () => {
 test("a record that is gone after the order holds no deposit", () => {
   assert.equal(orderDepositPaid(false, 0n, null), 0n);
   assert.equal(orderDepositPaid(true, RECORD, null), 0n);
+});
+
+// The line above the Buy button (Buğra, Nov 27): the wallet shows what leaves
+// when the order opens, not what comes back seconds later; a 0.01 SOL buy read
+// as 0.02 SOL in Solflare. The app now says the wallet's number first, and how
+// much of it returns.
+test("what returns for sure: the accounts opened and closed inside the buy, the margin, and the unused fee budget", () => {
+  // a pool buy, both lasting accounts already there (mainnet rent, three rungs)
+  const back = returnsAtLeast({
+    vaultTokenAccount: 1_513_840n,
+    vaultWsolAccount: 1_488_440n,
+    margin: 500_000n,
+    feeBudgetTotal: 679_390n,
+    maxFeeIfNoFill: 29_150n,
+  });
+  assert.equal(back, 1_513_840n + 1_488_440n + 500_000n + 679_390n - 29_150n);
+});
+
+test("the wallet's number is rounded to four places; what returns is rounded down, so it is never overstated", () => {
+  assert.equal(walletLine(14_181_670n, 4_152_520n), "Wallet shows 0.0142 SOL · 0.0041 returns");
+  assert.equal(walletLine(17_041_710n, 4_152_520n), "Wallet shows 0.017 SOL · 0.0041 returns");
+  assert.equal(walletLine(507_041_710n, 4_159_999n), "Wallet shows 0.507 SOL · 0.0041 returns");
 });

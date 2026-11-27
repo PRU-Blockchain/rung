@@ -136,3 +136,22 @@ export async function rentReserve(
   }
   return { userTokenAccount: ata, vaultTokenAccount: ata, vaultWsolAccount: wsol, accumulator, margin, total };
 }
+
+/**
+ * The reserve without the rent of accounts that already exist. Two of the
+ * accounts a buy may create outlive it: the buyer's token account and the
+ * venue's volume account for the vault. When they are there the buy creates
+ * nothing, so their rent need not leave the wallet. The accounts opened and
+ * closed inside the buy (the vault's token account, in a pool its wrapped-SOL
+ * account) and the margin always stay: the buy cannot run without them.
+ */
+export function trimReserve(r: RentReserve, exists: { userTokenAccount: boolean; accumulator: boolean }): RentReserve {
+  const userTokenAccount = exists.userTokenAccount ? 0n : r.userTokenAccount;
+  const accumulator = exists.accumulator ? 0n : r.accumulator;
+  return {
+    ...r,
+    userTokenAccount,
+    accumulator,
+    total: userTokenAccount + r.vaultTokenAccount + r.vaultWsolAccount + accumulator + r.margin,
+  };
+}

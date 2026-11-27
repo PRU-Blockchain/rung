@@ -1,24 +1,26 @@
 // What a buy will do and cost, before the wallet sees it.
 
 import {
+  feeBudget,
   FeeBudget,
   MAX_CAP_BPS,
   MAX_ORDER_LAMPORTS,
   MAX_RUNGS,
   MIN_ORDER_LAMPORTS,
-  MODES,
   Mode,
+  MODES,
   ORDER_ACCOUNT_LEN,
   OrderQuote,
   PoolOrderQuote,
-  RentReserve,
-  feeBudget,
   quoteOrder,
   quotePoolOrder,
+  RentReserve,
   rentReserve,
+  trimReserve,
   txFeeLamports,
 } from "../../../client/src";
 
+import { returnsAtLeast } from "../funds";
 import { rentFor } from "./connection";
 import { sol } from "./format";
 import { Market } from "./market";
@@ -96,15 +98,31 @@ export async function makePlan(market: Market, mode: Mode, rungs: number[], amou
 /** "If no rung fills, max fee": every try, the refund and the sweep; not the wallet's own fee. */
 export const maxFeeIfNoFill = (p: Plan) => p.budget.tries + p.budget.refund + p.budget.sweep;
 
+/** Which of the accounts that outlive a buy the wallet already has (see trimReserve). Unknown counts as missing. */
+export interface Exists {
+  userTokenAccount: boolean;
+  accumulator: boolean;
+}
+export const NOTHING_EXISTS: Exists = { userTokenAccount: false, accumulator: false };
+
 /** What leaves the wallet when the order opens, before the wallet's own fee. */
-export function leavesWallet(p: Plan, orderAccountExists: boolean) {
+export function leavesWallet(p: Plan, orderAccountExists: boolean, exists: Exists = NOTHING_EXISTS) {
   const orderDeposit = orderAccountExists ? 0n : p.orderRent;
+  const reserve = trimReserve(p.reserve, exists);
   return {
     buy: p.amount,
-    rentShare: p.reserve.total,
+    rentShare: reserve.total,
     feeShare: p.budget.total,
     orderDeposit,
-    total: p.amount + p.reserve.total + p.budget.total + orderDeposit,
+    total: p.amount + reserve.total + p.budget.total + orderDeposit,
+    /** Of `total`, what comes back for sure after a buy (funds.ts). */
+    back: returnsAtLeast({
+      vaultTokenAccount: reserve.vaultTokenAccount,
+      vaultWsolAccount: reserve.vaultWsolAccount,
+      margin: reserve.margin,
+      feeBudgetTotal: p.budget.total,
+      maxFeeIfNoFill: maxFeeIfNoFill(p),
+    }),
   };
 }
 

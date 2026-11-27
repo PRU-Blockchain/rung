@@ -4,14 +4,26 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Mode, PublicKey, lamportsToUsd, orderPda, usdText } from "../../../client/src";
+import {
+  Mode,
+  PublicKey,
+  ammUserVolumeAccumulatorPda,
+  associatedTokenAddress,
+  lamportsToUsd,
+  orderPda,
+  usdText,
+  userVolumeAccumulatorPda,
+  vaultPda,
+} from "../../../client/src";
 
 import { connection } from "../flow/connection";
-import { walletIsShort } from "../funds";
+import { walletIsShort, walletLine } from "../funds";
 import { bpsText, parseSol, priceText, shortAddress, sol } from "../flow/format";
 import { Market, MarketError, curveAgeSeconds, loadMarket, parseMint, priceKeys, venueText, withPrice } from "../flow/market";
 import {
+  Exists,
   MODE_OPTIONS,
+  NOTHING_EXISTS,
   Plan,
   WIDE_FIRST_RUNG,
   amountError,
@@ -101,6 +113,7 @@ export function BuyScreen(props: {
   const [planError, setPlanError] = useState<string | null>(null);
   const [balance, setBalance] = useState<bigint | null>(null);
   const [orderExists, setOrderExists] = useState(false);
+  const [exists, setExists] = useState<Exists>(NOTHING_EXISTS);
   const [details, setDetails] = useState(false);
   const usdPerSol = useSolUsd();
 
@@ -153,10 +166,23 @@ export function BuyScreen(props: {
       if (!m) return;
       try {
         const price = priceKeys(m);
-        const keys = [...price, ...(props.user ? [props.user, orderPda(props.user)] : [])];
+        // With a wallet: its balance, its order record, and the two accounts that outlive a buy (its token account
+        // for this mint, the venue's volume account for its vault): their rent is not sent when they exist.
+        const vault = props.user ? vaultPda(props.user) : null;
+        const keys = [
+          ...price,
+          ...(props.user && vault
+            ? [
+                props.user,
+                orderPda(props.user),
+                associatedTokenAddress(props.user, m.mint, m.tokenProgram),
+                m.venue === "PumpSwap" ? ammUserVolumeAccumulatorPda(vault) : userVolumeAccumulatorPda(vault),
+              ]
+            : []),
+        ];
         const infos = await connection.getMultipleAccountsInfo(keys);
         if (!live) return;
-        const [userInfo, orderInfo] = infos.slice(price.length);
+        const [userInfo, orderInfo, ataInfo, accInfo] = infos.slice(price.length);
         const next = withPrice(m, infos.slice(0, price.length));
         // The curve completed while the screen was open: read the token again (pool or not yet).
         const fresh = next === "moved" ? await loadMarket(m.mint) : next;
@@ -166,6 +192,7 @@ export function BuyScreen(props: {
           setBalance(BigInt(userInfo?.lamports ?? 0));
           // An earlier order record (open ones are cancelled in the same transaction) is reused.
           setOrderExists(!!orderInfo);
+          setExists({ userTokenAccount: !!ataInfo, accumulator: !!accInfo });
         }
       } catch (e) {
         if (live && e instanceof MarketError) {
@@ -185,7 +212,10 @@ export function BuyScreen(props: {
   useEffect(() => {
     setBalance(null);
     setOrderExists(false);
+    setExists(NOTHING_EXISTS);
   }, [props.user?.toBase58()]);
+  // Another token: its token account is another one.
+  useEffect(() => setExists(NOTHING_EXISTS), [market?.mint.toBase58()]);
 
   // A buy that failed (e.g. "Approval took too long") is reported at the
   // bottom of the screen. Coming back from the wallet or the launcher, Android
@@ -223,7 +253,7 @@ export function BuyScreen(props: {
     };
   }, [market, mode, rungs?.join(","), amount]);
 
-  const cost = plan ? leavesWallet(plan, orderExists) : null;
+  const cost = plan ? leavesWallet(plan, orderExists, exists) : null;
   const capBps = rungs ? rungs[rungs.length - 1] : null;
   const reason =
     marketError ??
@@ -431,11 +461,16 @@ export function BuyScreen(props: {
       <Footer>
         {props.error && <Text style={s.error}>{props.error}</Text>}
         {plan && market && (
-          <View style={st.feeRow}>
+          <View style={{ gap: 2 }}>
+            {/* The wallet shows what leaves when the order opens, not what returns seconds later: say its number
+                here first, so it is no surprise there (Buğra, Nov 27). */}
+            <View style={st.feeRow}>
+              {cost && <Text style={st.walletLine}>{walletLine(cost.total, cost.back)}</Text>}
+              <LinkButton label="Details" onPress={() => setDetails(true)} />
+            </View>
             <Text style={st.feeText}>
               Max fee <Text style={st.feeValue}>{sol(maxFeeIfNoFill(plan))}</Text>
             </Text>
-            <LinkButton label="Details" onPress={() => setDetails(true)} />
           </View>
         )}
         <Button
@@ -599,6 +634,7 @@ const st = StyleSheet.create({
   presetText: { fontSize: 14.5, fontWeight: "600", color: colors.text, fontVariant: ["tabular-nums"] },
   feeRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
   feeText: { flexShrink: 1, fontSize: 13.5, color: colors.muted },
+  walletLine: { flexShrink: 1, fontSize: 13.5, fontWeight: "600", color: colors.text, fontVariant: ["tabular-nums"] },
   feeValue: { fontWeight: "600", color: colors.text },
   modeRow: { flexDirection: "row", alignItems: "center", gap: 12, padding: 12, borderRadius: 16 },
   modeRowLabel: { fontSize: 15, fontWeight: "600", color: colors.text },

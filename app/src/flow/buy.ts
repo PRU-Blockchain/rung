@@ -10,26 +10,27 @@
 // `signAndSendTransactions` with the longest lifetime the program allows.
 
 import {
-  COMPUTE_BUDGET_PROGRAM_ID,
-  EarlyTry,
-  Keypair,
-  MAX_LIFETIME_SLOTS,
-  Order,
-  PublicKey,
-  TransactionMessage,
-  VersionedTransaction,
   ammUserVolumeAccumulatorPda,
   associatedTokenAddress,
   cancelIx,
   classifyFailure,
+  COMPUTE_BUDGET_PROGRAM_ID,
   decodeOrder,
   describeFailure,
+  EarlyTry,
   fetchOrder,
+  Keypair,
+  MAX_LIFETIME_SLOTS,
   openOrderIx,
+  Order,
   orderPda,
+  PublicKey,
   sendFirstTryEarly,
+  TransactionMessage,
+  trimReserve,
   userVolumeAccumulatorPda,
   vaultPda,
+  VersionedTransaction,
 } from "../../../client/src";
 
 import { AppState } from "react-native";
@@ -190,7 +191,9 @@ export async function openBuy(plan: Plan, user: PublicKey, signOpen: SignOpen): 
           venue: market.venue,
           rungsBps: plan.rungs,
           amount: plan.amount,
-          rentReserve: plan.reserve.total,
+          // The rent of accounts that already exist stays in the wallet; read just above, at the moment of the
+          // order (an account read as missing is funded as before).
+          rentReserve: trimReserve(plan.reserve, { userTokenAccount: !!ataInfo, accumulator: !!accInfo }).total,
           feeBudget: plan.budget.total,
           expectedTokensSeen: plan.quote.expectedTokensSeen,
           rawTokensSeen: plan.quote.rawTokensSeen,

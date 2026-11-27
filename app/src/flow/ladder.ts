@@ -176,9 +176,13 @@ export async function runOrder(run: Running, onEvent: (e: LadderEvent) => void):
     };
   }
   const refunded = result ? !!result.refunded : !orderNow;
+  // Still open with our key: the refund did not land (seen on devnet, Nov 27, while the public RPC refused
+  // requests). The key is the only thing that can end the order before it expires, and it needs its lamports for
+  // that fee: it is neither emptied nor forgotten, and the next start of the app tries the refund again.
+  const stillOpen = !filled && ours?.status === "Open";
 
   // The session key must end empty; runLadder sweeps, but not when it broke off.
-  if (!result || result.sessionBalanceAfter > txFeeLamports()) {
+  if (!stillOpen && (!result || result.sessionBalanceAfter > txFeeLamports())) {
     const swept = await sweep(run.session, user).catch(() => null);
     if (swept) note("unused fees back", swept.signature, swept.fee, "ok");
   }
@@ -240,6 +244,10 @@ export async function runOrder(run: Running, onEvent: (e: LadderEvent) => void):
   // The order is closed (filled or refunded): forget the key. A key that
   // still holds lamports here cannot pay a fee without dropping below the
   // rent-exempt minimum (the sweep failed twice), so keeping it would not help.
+  if (stillOpen) {
+    console.log("RUNG order still open after the refund attempts: session key kept for the next start");
+    return receipt;
+  }
   const left = await connection.getBalance(run.session.publicKey, "confirmed").catch(() => 0);
   if (left > 0) console.log(`RUNG session key left with ${left} lamports`);
   await endSession();

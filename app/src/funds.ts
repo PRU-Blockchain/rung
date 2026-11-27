@@ -26,3 +26,38 @@ export function walletIsShort(connected: boolean, balance: bigint | null, total:
   if (!connected || balance === null || total === null) return false;
   return balance < total + BALANCE_SLACK_LAMPORTS;
 }
+
+/**
+ * Of what leaves the wallet when the order opens, the part that comes back for
+ * sure after a buy: the rent of the accounts opened and closed inside the buy,
+ * the margin, and the fee budget beyond the most the tries, the refund and the
+ * sweep can cost. A buy on an early rung returns more; an order that does not
+ * buy returns the amount too.
+ */
+export function returnsAtLeast(p: {
+  vaultTokenAccount: bigint;
+  vaultWsolAccount: bigint;
+  margin: bigint;
+  feeBudgetTotal: bigint;
+  maxFeeIfNoFill: bigint;
+}): bigint {
+  const back = p.vaultTokenAccount + p.vaultWsolAccount + p.margin + p.feeBudgetTotal - p.maxFeeIfNoFill;
+  return back > 0n ? back : 0n;
+}
+
+/** Lamports as SOL with at most four decimals, trailing zeros dropped. */
+function sol4(lamports: bigint, round: "nearest" | "down"): string {
+  const unit = 100_000n; // 0.0001 SOL
+  const units = round === "down" ? lamports / unit : (lamports + unit / 2n) / unit;
+  const whole = units / 10_000n;
+  const frac = (units % 10_000n).toString().padStart(4, "0").replace(/0+$/, "");
+  return frac ? `${whole}.${frac}` : `${whole}`;
+}
+
+/**
+ * The line above the Buy button: the number the wallet will show, and how much
+ * of it returns. The wallet's number is rounded to four places; what returns is
+ * rounded down, so it is never overstated.
+ */
+export const walletLine = (leaves: bigint, back: bigint): string =>
+  `Wallet shows ${sol4(leaves, "nearest")} SOL · ${sol4(back, "down")} returns`;
