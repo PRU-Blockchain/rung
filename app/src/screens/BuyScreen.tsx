@@ -268,6 +268,7 @@ export function BuyScreen(props: {
 
   // Presentation only from here on.
   const [modeSheet, setModeSheet] = useState(false);
+  const [customOpen, setCustomOpen] = useState(false);
   const [walletSheet, setWalletSheet] = useState(false);
   const addressRef = useRef<TextInput>(null);
   const mintKey = market ? market.mint.toBase58() : null;
@@ -485,46 +486,69 @@ export function BuyScreen(props: {
         {!props.user && <Text style={[s.small, { textAlign: "center" }]}>The button connects your wallet first.</Text>}
       </Footer>
 
-      <Sheet visible={modeSheet} onClose={() => setModeSheet(false)} title="Mode" avoidKeyboard>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: 2 }}>
-          {MODE_OPTIONS.map((o) => {
-            const on = mode === o.mode;
-            return (
-              <Pressable
-                key={o.mode}
-                accessibilityRole="radio"
-                accessibilityState={{ checked: on }}
-                onPress={() => {
-                  touched.current = true;
-                  setMode(o.mode);
-                  if (o.mode !== "custom") setModeSheet(false);
-                }}
-                style={[st.modeRow, on && { backgroundColor: colors.raise }]}
-              >
-                <View style={{ flex: 1, gap: 3 }}>
-                  <Text style={st.modeRowLabel}>{o.label}</Text>
-                  <Text style={s.small}>{MODE_FOR[o.mode]}</Text>
-                  {o.mode === "launch" && young && <Text style={[s.small, { color: colors.text }]}>{SUGGESTED}</Text>}
-                </View>
-                <View style={[st.radio, on && st.radioOn]} />
-              </Pressable>
-            );
-          })}
-          {mode === "custom" && (
-            <View style={{ gap: 8, paddingHorizontal: 12, paddingTop: 6, paddingBottom: 4 }}>
-              <Text style={s.small}>Rungs in percent, increasing; the last one is your cap (at most 30%).</Text>
-              <CustomRungs
-                text={customText}
-                onChange={(t) => {
-                  touched.current = true;
-                  setCustomText(t);
-                }}
-              />
+      <Sheet
+        visible={modeSheet}
+        onClose={() => {
+          setModeSheet(false);
+          setCustomOpen(false);
+        }}
+        title={customOpen ? "Custom" : "Mode"}
+      >
+        {customOpen ? (
+          // Custom has its own page in the sheet: the boxes, the app's keypad and Done. The system keyboard is not used.
+          <View style={{ gap: 10 }}>
+            <Text style={s.small}>Rungs in percent, increasing; the last one is your cap (at most 30%).</Text>
+            <CustomRungs
+              text={customText}
+              onChange={(t) => {
+                touched.current = true;
+                setCustomText(t);
+              }}
+            />
+            <View style={{ minHeight: 20 }}>
               {"error" in custom && <Text style={s.error}>{custom.error}</Text>}
               {"rungs" in custom && custom.rungs[0] >= 2000 && <Text style={s.error}>{WIDE_FIRST_RUNG}</Text>}
             </View>
-          )}
-        </ScrollView>
+            <View style={{ flexDirection: "row", gap: 8 }}>
+              <Button label="All modes" kind="secondary" onPress={() => setCustomOpen(false)} style={{ flex: 1 }} />
+              <Button
+                label="Done"
+                onPress={() => {
+                  setModeSheet(false);
+                  setCustomOpen(false);
+                }}
+                style={{ flex: 1 }}
+              />
+            </View>
+          </View>
+        ) : (
+          <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: 2 }}>
+            {MODE_OPTIONS.map((o) => {
+              const on = mode === o.mode;
+              return (
+                <Pressable
+                  key={o.mode}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: on }}
+                  onPress={() => {
+                    touched.current = true;
+                    setMode(o.mode);
+                    if (o.mode === "custom") setCustomOpen(true);
+                    else setModeSheet(false);
+                  }}
+                  style={[st.modeRow, on && { backgroundColor: colors.raise }]}
+                >
+                  <View style={{ flex: 1, gap: 3 }}>
+                    <Text style={st.modeRowLabel}>{o.label}</Text>
+                    <Text style={s.small}>{MODE_FOR[o.mode]}</Text>
+                    {o.mode === "launch" && young && <Text style={[s.small, { color: colors.text }]}>{SUGGESTED}</Text>}
+                  </View>
+                  <View style={[st.radio, on && st.radioOn]} />
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        )}
       </Sheet>
 
       <Sheet visible={details} onClose={() => setDetails(false)} title="Details">
@@ -644,16 +668,6 @@ const st = StyleSheet.create({
   modeRowLabel: { fontSize: 15, fontWeight: "600", color: colors.text },
   radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: colors.faint },
   radioOn: { borderColor: colors.text, backgroundColor: colors.raise, borderWidth: 6 },
-  customInput: {
-    fontSize: 16,
-    color: colors.text,
-    backgroundColor: colors.bg,
-    borderWidth: 1,
-    borderColor: colors.line,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
   detailFirst: { fontSize: 13, lineHeight: 18, color: colors.text, fontWeight: "500" },
   detail: { fontSize: 13, lineHeight: 18, color: colors.muted },
   walletFull: { fontSize: 13, color: colors.muted, fontFamily: "monospace" },

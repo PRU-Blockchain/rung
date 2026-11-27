@@ -34,3 +34,26 @@ export function cleanBox(typed: string): string {
   }
   return out;
 }
+
+/**
+ * A box's text after one key of the app's keypad (a digit, "." or "del").
+ * A key acts on the end of the text. A box holds a percent: at most two digits
+ * before the point (the cap is 30%), one point, two decimals.
+ */
+export function pressBoxKey(text: string, key: string): string {
+  if (key === "del") return text.slice(0, -1);
+  if (key === ".") return text.includes(".") ? text : `${text === "" ? "0" : text}.`;
+  if (!/^[0-9]$/.test(key)) return text;
+  const [whole, dec] = text.split(".");
+  if (dec !== undefined) return dec.length >= 2 ? text : text + key;
+  if (whole === "0") return key;
+  return whole.length >= 2 ? text : text + key;
+}
+
+/**
+ * The same, for a box that may have just been picked: its first key starts the
+ * box over (a digit or a point replaces what was there, delete empties it), so
+ * picking a filled box and typing gives what was typed.
+ */
+export const pressPickedBox = (text: string, key: string, justPicked: boolean): string =>
+  justPicked ? (key === "del" ? "" : pressBoxKey("", key)) : pressBoxKey(text, key);

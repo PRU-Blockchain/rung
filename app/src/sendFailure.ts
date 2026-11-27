@@ -25,6 +25,8 @@ export function walletProblemText(code: unknown, text: string): string | null {
   }
   // The wallet app did not open its side of the connection: locked, or still starting.
   if (/ConnectionFailedException|Unable to connect to websocket/i.test(text)) return WALLET_UNREACHABLE;
+  // The wallet closed its side of the session before the request reached it (Solflare, Nov 27).
+  if (/Cannot send in CLOSED|socket is closed/i.test(text)) return WALLET_UNREACHABLE;
   // The wallet took the request and never answered: it showed a screen of its own instead.
   if (/TimeoutException|timed out/i.test(text)) return WALLET_SILENT;
   return null;

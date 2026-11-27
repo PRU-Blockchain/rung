@@ -68,3 +68,11 @@ test("an error the wallet step does not explain is left to the caller", () => {
   assert.equal(walletProblemText(undefined, "Network request failed"), null);
   assert.equal(walletProblemText(undefined, "Cannot read property 'x' of undefined"), null);
 });
+
+// Seen on Buğra's phone with Solflare, Nov 27: the wallet closed its side right after authorizing, before the
+// order reached it. The screen showed the adapter's own words ("Cannot send in CLOSED").
+test("a wallet that closes the session before the request is one that could not be reached", () => {
+  assert.equal(walletProblemText("EUNSPECIFIED", "Cannot send in CLOSED"), WALLET_UNREACHABLE);
+  assert.equal(walletProblemText(undefined, "WebSocket is closed"), WALLET_UNREACHABLE);
+});
+
