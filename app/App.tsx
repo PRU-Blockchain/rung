@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, BackHandler, LogBox, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { PublicKey } from "../client/src";
+import { PresetMode, PublicKey } from "../client/src";
 
 import { BuyError, inForeground, openBuy } from "./src/flow/buy";
 import { walletProblemText } from "./src/sendFailure";
@@ -86,10 +86,12 @@ function Main() {
     }
   };
 
-  const retry = (r: Receipt) =>
+  // Retry from the "not bought" screen: the same token and amount, in the mode picked there (Buğra, Nov 27;
+  // before, the only retry was Launch mode). A new order and a new wallet approval.
+  const retry = (r: Receipt, mode: PresetMode) =>
     buy(async () => {
       const market = await loadMarket(new PublicKey(r.mint));
-      return makePlan(market, "launch", rungsForMode("launch"), BigInt(r.amount));
+      return makePlan(market, mode, rungsForMode(mode), BigInt(r.amount));
     });
 
   const go = (next: Screen) => {
@@ -161,7 +163,7 @@ function Main() {
           r={screen.r}
           busy={busy}
           error={error}
-          onRetry={() => retry(screen.r)}
+          onRetry={(mode) => mode !== "custom" && retry(screen.r, mode)}
           onNew={() => go({ name: "buy" })}
           onHistory={() => go({ name: "history", back: screen })}
         />

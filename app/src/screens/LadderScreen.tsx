@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, Vibration, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { LadderEvent, findEvent } from "../../../client/src";
@@ -8,6 +8,7 @@ import { bpsText, sol } from "../flow/format";
 import { Receipt } from "../flow/history";
 import { Running, paidAboveSeenPct, runOrder } from "../flow/ladder";
 import { signedPctText } from "../percent";
+import { vibrationFor } from "./ladderHaptics";
 import { Header, TokenLine, TxLinkText, colors, modeLabel, s } from "./ui";
 
 type RungState =
@@ -77,6 +78,9 @@ export function LadderScreen({ running, onDone }: { running: Running; onDone: (r
     const amount = BigInt(p.amount);
     const seen = BigInt(p.expectedTokensSeen);
     const onEvent = (e: LadderEvent) => {
+      // In the hand: a tick at each try, two pulses at a buy, one longer pulse at a refund.
+      const buzz = vibrationFor(e);
+      if (buzz !== null) Vibration.vibrate(buzz);
       if (e.type === "sent") {
         const label = e.kind === "try" ? `try ${bpsText(p.rungsBps[e.rungIndex ?? 0])}` : e.kind === "refund" ? "refund" : "unused fees back";
         setLinks((l) => [...l, { label, signature: e.signature }]);

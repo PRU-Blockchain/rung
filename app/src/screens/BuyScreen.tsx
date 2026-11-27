@@ -47,7 +47,7 @@ import {
 const PRESETS = ["0.01", "0.05", "0.1", "0.5"];
 
 /** What each mode is for: the README's mode table, as on the site. */
-const MODE_FOR: Record<Mode, string> = {
+export const MODE_FOR: Record<Mode, string> = {
   tight: "established tokens",
   normal: "established tokens, everyday buys",
   fast: "most-traded, fast-moving pools",
