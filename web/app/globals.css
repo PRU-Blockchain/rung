@@ -263,6 +263,8 @@ summary::-webkit-details-marker { display: none; }
 .src a span { color: var(--muted); }
 .links-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 14.5px; }
 .links-list a { overflow-wrap: anywhere; }
+.block .build-contact { margin-top: 18px; font-size: 17px; }
+.build-contact a { font-weight: 600; }
 
 .foot .wrap { padding-block: 36px 56px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--muted); }
 .foot p { margin: 0; }

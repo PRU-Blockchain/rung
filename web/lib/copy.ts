@@ -127,6 +127,12 @@ export const COPY = {
     { label: "Mainnet runs", anchor: "mainnet-runs" },
   ],
 
+  // --- 5b. For other products: the ladder as a part to build in (Buğra, Nov 27) ----
+  buildHeading: "Build Rung into your app",
+  buildText:
+    "Wallets, Telegram bots and trading terminals can give their users the same ladder without writing an on-chain program of their own. The program is live on mainnet, the code is open, and the TypeScript client in the repository builds every instruction.",
+  buildContact: "Want it in your product? Write to us on X:",
+
   // --- 6. Counter -------------------------------------------------------------
   // The counter and the list of buys are evidence for whoever wants to check, not something a buyer needs
   // to read: they sit in one section that opens (Buğra, Nov 27).
@@ -183,6 +189,7 @@ export const COPY = {
   footerLicense: "License:",
   footerRepo: "Repository",
   footerProgram: "Program",
+  footerContact: "Contact:",
   footerSeeker: "Seeker image:",
   footerPressKit: "Solana Mobile press kit",
 } as const;

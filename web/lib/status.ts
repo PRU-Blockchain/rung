@@ -24,6 +24,8 @@ export const STATUS = {
   videoUrl: null as string | null,
   repoUrl: "https://github.com/PRU-Blockchain/rung",
   license: "MIT",
+  /** Where to reach the team: Buğra's X account (Nov 27; there is no project account yet). */
+  contact: { handle: "@yavascan", url: "https://x.com/yavascan" },
 } as const;
 
 /** Explorer link for a transaction or an address on the configured cluster. */

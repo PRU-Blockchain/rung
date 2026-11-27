@@ -284,6 +284,19 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="block" id="build" aria-labelledby="build-h">
+          <div className="wrap">
+            <h2 id="build-h">{COPY.buildHeading}</h2>
+            <p>{COPY.buildText}</p>
+            <p className="build-contact">
+              {COPY.buildContact}{" "}
+              <a href={STATUS.contact.url} rel="noopener noreferrer">
+                {STATUS.contact.handle}
+              </a>
+            </p>
+          </div>
+        </section>
+
         <section className="block" id="tech" aria-label={COPY.techHeading}>
           <div className="wrap">
             <details className="fold tech">
@@ -316,6 +329,12 @@ export default function Home() {
             {COPY.footerProgram} ({STATUS.network}):{" "}
             <a className="mono" href={explorerAddress(STATUS.programId)} rel="noopener noreferrer">
               {STATUS.programId}
+            </a>
+          </p>
+          <p>
+            {COPY.footerContact}{" "}
+            <a href={STATUS.contact.url} rel="noopener noreferrer">
+              {STATUS.contact.handle}
             </a>
           </p>
           <p>
