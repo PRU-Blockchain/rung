@@ -10,8 +10,7 @@ import { LIFETIME_WHEN_APP_SENDS, LIFETIME_WHEN_WALLET_SENDS } from "../flow/buy
 import { Account, useAuthorization } from "./useAuthorization";
 
 export function useMobileWallet() {
-  const { authorizeSession, deauthorizeSession, clearAuthorization } =
-    useAuthorization();
+  const { authorizeSession, clearAuthorization } = useAuthorization();
 
   const connect = useCallback(
     async (): Promise<Account> =>
@@ -19,14 +18,13 @@ export function useMobileWallet() {
     [authorizeSession]
   );
 
+  // Disconnect forgets the wallet here, at once, without opening it. It used to open the wallet to withdraw the
+  // authorization first: Android then asked which wallet app to open, a wrong pick left the buyer inside that
+  // wallet, and until the wallet answered Rung stayed connected (seen on the emulator, Nov 27). The wallet's own
+  // record of the authorization stays until it expires or is removed there; it gives Rung nothing by itself.
   const disconnect = useCallback(async (): Promise<void> => {
-    try {
-      await transact((wallet) => deauthorizeSession(wallet));
-    } finally {
-      // Forget the local authorization even if the wallet could not be reached.
-      await clearAuthorization();
-    }
-  }, [deauthorizeSession, clearAuthorization]);
+    await clearAuthorization();
+  }, [clearAuthorization]);
 
   /**
    * One wallet window for a buy: authorize (silent with a valid cached token)

@@ -84,6 +84,8 @@ export function NotBoughtScreen(props: {
           <Text style={st.big}>{h.big}</Text>
           {h.after && <Text style={st.reason}>{h.after}</Text>}
         </View>
+        {/* "Open the links below to check": when the refund was not seen, the links stay on the screen itself. */}
+        {!refunded && <TxLinks r={r} />}
 
         {/* One card per rung: tried and missed in red, not tried in grey. */}
         <View style={st.mini}>

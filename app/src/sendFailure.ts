@@ -18,7 +18,11 @@ export const WALLET_SILENT = "The wallet did not answer in time. Nothing was sen
 export function walletProblemText(code: unknown, text: string): string | null {
   if (code === -3 || /declin|not signed|reject/i.test(text)) return "The wallet did not approve the buy. Nothing was sent.";
   if (/CancellationException|cancel/i.test(text)) return "The wallet closed before approving. Nothing was sent.";
-  if (/WRONG_ACCOUNT/.test(text)) return "The wallet approved with a different account. Nothing was sent.";
+  // Connected with one wallet, approved in another: say how to switch (Nov 27; the old sentence stopped at
+  // "approved with a different account").
+  if (/WRONG_ACCOUNT/.test(text)) {
+    return "That wallet holds a different account than the one connected here. Nothing was sent. To use it, tap your address at the top and disconnect first.";
+  }
   // The wallet app did not open its side of the connection: locked, or still starting.
   if (/ConnectionFailedException|Unable to connect to websocket/i.test(text)) return WALLET_UNREACHABLE;
   // The wallet took the request and never answered: it showed a screen of its own instead.

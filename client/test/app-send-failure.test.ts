@@ -53,7 +53,15 @@ test("the answers the app already worded keep their words", () => {
     walletProblemText(undefined, "java.util.concurrent.CancellationException: request cancelled"),
     "The wallet closed before approving. Nothing was sent.",
   );
-  assert.equal(walletProblemText(undefined, "WRONG_ACCOUNT"), "The wallet approved with a different account. Nothing was sent.");
+});
+
+// Seen on the emulator, Nov 27: connected with one wallet, the buyer picks another wallet app at the approval. The
+// old sentence ("approved with a different account") did not say what to do next.
+test("another wallet than the connected one: the message says how to switch", () => {
+  assert.equal(
+    walletProblemText(undefined, "WRONG_ACCOUNT"),
+    "That wallet holds a different account than the one connected here. Nothing was sent. To use it, tap your address at the top and disconnect first.",
+  );
 });
 
 test("an error the wallet step does not explain is left to the caller", () => {

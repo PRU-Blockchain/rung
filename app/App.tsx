@@ -7,14 +7,16 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, BackHandler, LogBox, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { PresetMode, PublicKey } from "../client/src";
+import { PresetMode, PublicKey, orderPda } from "../client/src";
 
 import { BuyError, inForeground, openBuy } from "./src/flow/buy";
 import { walletProblemText } from "./src/sendFailure";
 import { Receipt } from "./src/flow/history";
 import { Running, findUnfinished } from "./src/flow/ladder";
 import { loadMarket } from "./src/flow/market";
-import { Plan, makePlan, rungsForMode } from "./src/flow/plan";
+import { connection } from "./src/flow/connection";
+import { walletIsShort } from "./src/funds";
+import { Plan, leavesWallet, makePlan, rungsForMode } from "./src/flow/plan";
 import { BuyScreen } from "./src/screens/BuyScreen";
 import { HistoryScreen } from "./src/screens/HistoryScreen";
 import { LadderScreen } from "./src/screens/LadderScreen";
@@ -69,6 +71,7 @@ function Main() {
       // the background); the wallet then opens once, to authorize and sign.
       // Without any cached account the first buy connects first.
       let user: PublicKey;
+      const justConnected = !selectedAccount;
       if (selectedAccount) user = selectedAccount.publicKey;
       else {
         user = (await connect()).publicKey;
@@ -77,6 +80,15 @@ function Main() {
         await inForeground();
       }
       const plan = await getPlan();
+      // A wallet connected by this very press has not had its balance looked at yet (the buy screen checks only
+      // a wallet it already knows): look now, so the wallet is not opened a second time for an order that
+      // cannot be paid.
+      if (justConnected) {
+        const [balance, order] = await Promise.all([connection.getBalance(user), connection.getAccountInfo(orderPda(user))]);
+        if (walletIsShort(true, BigInt(balance), leavesWallet(plan, order !== null).total)) {
+          throw new BuyError("Not enough SOL in the wallet for this buy.");
+        }
+      }
       const opened = await openBuy(plan, user, signOpen);
       setScreen({ name: "ladder", running: opened });
     } catch (e) {
