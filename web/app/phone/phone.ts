@@ -290,14 +290,16 @@ function template(): string {
     BRAND +
     "</div>" +
     '<div class="scroll">' +
-    '<div class="nb-head"><span class="nb-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span>' +
-    '<div class="lad-token"><div class="avatar sm" aria-hidden="true">TH</div><div class="token-main"><span class="tname">The Black sheep · Sheep</span><span class="addr small">5Z7j...pump</span></div></div>' +
+    // The app's screen since Nov 27 (no cap line here: the app draws it from the price it reads after the last
+    // try, and for this order, sent with the script, that price was not recorded).
+    '<div class="nb-head">' +
+    '<div class="lad-token"><div class="avatar sm" aria-hidden="true">TH</div><div class="token-main"><span class="tname">The Black sheep · Sheep</span><span class="addr small">5Z7j...pump</span><span class="sub">0.01 SOL · Tight 1% → 2% → 3%</span></div></div>' +
     '<p class="nb-title"><span class="nb-a">Price went above your cap.</span> <span class="nb-b">Not bought. Your SOL is back.</span></p></div>' +
     '<div class="mini" aria-hidden="true"><div><i></i>try 1%</div><div><i></i>try 2%</div><div><i></i>try 3%</div></div>' +
-    '<p class="nb-p">Fees: 0.00003325 SOL.</p>' +
-    '<div class="links" data-r="nb-links"></div>' +
+    '<dl class="rows"><div><dt>Back in your wallet</dt><dd>0.01 SOL</dd></div><div><dt>Fees</dt><dd>0.00003325 SOL</dd></div></dl>' +
+    '<button type="button" class="link-btn" data-r="nb-details">Details</button>' +
     "</div>" +
-    '<div class="footer"><button type="button" class="primary" data-act="retry"><span class="p1">Retry with Launch mode</span></button><div class="row2"><button type="button" class="secondary" data-act="new">New buy</button><button type="button" class="secondary" data-act="history">History</button></div></div>' +
+    '<div class="footer"><button type="button" class="primary" data-act="retry"><span class="p1">Retry</span></button><div class="row2"><button type="button" class="secondary" data-act="new">New buy</button><button type="button" class="secondary" data-act="history">History</button></div></div>' +
     "</section>" +
     // History
     '<section class="screen" data-screen="history" aria-label="History" hidden>' +
@@ -310,6 +312,8 @@ function template(): string {
     '<section class="sheet" data-r="sheet-mode" role="dialog" aria-modal="true" aria-label="Mode" hidden><div class="grab"></div><h3>Mode</h3><div data-r="mode-list" role="radiogroup" aria-label="Mode"></div>' +
     '<div class="custom-box" data-r="custom-box" hidden><p>Rungs in percent, increasing; the last one is your cap (at most 30%).</p><input data-r="custom-input" type="text" inputmode="decimal" aria-label="Custom" autocomplete="off"><p class="err" data-r="custom-err" hidden></p></div></section>' +
     '<section class="sheet" data-r="sheet-details" role="dialog" aria-modal="true" aria-label="Details" hidden><div class="grab"></div><h3>Details</h3><ul class="dlist" data-r="dlist"></ul></section>' +
+    '<section class="sheet" data-r="sheet-nb" role="dialog" aria-modal="true" aria-label="Details" hidden><div class="grab"></div><h3>Details</h3><div class="links" data-r="nb-links"></div></section>' +
+    '<section class="sheet" data-r="sheet-retry" role="dialog" aria-modal="true" aria-label="Retry with" hidden><div class="grab"></div><h3>Retry with</h3><p class="retry-note">Same token, same amount: 0.01 SOL. Your wallet asks once.</p><div data-r="retry-list"></div></section>' +
     '<section class="sheet" data-r="sheet-wallet" role="dialog" aria-modal="true" aria-label="Waiting for your wallet…" hidden><div class="grab"></div><div class="wait"><span class="spinner" aria-hidden="true"></span><h3>Waiting for your wallet…</h3></div></section>' +
     '<div class="gbar" aria-hidden="true"><i></i></div>' +
     "</div>"
@@ -888,6 +892,16 @@ export function mountPhone(root: HTMLElement, opts: { scenario?: ScenarioKey } =
     if (!t || !t.closest || (!t.closest('[data-r="pop"]') && !t.closest('[data-r="wallet"]'))) closePop();
   }
   document.addEventListener("click", onDocumentClick);
+  q("nb-details").addEventListener("click", (e) => openSheet("sheet-nb", e.currentTarget as HTMLElement));
+  q("retry-list").addEventListener("click", (e) => {
+    const row = (e.target as HTMLElement).closest<HTMLElement>(".mode-row");
+    if (!row) return;
+    // No recorded retry: the buy screen with the picked mode; the real app opens the wallet here.
+    closeSheets(false);
+    st.loaded = true;
+    st.mode = row.dataset.mode as ModeId;
+    show("buy");
+  });
   q("rc-details").addEventListener("click", (e) => {
     const d = q("rc-deposits");
     d.hidden = !d.hidden;
@@ -900,10 +914,22 @@ export function mountPhone(root: HTMLElement, opts: { scenario?: ScenarioKey } =
       else if (a === "history") show("history");
       else if (a === "back") show(st.prev || "buy");
       else if (a === "retry") {
-        // No recorded retry: back to the buy screen with Launch selected; the real app opens the wallet here.
-        st.loaded = true;
-        st.mode = "launch";
-        show("buy");
+        // As in the app: Retry asks for a mode. The four ladders; the one just tried says so.
+        const box = q("retry-list");
+        box.innerHTML = "";
+        for (const m of MODES) {
+          if (m.id === "custom") continue;
+          const row = document.createElement("button");
+          row.type = "button";
+          row.className = "mode-row";
+          row.dataset.mode = m.id;
+          row.innerHTML = '<span class="mr-label"></span><span class="mr-for"></span><span class="mr-tried"></span>';
+          row.querySelector(".mr-label")!.textContent = m.label;
+          row.querySelector(".mr-for")!.textContent = m.forText;
+          if (m.id === SCENARIOS.nobuy.mode) row.querySelector(".mr-tried")!.textContent = "just tried";
+          box.appendChild(row);
+        }
+        openSheet("sheet-retry", b);
       }
     });
   });
