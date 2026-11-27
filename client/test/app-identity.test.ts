@@ -31,6 +31,19 @@ test("every certificate fingerprint is a SHA-256 in the colon form wallets compa
   for (const p of prints) assert.match(p, /^([0-9A-F]{2}:){31}[0-9A-F]{2}$/);
 });
 
+// The first builds were signed with the debug key that ships with every React
+// Native project: its certificate is public, so anyone can sign an app with it.
+// While the site listed it, any such app using Rung's package name would have
+// passed the wallets' check. Since Nov 27, 2026 Rung has its own release key.
+const PUBLIC_DEBUG_CERTIFICATE = "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C";
+const RUNG_RELEASE_CERTIFICATE = "54:E1:1F:93:2C:65:CB:5C:2A:1E:29:03:05:2C:85:FE:24:B0:8F:D1:A6:F7:2F:26:A0:7E:40:2E:6C:C0:40:E6";
+
+test("the site vouches for Rung's own release certificate and not for the public debug one", () => {
+  const prints = links()[0].target.sha256_cert_fingerprints;
+  assert.deepEqual(prints, [RUNG_RELEASE_CERTIFICATE]);
+  assert.equal(prints.includes(PUBLIC_DEBUG_CERTIFICATE), false);
+});
+
 test("the document is answered by a route that sets the bare content type itself", () => {
   // The wallets' verifier (solana-mobile/digital-asset-links-android, URISourceVerifier)
   // compares the Content-Type header with the bare string "application/json".
