@@ -37,11 +37,25 @@ function barStyle(b: (typeof BARS)[number]): CSSProperties {
 // The phone keeps a real phone's proportions in every window: when the height is short, the whole phone scales down
 // together (--pz). The measure is the Buy button: 777 px below the top of the frame at design size (the frame is
 // 818 px), so the button stays on the first screen and the bottom of the frame may run a little past the fold; on a
-// laptop the phone is larger that way (Buğra, Nov 26). On phone screens (600 px and below) the app fills the screen
-// and the scale stays 1. The same function runs inline before the first paint (FIT_PHONE in app/page.tsx).
+// laptop the phone is larger that way (Buğra, Nov 26). On phone screens (600 px and below) the app fills the width
+// when the screen is tall enough for it; on a shorter screen (most phone browsers with their bars showing) the
+// phone scales down as a whole, so the keypad and the Buy button stay on the first screen (Nov 27). The measure
+// there is 624 px: the phone's smallest height (610 px of app, see globals.css, plus its frame). The height used
+// is the small viewport (100svh), which does not change while the browser's bars slide away.
+// The same function runs inline before the first paint (FIT_PHONE in app/page.tsx).
 function fitPhone(): void {
   let s = 1;
-  if (!window.matchMedia("(max-width: 600px)").matches) {
+  if (window.matchMedia("(max-width: 600px)").matches) {
+    const col = document.querySelector<HTMLElement>(".phone-col");
+    if (col && document.body) {
+      const probe = document.createElement("div");
+      probe.style.cssText = "position:fixed;top:0;left:0;width:0;height:100svh;visibility:hidden;pointer-events:none";
+      document.body.appendChild(probe);
+      const h = probe.offsetHeight || window.innerHeight;
+      probe.remove();
+      s = Math.max(0.6, Math.min(1, (h - (col.getBoundingClientRect().top + window.scrollY) - 6) / 624));
+    }
+  } else {
     const wrap = document.querySelector<HTMLElement>(".hero .wrap");
     if (wrap) {
       const top = wrap.getBoundingClientRect().top + window.scrollY + parseFloat(getComputedStyle(wrap).paddingTop);
@@ -53,10 +67,16 @@ function fitPhone(): void {
 
 export default function PhoneStage({
   label,
+  demo,
+  tryApp,
   chips,
   notes,
 }: {
   label: string;
+  /** The word on the phone's frame that says this is not the app itself. */
+  demo: string;
+  /** The way to the app, under the phone: the APK once there is one, until then the "How to try" section. */
+  tryApp: { label: string; href: string };
   chips: Record<ScenarioKey, string>;
   notes: Record<ScenarioKey, string>;
 }) {
@@ -171,7 +191,10 @@ export default function PhoneStage({
       <video className="seeker-back" ref={videoRef} muted playsInline preload="auto" aria-hidden="true" width={1280} height={720}>
         <source src="/site/seeker-in.mp4" type="video/mp4" />
       </video>
-      <div className="device seeker" ref={phoneRef} />
+      <div className="device-box">
+        <span className="demo-tag">{demo}</span>
+        <div className="device seeker" ref={phoneRef} />
+      </div>
       <div className="replay">
         <div className="chips" role="group" aria-label={label}>
           {ORDER.map((k) => (
@@ -181,6 +204,9 @@ export default function PhoneStage({
           ))}
         </div>
         <p>{notes[scen]}</p>
+        <a className="btn primary try-app" href={tryApp.href}>
+          {tryApp.label}
+        </a>
       </div>
     </div>
   );

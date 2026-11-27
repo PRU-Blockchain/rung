@@ -43,6 +43,10 @@ export const COPY = {
 
   // --- 2. The phone on the first screen: a replay of real orders -------------
   replayLabel: "Replay",
+  // On the phone's frame, so nobody takes the replay for the app itself; and the way to the app, under it
+  // (Buğra, Nov 27).
+  demoLabel: "Demo",
+  tryRealApp: "Try real app",
   replayNotes: {
     app: "Replay of a real mainnet buy from the Android app, Nov 24, 2026: CATE, Tight, 0.01 SOL. Tap Buy once; every step links to its transaction.",
     climb:
@@ -124,6 +128,9 @@ export const COPY = {
   ],
 
   // --- 6. Counter -------------------------------------------------------------
+  // The counter and the list of buys are evidence for whoever wants to check, not something a buyer needs
+  // to read: they sit in one section that opens (Buğra, Nov 27).
+  techHeading: "Technical details",
   counterHeading: "Counter",
   counterLoading: "Reading the program's transactions…",
   counterNote:
@@ -142,7 +149,8 @@ export const COPY = {
     opened: "orders opened",
     openedOnPools: "of which on pools",
     filled: "bought",
-    notBought: "not bought (SOL refunded: expired or gave up)",
+    // An order that ends without a buy is the cap doing its job, not a failed buy (Buğra, Nov 27).
+    notBought: "stopped at the cap: not bought, SOL returned",
     cancelled: "cancelled by the user",
     open: "no outcome yet in this window",
     avgRung: "average rung used, bought orders",
@@ -165,6 +173,8 @@ export const COPY = {
   recentHeader: ["time (UTC)", "result", "transaction"],
   notBought: "not bought",
   boughtOn: (rung: number, slippage: string) => `bought on rung ${rung} (${slippage})`,
+  /** Added to a row whose rung belongs to none of the four modes. */
+  customRungs: "custom rungs",
   explorer: "explorer",
   explorerAll: "All transactions on Solana Explorer",
 

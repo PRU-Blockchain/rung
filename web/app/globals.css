@@ -181,7 +181,15 @@ a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px soli
 .sol-field.pulse i { opacity: calc(var(--o) * 2.2); filter: brightness(1.25); }
 .sol-field.good i { opacity: calc(var(--o) * 2.2); filter: hue-rotate(40deg) brightness(1.2); }
 @keyframes sol-drift { from { transform: translateY(18px) skewX(-28deg); } to { transform: translateY(-30px) skewX(-28deg); } }
+/* The phone and the word on its frame: "Demo", so the replay is not taken for the app itself. */
+.device-box { position: relative; max-width: 100%; }
+.demo-tag {
+  position: absolute; z-index: 4; top: -13px; right: 34px; padding: 4px 12px; border-radius: 999px;
+  background: var(--bg); border: 1px solid var(--accent); color: var(--accent);
+  font-family: var(--f-mono); font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.4;
+}
 .replay { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.replay .try-app { align-self: center; margin-top: 6px; min-width: 200px; justify-content: center; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .chips button { font: inherit; font-size: 13px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; }
 .chips button:hover { color: var(--fg); }
@@ -229,6 +237,13 @@ summary::-webkit-details-marker { display: none; }
 .fold[open] > summary::after, .gets details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 .fold > summary:hover::after, .gets summary:hover::after { border-color: var(--fg); }
 .fold-body { padding: 0 0 24px; }
+/* "Technical details": the counter and the list of buys, for whoever wants to check. One section that opens. */
+#tech .wrap { padding-block: 28px 40px; }
+.fold.tech { margin-top: 0; }
+.fold.tech > summary { font-size: clamp(20px, 2.2vw, 24px); padding-block: 20px; }
+.fold.tech > .fold-body { padding-top: 6px; }
+.block .fold-body .tech-h { margin: 8px 0 18px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 19px; }
+.fold.tech .fold { margin-top: 22px; }
 .block .fold-body h3 { margin-top: 24px; font-size: 16px; }
 
 .gets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: start; }
@@ -275,8 +290,14 @@ summary::-webkit-details-marker { display: none; }
     letter-spacing: -0.012em; text-wrap: balance; color: var(--fg);
   }
   .hero-mini span { color: var(--muted); }
-  .phone-col { padding-top: 16px; }
-  .device.seeker { height: clamp(560px, calc(100svh - 148px), 760px); padding: 7px; border-radius: 42px; }
+  /* The big title would repeat the small one a screen later: kept for screen readers, not shown. */
+  .hero h1 { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .lead { margin-top: 0; }
+  .device-box { width: 100%; display: flex; justify-content: center; }
+  .demo-tag { right: 28px; }
+  /* When the screen is too short for the app, the whole column scales down (--pz) and narrows with it. */
+  .phone-col { padding-top: 16px; width: calc(100% * var(--pz, 1)); justify-self: center; }
+  .device.seeker { height: clamp(610px, calc(100svh - 148px), 760px); padding: 7px; border-radius: 42px; }
   .device.seeker::before { top: 120px; height: 70px; }
   .device.seeker::after { top: 206px; height: 46px; }
   .device.seeker .app { border-radius: 35px; outline: none; }

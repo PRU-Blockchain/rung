@@ -2,6 +2,7 @@ import { Suspense, type ReactNode } from "react";
 
 import { COPY } from "@/lib/copy";
 import { MAX_SIGNATURES, getCounter, type CounterData } from "@/lib/counter";
+import { isModeRung } from "@/lib/rungs";
 import { STATUS, explorerAddress, explorerTx } from "@/lib/status";
 
 import PhoneStage from "./phone-stage";
@@ -14,7 +15,7 @@ const NETWORK_LABEL = STATUS.network === "mainnet-beta" ? "mainnet" : STATUS.net
 
 // Sets the phone's scale (--pz) right after the first screen is parsed, before the first paint, so the phone does not
 // jump when the page hydrates. The same function as fitPhone in app/phone-stage.tsx, which keeps it up to date.
-const FIT_PHONE = `(function(){function f(){var s=1;if(!matchMedia("(max-width: 600px)").matches){var w=document.querySelector(".hero .wrap");if(w){var t=w.getBoundingClientRect().top+scrollY+parseFloat(getComputedStyle(w).paddingTop);s=Math.max(0.55,Math.min(1,(innerHeight-t-14)/777))}}document.documentElement.style.setProperty("--pz",s.toFixed(3))}f();window.__rungFitPhone=f})();`;
+const FIT_PHONE = `(function(){function f(){var s=1;if(matchMedia("(max-width: 600px)").matches){var c=document.querySelector(".phone-col");if(c&&document.body){var p=document.createElement("div");p.style.cssText="position:fixed;top:0;left:0;width:0;height:100svh;visibility:hidden;pointer-events:none";document.body.appendChild(p);var h=p.offsetHeight||innerHeight;p.remove();s=Math.max(0.6,Math.min(1,(h-(c.getBoundingClientRect().top+scrollY)-6)/624))}}else{var w=document.querySelector(".hero .wrap");if(w){var t=w.getBoundingClientRect().top+scrollY+parseFloat(getComputedStyle(w).paddingTop);s=Math.max(0.55,Math.min(1,(innerHeight-t-14)/777))}}document.documentElement.style.setProperty("--pz",s.toFixed(3))}f();window.__rungFitPhone=f})();`;
 
 /** Renders the prompt's `*italic*` markup as <em>. */
 function Rich({ text }: { text: string }) {
@@ -68,8 +69,8 @@ export default function Home() {
           </a>
           <NetworkPill />
           <nav className="nav-links" aria-label="Sections">
-            <a href="#counter">{COPY.counterHeading}</a>
             <a href="#how">{COPY.howHeading}</a>
+            <a href="#tech">{COPY.techHeading}</a>
             <a href={STATUS.repoUrl} rel="noopener noreferrer">
               {COPY.repository}
             </a>
@@ -81,7 +82,8 @@ export default function Home() {
         <section className="hero">
           <div className="wrap">
             {/* Phone screens only: the title, small, above the app, so a first look says what this is. The
-                heading itself is the h1 below the phone; this copy is for the eye only. */}
+                heading itself is the h1 below; on phone screens that one is kept for screen readers only, so
+                the title is not read twice on the way down. */}
             <p className="hero-mini" aria-hidden="true">
               {name} <span>—</span> {claim}
             </p>
@@ -121,6 +123,8 @@ export default function Home() {
 
             <PhoneStage
               label={COPY.replayLabel}
+              demo={COPY.demoLabel}
+              tryApp={{ label: COPY.tryRealApp, href: STATUS.apkUrl ?? "#try" }}
               chips={{ app: COPY.boughtOn(1, "1%"), climb: COPY.boughtOn(2, "2%"), nobuy: COPY.notBought }}
               notes={COPY.replayNotes}
             />
@@ -155,16 +159,6 @@ export default function Home() {
             </div>
           </section>
         )}
-
-        <Suspense
-          fallback={
-            <CounterSection>
-              <p className="small">{COPY.counterLoading}</p>
-            </CounterSection>
-          }
-        >
-          <Live />
-        </Suspense>
 
         <section className="block" id="how" aria-labelledby="how-h">
           <div className="wrap">
@@ -289,6 +283,25 @@ export default function Home() {
             </ul>
           </div>
         </section>
+
+        <section className="block" id="tech" aria-label={COPY.techHeading}>
+          <div className="wrap">
+            <details className="fold tech">
+              <summary>{COPY.techHeading}</summary>
+              <div className="fold-body">
+                <Suspense
+                  fallback={
+                    <CounterSection>
+                      <p className="small">{COPY.counterLoading}</p>
+                    </CounterSection>
+                  }
+                >
+                  <Live />
+                </Suspense>
+              </div>
+            </details>
+          </div>
+        </section>
       </main>
 
       <footer className="foot">
@@ -319,14 +332,12 @@ export default function Home() {
 
 function CounterSection({ children }: { children: ReactNode }) {
   return (
-    <section className="block" id="counter" aria-labelledby="counter-h">
-      <div className="wrap">
-        <h2 id="counter-h">
-          {COPY.counterHeading} <NetworkPill />
-        </h2>
-        {children}
-      </div>
-    </section>
+    <div id="counter">
+      <h3 className="tech-h">
+        {COPY.counterHeading} <NetworkPill />
+      </h3>
+      {children}
+    </div>
   );
 }
 
@@ -347,6 +358,14 @@ async function Live() {
       <CounterBody d={result.data} />
     </CounterSection>
   );
+}
+
+/** "bought on rung 1 (1%)"; a rung that belongs to no mode says so: "(0.01%, custom rungs)". */
+function recentResult(r: CounterData["recent"][number]): string {
+  if (r.outcome !== "bought") return COPY.notBought;
+  const index = r.rungIndex ?? 0;
+  const bps = r.rungBps ?? 0;
+  return COPY.boughtOn(index + 1, isModeRung(index, bps) ? pct(bps) : `${pct(bps)}, ${COPY.customRungs}`);
 }
 
 function CounterBody({ d }: { d: CounterData }) {
@@ -448,7 +467,7 @@ function CounterBody({ d }: { d: CounterData }) {
               {d.recent.slice(0, RECENT_SHOWN).map((r) => (
                 <tr key={r.signature}>
                   <td>{r.time === null ? "–" : utc(r.time * 1000)}</td>
-                  <td>{r.outcome === "bought" ? COPY.boughtOn((r.rungIndex ?? 0) + 1, pct(r.rungBps ?? 0)) : COPY.notBought}</td>
+                  <td>{recentResult(r)}</td>
                   <td>
                     <a className="mono" href={explorerTx(r.signature)} rel="noopener noreferrer">
                       {r.signature.slice(0, 8)}… ({COPY.explorer})
