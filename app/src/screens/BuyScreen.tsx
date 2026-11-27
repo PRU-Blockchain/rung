@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Clipboard from "expo-clipboard";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
@@ -22,6 +23,7 @@ import {
 } from "../flow/plan";
 import { useSolUsd, useTokenInfo } from "../flow/tokenInfo";
 import { pressKey } from "./amountKeys";
+import { BUY_PREFS_KEY, DEFAULT_BUY_PREFS, readBuyPrefs, writeBuyPrefs } from "./buyPrefs";
 import { Keypad } from "./Keypad";
 import { addressInText } from "./pasteAddress";
 import { tokShort, wholeTokens } from "./tokShort";
@@ -73,9 +75,27 @@ export function BuyScreen(props: {
   // "suggested for a token's first two minutes" stayed on after two minutes.
   const [createdAt, setCreatedAt] = useState<number | null>(null);
   const [, setAgeTick] = useState(0);
-  const [mode, setMode] = useState<Mode>("tight");
-  const [customText, setCustomText] = useState("1, 2, 3");
-  const [amountText, setAmountText] = useState("0.01");
+  const [mode, setMode] = useState<Mode>(DEFAULT_BUY_PREFS.mode);
+  const [customText, setCustomText] = useState(DEFAULT_BUY_PREFS.customText);
+  const [amountText, setAmountText] = useState(DEFAULT_BUY_PREFS.amountText);
+  // The screen opens with the amount and the mode of the last buy (Buğra, Nov 27). They are read once; if the
+  // user has already changed something by then, what they chose stays.
+  const touched = useRef(false);
+  useEffect(() => {
+    let live = true;
+    AsyncStorage.getItem(BUY_PREFS_KEY)
+      .then((text) => {
+        if (!live || touched.current || text === null) return;
+        const kept = readBuyPrefs(text);
+        setMode(kept.mode);
+        setCustomText(kept.customText);
+        setAmountText(kept.amountText);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [planError, setPlanError] = useState<string | null>(null);
   const [balance, setBalance] = useState<bigint | null>(null);
@@ -246,6 +266,12 @@ export function BuyScreen(props: {
   const focusTokenBox = async () => {
     if (noToken && (await pasteIfAddress())) addressRef.current?.blur();
   };
+  // Buying keeps this amount and mode for the next time the screen opens.
+  const buy = () => {
+    if (!plan) return;
+    void AsyncStorage.setItem(BUY_PREFS_KEY, writeBuyPrefs({ mode, amountText, customText })).catch(() => {});
+    props.onBuy(plan);
+  };
   const chipLabel = MODE_OPTIONS.find((o) => o.mode === mode)?.label ?? "";
   const launchLabel = MODE_OPTIONS.find((o) => o.mode === "launch")?.label ?? "";
   const customError = mode === "custom" && "error" in custom ? custom.error : null;
@@ -380,7 +406,10 @@ export function BuyScreen(props: {
                   key={p}
                   accessibilityRole="button"
                   accessibilityState={{ selected: on }}
-                  onPress={() => setAmountText(p)}
+                  onPress={() => {
+                    touched.current = true;
+                    setAmountText(p);
+                  }}
                   style={[st.preset, on && st.presetOn]}
                 >
                   <Text style={st.presetText}>{p}</Text>
@@ -389,7 +418,12 @@ export function BuyScreen(props: {
             })}
           </View>
 
-          <Keypad onKey={(k) => setAmountText((t) => pressKey(t, k))} />
+          <Keypad
+            onKey={(k) => {
+              touched.current = true;
+              setAmountText((t) => pressKey(t, k));
+            }}
+          />
         </View>
       </ScrollView>
 
@@ -405,7 +439,7 @@ export function BuyScreen(props: {
         )}
         <Button
           label={noToken ? "Paste" : "Buy once"}
-          onPress={noToken ? () => void paste() : () => plan && props.onBuy(plan)}
+          onPress={noToken ? () => void paste() : buy}
           disabled={noToken ? props.busy : !!reason || props.busy}
         />
         {!props.user && <Text style={[s.small, { textAlign: "center" }]}>The button connects your wallet first.</Text>}
@@ -421,6 +455,7 @@ export function BuyScreen(props: {
                 accessibilityRole="radio"
                 accessibilityState={{ checked: on }}
                 onPress={() => {
+                  touched.current = true;
                   setMode(o.mode);
                   if (o.mode !== "custom") setModeSheet(false);
                 }}
@@ -441,7 +476,10 @@ export function BuyScreen(props: {
               <TextInput
                 style={st.customInput}
                 value={customText}
-                onChangeText={setCustomText}
+                onChangeText={(t) => {
+                  touched.current = true;
+                  setCustomText(t);
+                }}
                 placeholder="1, 2, 3"
                 placeholderTextColor={colors.faint}
                 keyboardType="numbers-and-punctuation"
