@@ -131,6 +131,7 @@ export const COPY = {
   buildHeading: "Build Rung into your app",
   buildText:
     "Wallets, Telegram bots and trading terminals can give their users the same ladder without writing an on-chain program of their own. The program is live on mainnet, the code is open, and the TypeScript client in the repository builds every instruction.",
+  buildKit: "Integration kit: coming soon.",
   buildContact: "Want it in your product? Write to us on X:",
 
   // --- 6. Counter -------------------------------------------------------------
@@ -190,6 +191,7 @@ export const COPY = {
   footerRepo: "Repository",
   footerProgram: "Program",
   footerContact: "Contact:",
+  footerTeam: "Built by",
   footerSeeker: "Seeker image:",
   footerPressKit: "Solana Mobile press kit",
 } as const;

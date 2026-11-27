@@ -15,7 +15,7 @@ export const STATUS = {
   audit: "unaudited, use small amounts", // verbatim
   // The hand-off's line was "Android emulator; not tested on a real device or Seeker"; since Nov 27, 2026 the
   // app has been used on a real phone, so the line says what is true now.
-  devices: "Tried on one Android phone (Android 16) and on the Android emulator; not tested on Seeker",
+  devices: "Tried on an Android 16 phone and on the Android emulator",
   /** The published APK (release v0.1.0, Nov 27, 2026: mainnet build, signed with Rung's release key). */
   apkUrl: "https://github.com/PRU-Blockchain/rung/releases/download/v0.1.0/rung-0.1.0-mainnet.apk" as string | null,
   /**
@@ -28,6 +28,8 @@ export const STATUS = {
   license: "MIT",
   /** Where to reach the team: Buğra's X account (Nov 27; there is no project account yet). */
   contact: { handle: "@yavascan", url: "https://x.com/yavascan" },
+  /** The two people who built Rung, as they write their names (Nov 28, 2026). */
+  team: "Buğra Yavaşcan and Marwa İpek",
 } as const;
 
 /** Explorer link for a transaction or an address on the configured cluster. */

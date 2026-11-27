@@ -288,6 +288,7 @@ export default function Home() {
           <div className="wrap">
             <h2 id="build-h">{COPY.buildHeading}</h2>
             <p>{COPY.buildText}</p>
+            <p>{COPY.buildKit}</p>
             <p className="build-contact">
               {COPY.buildContact}{" "}
               <a href={STATUS.contact.url} rel="noopener noreferrer">
@@ -330,6 +331,9 @@ export default function Home() {
             <a className="mono" href={explorerAddress(STATUS.programId)} rel="noopener noreferrer">
               {STATUS.programId}
             </a>
+          </p>
+          <p>
+            {COPY.footerTeam} {STATUS.team}
           </p>
           <p>
             {COPY.footerContact}{" "}

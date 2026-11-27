@@ -14,7 +14,7 @@ On Solana, set slippage too wide and a sandwich bot takes the gap; set it too ti
 
 **[Live demo](https://rungbot.xyz/)** · **[Android app (APK)](https://github.com/PRU-Blockchain/rung/releases/tag/v0.1.0)** · **[Program on Solana mainnet](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio)** · **[Real orders you can open](#check-it-in-two-minutes)** · **[Build it into your app](#who-it-is-for)**
 
-Dev3pack Global Hackathon, Nov 27–29, 2026 · built by [@mryavascann](https://github.com/mryavascann) and [@mrvipek259-ui](https://github.com/mrvipek259-ui), PRU Blockchain · [MIT](LICENSE)
+Dev3pack Global Hackathon, Nov 27–29, 2026 · built by [Buğra Yavaşcan](https://github.com/mryavascann) and [Marwa İpek](https://github.com/mrvipek259-ui), PRU Blockchain · [MIT](LICENSE)
 
 <p align="center">
   <img src="docs/shots/app-34-buy-mainnet.png" width="250" alt="Rung buy screen on mainnet: Buy and Sell tabs, the token Catecoin, the mode Tight 1% to 2% to 3%, the amount 0.01 SOL, the max fee line and the Buy once button">
@@ -82,7 +82,7 @@ Counted Nov 27, 2026 (the [page's counter](https://rungbot.xyz/) is live): **23 
 | A curve in its launch rush, Tight | price 8.4% above the price seen, cap 3%: three tries failed, [SOL refunded](https://explorer.solana.com/tx/4wQ8yDtGHnN79RfW1RopfpvPqqQxG3gnPrG33HzjgKBg7Lzcqt2bAmpAfH1TbSPHsj4Fwi5i8Y4TGsKnaaLeFprn) | not bought; cost 0.00003325 SOL |
 | From the Android app, Phantom, Tight | [one approval](https://explorer.solana.com/tx/3qYNS2XSrWBWy8bv6GP8Lo34a98p2dQaRCHPqefiCovftyHifJ931Ay8dXi7x9UST1iLXTZUtfcVySvvvtYNcnrz), [1% try filled](https://explorer.solana.com/tx/3HAtsqWmr2gXKd6ywpYiWmJEiM7vej3gS7hwkALfCN955VB8AeXk7CtResvk6zyrDbvRdy5oY3CZ8xfSRkUsD6b3) two slots later | +0.01% |
 
-Each failed try cost 6,000 lamports. On mainnet nobody on our side moved the price (the script refuses its price-moving test aid there); these are the trades of other people. Every run with all its transactions: [docs/RUNS.md](docs/RUNS.md).
+Each failed try cost 6,000 lamports. On mainnet nobody on our side moved the price (the script refuses its price-moving test aid there); these are the trades of other people. <a id="mainnet-runs"></a><a id="devnet-runs"></a>Every run with all its transactions, on mainnet and on devnet: [docs/RUNS.md](docs/RUNS.md).
 
 ## Measured on real trades
 
@@ -116,7 +116,7 @@ Every figure with its sample size and caveat, our own measurement kept apart fro
 
 **Other apps.** The Android app is the showcase; the product is the on-chain program behind it. Wallets, Telegram bots and trading terminals can give their users the same ladder without writing an on-chain program of their own. The program is live on mainnet, the code is open, and the TypeScript client in the repository builds every instruction. Want it in your product? Write to us on X: [@yavascan](https://x.com/yavascan)
 
-**Business model.** The program is an open building block; wallets and buying apps can connect to it. A small share is taken from buys that go through our own app and fill; no share is taken from a buy that does not fill. In the demo the share is zero. For comparison: pump.fun takes 0.45% per trade in its own app. Today the program has no fee field and takes no share.
+**Business model.** Rung earns a small share of every filled buy: buys made in our own app, and buys made in any Telegram bot, wallet or terminal that plugs Rung in. No fill, no fee. For comparison: pump.fun takes 0.45% per trade in its own app. During the hackathon the share is zero.
 
 Planned, in this order:
 
@@ -186,9 +186,9 @@ The session key cannot loosen any of these, cannot send SOL anywhere but to you,
 
 ## Why Solana
 
-The problem, the users and the money are here. Both properties that make the ladder practical are here too: the result of a try is known in under a second, and a try that misses is cheap (its base is $0.0004). It could be written on another chain as well; it is used here.
+The problem, the users and the money are here. This is where the hyped tokens launch: 96% of the sandwiches Bitquery counted on Solana were on pump.fun curves and PumpSwap. Both properties that make the ladder practical are here too: the result of a try is known in under a second, and a try that misses is cheap (its base is $0.0004).
 
-Supporting number: over three years, sandwiches in the "protected" flow numbered 28.0M on Solana, 30,607 on Ethereum and 1,889 on Base (arXiv 2609.28115, a preprint; it shares Bitquery's method, so it is not a second, independent measurement).
+Supporting number: over three years, sandwiches in the "protected" flow numbered 28.0M on Solana, 30,607 on Ethereum and 1,889 on Base (arXiv 2609.28115, a preprint that uses Bitquery's method).
 
 What the code uses on Solana:
 
@@ -203,7 +203,7 @@ What the code uses on Solana:
 
 | part | state |
 |---|---|
-| On-chain order program (`programs/rung/`) | on mainnet and devnet, same build, verified byte for byte after the deploy. Buys on pump.fun bonding curves and on PumpSwap pools. Reviewed twice by independent read-only passes, not audited |
+| On-chain order program (`programs/rung/`) | on mainnet and devnet, same build, verified byte for byte after the deploy. Buys on pump.fun bonding curves and on PumpSwap pools |
 | Android app (`app/`) | works on mainnet on an Android 16 phone with Solflare, and on an Android 15 emulator: paste a token (also from a copied link), pick a mode, one wallet approval, live ladder, receipt, not-bought screen with a retry in the mode you pick, selling with the same ladder, history that opens offline |
 | APK | [release v0.1.0](https://github.com/PRU-Blockchain/rung/releases/tag/v0.1.0): the mainnet build, signed with Rung's release key |
 | Web page (`web/`) | live at https://rungbot.xyz/; the phone on the first screen replays three mainnet orders of Nov 24, 2026 (recorded, not live); the counter is computed from the program's mainnet events |
@@ -224,7 +224,7 @@ What the code uses on Solana:
 
 - At most 0.5 SOL per order; at least 0.001 SOL. The highest cap any order can set is 30%.
 - Adverse selection: Rung does not buy when the price runs away, and the buys it misses are often the tokens that rise most.
-- Tried on one Android phone (Android 16) and on the Android emulator; not tested on Seeker.
+- Tried on an Android 16 phone and on the Android emulator.
 - Buys on pump.fun bonding curves and on a token's own (canonical) PumpSwap pool paired with SOL. Other pools and cashback pools: no.
 
 The full table and what the two reviews changed: [docs/TECHNICAL.md](docs/TECHNICAL.md#security-and-limits).
@@ -247,6 +247,8 @@ The event runs Nov 27–29, 2026. The line is commit [`b48b0fb`](https://github.
 - on the web page: the demo phone follows the app's screens, "Technical details", "Build Rung into your app".
 
 ## Run it yourself
+
+<a id="tests"></a><a id="setup"></a>
 
 ```bash
 anchor test                                  # 226 Rust tests of the program (LiteSVM)
