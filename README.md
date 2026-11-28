@@ -12,9 +12,11 @@ On Solana, set slippage too wide and a sandwich bot takes the gap; set it too ti
 
 **What it is.** An open on-chain order program, live on Solana mainnet, and an Android app built on it. Your wallet signs one order; the SOL waits in a vault that only the program can move; a one-time key sends the tries; the program allows one buy and sends the SOL back if nothing fills.
 
-**[Live demo](https://rungbot.xyz/)** · **[Android app (APK)](https://github.com/PRU-Blockchain/rung/releases/tag/v0.1.0)** · **[Program on Solana mainnet](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio)** · **[Real orders you can open](#check-it-in-two-minutes)** · **[Build it into your app](#who-it-is-for)**
+**[Demo video (2:24)](https://youtu.be/H-a8bBl0X3Y)** · **[Live demo](https://rungbot.xyz/)** · **[Android app (APK)](https://github.com/PRU-Blockchain/rung/releases/tag/v0.1.0)** · **[Program on Solana mainnet](https://explorer.solana.com/address/Ej2bWTwgPULuni3RVS7Krg1cNYrm5Em5WqfMcUVJUhio)** · **[Real orders you can open](#check-it-in-two-minutes)** · **[Build it into your app](#who-it-is-for)**
 
 Dev3pack Global Hackathon, Nov 27–29, 2026 · built by [Buğra Yavaşcan](https://github.com/mryavascann) and [Marwa İpek](https://github.com/mrvipek259-ui), PRU Blockchain · [MIT](LICENSE)
+
+<p align="center"><a href="https://youtu.be/H-a8bBl0X3Y"><img src="docs/shots/video-cover.png" width="640" alt="Rung demo video on YouTube, 2 minutes 24 seconds"></a><br><a href="https://youtu.be/H-a8bBl0X3Y">▶ Watch the video (2:24)</a></p>
 
 <p align="center">
   <img src="docs/shots/app-34-buy-mainnet.png" width="250" alt="Rung buy screen on mainnet: Buy and Sell tabs, the token Catecoin, the mode Tight 1% to 2% to 3%, the amount 0.01 SOL, the max fee line and the Buy once button">
@@ -206,6 +208,7 @@ What the code uses on Solana:
 | On-chain order program (`programs/rung/`) | on mainnet and devnet, same build, verified byte for byte after the deploy. Buys on pump.fun bonding curves and on PumpSwap pools |
 | Android app (`app/`) | works on mainnet on an Android 16 phone with Solflare, and on an Android 15 emulator: paste a token (also from a copied link), pick a mode, one wallet approval, live ladder, receipt, not-bought screen with a retry in the mode you pick, selling with the same ladder, history that opens offline |
 | APK | [release v0.1.0](https://github.com/PRU-Blockchain/rung/releases/tag/v0.1.0): the mainnet build, signed with Rung's release key |
+| Demo video | [on YouTube](https://youtu.be/H-a8bBl0X3Y), 2 minutes 24 seconds |
 | Web page (`web/`) | live at https://rungbot.xyz/; the phone on the first screen replays three mainnet orders of Nov 24, 2026 (recorded, not live); the counter is computed from the program's mainnet events |
 | TypeScript client (`client/`) and command-line script (`scripts/ladder.ts`) | build every instruction and run the ladder on devnet, on a local fork of mainnet and on mainnet |
 | Tests | 226 Rust tests of the program and 240 client tests; further tests run the program against the real pump.fun and PumpSwap programs dumped from mainnet and on a local fork of mainnet |

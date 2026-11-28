@@ -19,11 +19,13 @@ export const STATUS = {
   /** The published APK (release v0.1.0, Nov 27, 2026: mainnet build, signed with Rung's release key). */
   apkUrl: "https://github.com/PRU-Blockchain/rung/releases/download/v0.1.0/rung-0.1.0-mainnet.apk" as string | null,
   /**
-   * `null` until the demo video is published (README: "Demo video: not yet").
-   * Once set, the first screen shows "Watch the video" and the page embeds it:
+   * The demo video (2:24, published on YouTube on Nov 28, 2026; the README links to
+   * https://youtu.be/H-a8bBl0X3Y). This is the address the page puts in its frame, so it is
+   * YouTube's embed address, on the domain that sets no cookies until the visitor plays it.
+   * While set, the first screen shows "Watch the video" and the page embeds it:
    * a video file (.mp4, .webm) plays in a <video>, anything else in an <iframe>.
    */
-  videoUrl: null as string | null,
+  videoUrl: "https://www.youtube-nocookie.com/embed/H-a8bBl0X3Y" as string | null,
   repoUrl: "https://github.com/PRU-Blockchain/rung",
   license: "MIT",
   /** Where to reach the team: Buğra's X account (Nov 27; there is no project account yet). */
