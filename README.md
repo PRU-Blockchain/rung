@@ -127,6 +127,16 @@ Planned, in this order:
 - **The Solana dApp Store.** Rung is a native Android app; listing it there is the first place to meet buyers on mobile.
 - **A bolder ladder** for buyers who want to be sure to buy. Today the program caps a ladder at 30%. In the [replay](measure/replay/results/replay-2026-11-24.md), 15 → 25 → 35 → 50% filled as often as one buy at 25% (launches: 95.0% against 94.8%) with about half the room in the block where it fills (191 against 390 SOL). It needs a program change.
 
+## Why we built this
+
+> When I was buying memecoins I got sandwiched a lot. Chasing coins at launch, I had no idea how to set slippage; so that I would not miss the token I typed something like 50%, and many times I bought far too high.
+>
+> I did not realise it at the time. But when the chance to build something on Solana came up, the first thing I thought was: could I solve this? So that is what I went for.
+>
+> We know this is a problem that can really be solved. And we want to solve it.
+>
+> — Buğra Yavaşcan
+
 ## How it works
 
 ```mermaid
